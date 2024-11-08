@@ -35,7 +35,7 @@ Key                | Description
 
 Page                                     | Address
 -----------------------------------------|-----------------------------
-Start page for LFP Service               | `/late-filing-penalty`
+Start page for Penalty Service           | `/late-filing-penalty`
 Tell us your penalty details             | `/late-filing-penalty/enter-details`
 
 ## Terraform ECS

@@ -111,7 +111,7 @@ variable "use_set_environment_files" {
   description = "Toggle default global and shared environment files"
 }
 
-variable "lfp_pay_web_version" {
+variable "pps_pay_web_version" {
   type        = string
-  description = "The version of the lfp-pay-web container to run."
+  description = "The version of the pps-pay-web container to run."
 }
