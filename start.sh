@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Start script for lfp-pay-web
+# Start script for pps-pay-web
 
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ -z "${MESOS_SLAVE_PID}" ]]; then
     source ~/.chs_env/private_env
     source ~/.chs_env/global_env
-    source ~/.chs_env/lfp-pay-web/env
+    source ~/.chs_env/pps-pay-web/env
 
-    PORT="${LFP_PAY_WEB_PORT}"
+    PORT="${PPS_PAY_WEB_PORT}"
 else
     PORT="$1"
     CONFIG_URL="$2"
@@ -27,5 +27,5 @@ else
     source "${APP_DIR}/app_env"
 fi
 
-#exec java ${JAVA_MEM_ARGS} -jar -Dserver.port="${PORT}" "${APP_DIR}/lfp-pay-web.jar"
-exec java ${JAVA_MEM_ARGS} -Djava.util.logging.config.file="${APP_DIR}/logging.properties" -jar -Dserver.port="${PORT}" "${APP_DIR}/lfp-pay-web.jar"
+#exec java ${JAVA_MEM_ARGS} -jar -Dserver.port="${PORT}" "${APP_DIR}/pps-pay-web.jar"
+exec java ${JAVA_MEM_ARGS} -Djava.util.logging.config.file="${APP_DIR}/logging.properties" -jar -Dserver.port="${PORT}" "${APP_DIR}/pps-pay-web.jar"
