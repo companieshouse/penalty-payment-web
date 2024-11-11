@@ -1,4 +1,4 @@
-# Companies House Late Filing Penalties Web Service
+# Companies House Penalties Payment Web Service
 The Companies House Web Service for handling payments of penalties. This application is written using the [Spring Boot](http://projects.spring.io/spring-boot/) Java framework.
 
 - Retrieves Payable penalties from the PPS-PAY-API service
