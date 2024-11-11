@@ -77,8 +77,7 @@ public class EnterPPSDetailsController extends BaseController {
             return getTemplateName();
         }
 
-        String companyNumber = companyService.appendToCompanyNumber(
-                enterPPSDetails.getCompanyNumber().toUpperCase());
+        String companyNumber = companyService.appendToCompanyNumber(enterPPSDetails.getCompanyNumber().toUpperCase());
         String penaltyNumber = enterPPSDetails.getPenaltyNumber();
 
         try {
