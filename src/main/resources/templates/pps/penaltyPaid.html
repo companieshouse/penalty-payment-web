@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title th:text="'Penalties for ' + ${companyName}"></title>
+    <title th:text="'Late filing penalties for ' + ${companyName}"></title>
 </head>
 
 <div id="no-payment-found-main-content" layout:fragment="content">
@@ -13,7 +13,7 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    Penalty for
+                    Late filing penalty for
                     <span class="govuk-heading-xl" id="company-name" th:text="${companyName}"></span>
                 </h1>
                 <p class="govuk-body-l">

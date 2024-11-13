@@ -10,12 +10,12 @@
     </title>
 </head>
 
-    <div id="pps-enter-details"  layout:fragment="content">
-        <form id="ppsenterdetails" th:action="@{''}" th:object="${enterPPSDetails}" method="post" class="form">
+    <div id="lfp-enter-details"  layout:fragment="content">
+        <form id="lfpenterdetails" th:action="@{''}" th:object="${enterLFPDetails}" method="post" class="form">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
 
-                    <div th:replace="fragments/ppsGlobalErrors :: globalErrors"></div>
+                    <div th:replace="fragments/lfpGlobalErrors :: globalErrors"></div>
 
                     <h1 id="page-title " class="govuk-heading-xl">
                         <span id="page-title-heading">Tell us your penalty details</span>
