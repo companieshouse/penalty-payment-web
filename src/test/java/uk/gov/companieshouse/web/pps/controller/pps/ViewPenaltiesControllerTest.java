@@ -16,7 +16,7 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
@@ -45,7 +45,7 @@ class ViewPenaltiesControllerTest {
     private PenaltyPaymentService mockPenaltyPaymentService;
 
     @Mock
-    private PayablePenaltyPaymentService mockPayablePenaltyPaymentService;
+    private PayablePenaltyService mockPayablePenaltyService;
 
     @Mock
     private CompanyService mockCompanyService;
@@ -183,7 +183,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(view().name(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER));
 
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
-        verify(mockPayablePenaltyPaymentService, times(1))
+        verify(mockPayablePenaltyService, times(1))
                 .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
                 .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
@@ -216,7 +216,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(view().name(ERROR_VIEW));
 
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
-        verify(mockPayablePenaltyPaymentService, times(1))
+        verify(mockPayablePenaltyService, times(1))
                 .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
 
     }
@@ -237,7 +237,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(view().name(ERROR_VIEW));
 
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
-        verify(mockPayablePenaltyPaymentService, times(1))
+        verify(mockPayablePenaltyService, times(1))
                 .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
                 .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
@@ -263,7 +263,7 @@ class ViewPenaltiesControllerTest {
                                                PayableLateFilingPenaltySession payableLateFilingPenaltySession)
             throws ServiceException {
 
-        when(mockPayablePenaltyPaymentService.createLateFilingPenaltySession(companyNumber, penaltyNumber, lateFilingPenalty.getOutstanding()))
+        when(mockPayablePenaltyService.createLateFilingPenaltySession(companyNumber, penaltyNumber, lateFilingPenalty.getOutstanding()))
                 .thenReturn(payableLateFilingPenaltySession);
     }
 
@@ -303,7 +303,7 @@ class ViewPenaltiesControllerTest {
     private void configureErrorCreatingLateFilingPenalty(String companyNumber, String penaltyNumber, LateFilingPenalty lateFilingPenalty)
             throws ServiceException {
 
-        doThrow(ServiceException.class).when(mockPayablePenaltyPaymentService)
+        doThrow(ServiceException.class).when(mockPayablePenaltyService)
                 .createLateFilingPenaltySession(companyNumber, penaltyNumber, lateFilingPenalty.getOutstanding());
     }
 

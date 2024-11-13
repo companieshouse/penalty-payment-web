@@ -4,7 +4,7 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 
-public interface PayablePenaltyPaymentService {
+public interface PayablePenaltyService {
 
     PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String penaltyId) throws ServiceException;
 

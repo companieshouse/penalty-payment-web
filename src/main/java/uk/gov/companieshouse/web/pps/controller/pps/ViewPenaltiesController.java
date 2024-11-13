@@ -16,7 +16,7 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +45,7 @@ public class ViewPenaltiesController extends BaseController {
     private PenaltyPaymentService penaltyPaymentService;
 
     @Autowired
-    private PayablePenaltyPaymentService payablePenaltyPaymentService;
+    private PayablePenaltyService payablePenaltyService;
 
     @Autowired
     private PaymentService paymentService;
@@ -111,7 +111,7 @@ public class ViewPenaltiesController extends BaseController {
             LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber).get(0);
 
             // Create payable session
-            payableLateFilingPenaltySession = payablePenaltyPaymentService.createLateFilingPenaltySession(
+            payableLateFilingPenaltySession = payablePenaltyService.createLateFilingPenaltySession(
                     companyNumber,
                     penaltyNumber,
                     lateFilingPenalty.getOutstanding());

@@ -20,7 +20,7 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PayablePenaltyPaymentServiceImplTest {
+class PayablePenaltyServiceImplTest {
 
     @Mock
     private ApiClient apiClient;
@@ -55,7 +55,7 @@ class PayablePenaltyPaymentServiceImplTest {
     private ApiResponse<PayableLateFilingPenalty> payableLateFilingPenaltyApiResponse;
 
     @InjectMocks
-    private PayablePenaltyPaymentService mockPayablePenaltyPaymentService = new PayablePenaltyPaymentServiceImpl();
+    private PayablePenaltyService mockPayablePenaltyService = new PayablePenaltyServiceImpl();
 
     private static final String COMPANY_NUMBER = "12345678";
 
@@ -92,7 +92,7 @@ class PayablePenaltyPaymentServiceImplTest {
         when(payableLateFilingPenaltyApiResponse.getData()).thenReturn(validLateFilingPenalty);
 
         PayableLateFilingPenalty payableLateFilingPenalty =
-                mockPayablePenaltyPaymentService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
 
         assertEquals(payableLateFilingPenalty, validLateFilingPenalty);
     }
@@ -105,7 +105,7 @@ class PayablePenaltyPaymentServiceImplTest {
         when(payableLateFilingPenaltyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyPaymentService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
     }
 
     @Test
@@ -116,7 +116,7 @@ class PayablePenaltyPaymentServiceImplTest {
         when(payableLateFilingPenaltyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyPaymentService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
     }
 
     /**
@@ -134,7 +134,7 @@ class PayablePenaltyPaymentServiceImplTest {
         when(sessionResponseWithData.getData()).thenReturn(payableLateFilingPenaltySession);
 
         PayableLateFilingPenaltySession createdLateFilingPenaltySession =
-                mockPayablePenaltyPaymentService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT);
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT);
 
         assertEquals(createdLateFilingPenaltySession, payableLateFilingPenaltySession);
     }
@@ -148,7 +148,7 @@ class PayablePenaltyPaymentServiceImplTest {
         when(payableLateFilingPenaltyCreate.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyPaymentService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
     }
 
     @Test
@@ -160,6 +160,6 @@ class PayablePenaltyPaymentServiceImplTest {
         when(payableLateFilingPenaltyCreate.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyPaymentService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
     }
 }

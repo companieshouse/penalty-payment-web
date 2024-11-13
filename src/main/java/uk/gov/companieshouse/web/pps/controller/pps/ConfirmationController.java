@@ -11,7 +11,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class ConfirmationController extends BaseController {
     }
 
     @Autowired
-    private PayablePenaltyPaymentService payablePenaltyPaymentService;
+    private PayablePenaltyService payablePenaltyService;
 
     @Autowired
     private SessionService sessionService;
@@ -69,7 +69,7 @@ public class ConfirmationController extends BaseController {
             LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
             PayableLateFilingPenalty payableLateFilingPenalty;
             try {
-                payableLateFilingPenalty = payablePenaltyPaymentService
+                payableLateFilingPenalty = payablePenaltyService
                         .getPayableLateFilingPenalty(companyNumber, penaltyId);
             } catch (ServiceException ex) {
                 LOGGER.errorRequest(request, ex.getMessage(), ex);

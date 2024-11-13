@@ -13,12 +13,12 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.api.model.latefilingpenalty.Transaction;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 
 import java.util.Collections;
 
 @Service
-public class PayablePenaltyPaymentServiceImpl implements PayablePenaltyPaymentService {
+public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     private static final UriTemplate GET_PAYABLE_LFP_URI =
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{penaltyId}");
