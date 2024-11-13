@@ -8,7 +8,7 @@
 <div th:fragment="globalErrors" th:if="${#fields.hasErrors('*')}">
     <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">
         <h2 class="govuk-error-summary__title" id="error-summary-heading">We couldn't find your penalty details</h2>
-        <p id="error-summary-subheading">You must provide a company number and penalty reference to pay a penalty.</p>
+        <p id="error-summary-subheading">You must provide a company number and penalty reference to pay a late filing penalty.</p>
         <ul class="govuk-list govuk-error-summary__list" id="error-text">
             <li th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? globalerr : fielderr">
                 <div>

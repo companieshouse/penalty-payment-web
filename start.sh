@@ -9,7 +9,7 @@ if [[ -z "${MESOS_SLAVE_PID}" ]]; then
     source ~/.chs_env/global_env
     source ~/.chs_env/penalty-payment-web/env
 
-    PORT="${PPS_PAY_WEB_PORT}"
+    PORT="${Penalty_Payment_WEB_PORT}"
 else
     PORT="$1"
     CONFIG_URL="$2"

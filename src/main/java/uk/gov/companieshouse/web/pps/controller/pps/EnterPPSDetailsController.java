@@ -48,7 +48,7 @@ public class EnterPPSDetailsController extends BaseController {
 
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
-    private static final String ENTER_PPS_DETAILS_MODEL_ATTR = "enterPPSDetails";
+    private static final String ENTER_LFP_DETAILS_MODEL_ATTR = "enterLFPDetails";
     private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
 
     @Override protected String getTemplateName() {
@@ -57,7 +57,7 @@ public class EnterPPSDetailsController extends BaseController {
 
     @GetMapping
     public String getPPSEnterDetails(Model model) {
-        model.addAttribute(ENTER_PPS_DETAILS_MODEL_ATTR, new EnterPPSDetails());
+        model.addAttribute(ENTER_LFP_DETAILS_MODEL_ATTR, new EnterPPSDetails());
 
         addBackPageAttributeToModel(model);
 
@@ -65,7 +65,7 @@ public class EnterPPSDetailsController extends BaseController {
     }
 
     @PostMapping
-    public String postPPSEnterDetails(@ModelAttribute(ENTER_PPS_DETAILS_MODEL_ATTR) @Valid EnterPPSDetails enterPPSDetails,
+    public String postPPSEnterDetails(@ModelAttribute(ENTER_LFP_DETAILS_MODEL_ATTR) @Valid EnterPPSDetails enterPPSDetails,
                                       BindingResult bindingResult,
                                       HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 
@@ -87,7 +87,7 @@ public class EnterPPSDetailsController extends BaseController {
 
                 redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
                 redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
-                redirectAttributes.addFlashAttribute(ENTER_PPS_DETAILS_MODEL_ATTR, enterPPSDetails);
+                redirectAttributes.addFlashAttribute(ENTER_LFP_DETAILS_MODEL_ATTR, enterPPSDetails);
 
             // If there are no payable late filing penalties either the company does not exist or has no penalties.
             if (payableLateFilingPenalties.isEmpty()) {

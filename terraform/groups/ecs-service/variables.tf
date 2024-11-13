@@ -111,7 +111,7 @@ variable "use_set_environment_files" {
   description = "Toggle default global and shared environment files"
 }
 
-variable "pps_pay_web_version" {
+variable "penalty_payment_web_version" {
   type        = string
   description = "The version of the penalty-payment-web container to run."
 }
