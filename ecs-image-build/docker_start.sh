@@ -1,5 +1,5 @@
 #!/bin/bash 
-# Start script for pps-pay-web
+# Start script for penalty-payment-web
 
 PORT=8080
-exec java -jar -Dserver.port="${PORT}" "pps-pay-web.jar"
+exec java -jar -Dserver.port="${PORT}" "penalty-payment-web.jar"

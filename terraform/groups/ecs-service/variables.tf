@@ -113,5 +113,5 @@ variable "use_set_environment_files" {
 
 variable "pps_pay_web_version" {
   type        = string
-  description = "The version of the pps-pay-web container to run."
+  description = "The version of the penalty-payment-web container to run."
 }

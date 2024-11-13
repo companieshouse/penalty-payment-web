@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>pps-pay-web</artifactId>
+    <artifactId>penalty-payment-web</artifactId>
     <version>unversioned</version>
-    <name>pps-pay-web</name>
+    <name>penalty-payment-web</name>
     <description>Companies House Service for paying penalties and associated fees</description>
     <parent>
         <groupId>uk.gov.companieshouse</groupId>
@@ -241,7 +241,7 @@
                         <image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/ci-corretto-build-21:latest</image>
                     </from>
                     <to>
-                        <image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/local/pps-pay-web:latest</image>
+                        <image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/local/penalty-payment-web:latest</image>
                     </to>
                     <container>
                         <expandClasspathDependencies>true</expandClasspathDependencies>
