@@ -1,5 +1,5 @@
 #!/bin/bash 
-# Start script for penalty-payment-web
+# Start script for lfp-pay-web
 
 PORT=8080
-exec java -jar -Dserver.port="${PORT}" "penalty-payment-web.jar"
+exec java -jar -Dserver.port="${PORT}" "lfp-pay-web.jar"

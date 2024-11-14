@@ -12,7 +12,7 @@ import uk.gov.companieshouse.web.pps.interceptor.LoggingInterceptor;
 @SpringBootApplication
 public class PPSWebApplication implements WebMvcConfigurer {
 
-    public static final String APPLICATION_NAME_SPACE = "penalty-payment-web";
+    public static final String APPLICATION_NAME_SPACE = "lfp-pay-web";
 
     private UserDetailsInterceptor userDetailsInterceptor;
     private LoggingInterceptor loggingInterceptor;

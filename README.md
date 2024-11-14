@@ -24,7 +24,7 @@ In order to run this Web App locally you will need to install:
 
 Key                | Description
 -------------------|------------------------------------
-`Penalty_Payment_WEB_PORT` |The port of the Penalty-Payment-WEB service
+`PENALTY_PAYMENT_WEB_PORT` |The port of the Penalty-Payment-WEB service
 `HUMAN_LOG`        |For human readable logs
 `CH_BANK_ACC_NUM`  |Companies House Bank account number (for penalty start page)
 `CH_BANK_SORT_CODE`|Companies House Bank sort code (for penalty start page)
@@ -46,11 +46,11 @@ The code present in this repository is used to define and deploy a dockerised co
 This is done by calling a [module](https://github.com/companieshouse/terraform-modules/tree/main/aws/ecs) from terraform-modules. Application specific attributes are injected and the service is then deployed using Terraform via the CICD platform 'Concourse'.
 
 
-Application specific attributes | Value                                                                                                                                                                                                                                      | Description
-:---------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------
-**ECS Cluster**        | company-requests                                                                                                                                                                                                                           | ECS cluster (stack) the service belongs to
-**Load balancer**      | {env}-chs-chgovuk                                                                                                                                                                                                                          | The load balancer that sits in front of the service
-**Concourse pipeline**     | [Pipeline link](https://ci-platform.companieshouse.gov.uk/teams/team-development/pipelines/penalty-payment-web) <br> [Pipeline code](https://github.com/companieshouse/ci-pipelines/blob/master/pipelines/ssplatform/team-development/penalty-payment-web) | Concourse pipeline link in shared services
+Application specific attributes | Value                                | Description
+:---------|:-----------------------------------------------------------------------------|:-----------
+**ECS Cluster**        | company-requests                                  | ECS cluster (stack) the service belongs to
+**Load balancer**      | {env}-chs-chgovuk                                | The load balancer that sits in front of the service
+**Concourse pipeline**     |[Pipeline link](https://ci-platform.companieshouse.gov.uk/teams/team-development/pipelines/lfp-pay-web) <br> [Pipeline code](https://github.com/companieshouse/ci-pipelines/blob/master/pipelines/ssplatform/team-development/lfp-pay-web)                                  | Concourse pipeline link in shared services
 
 
 ### Contributing
