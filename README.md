@@ -11,7 +11,7 @@ In order to run this Web App locally you will need to install:
 - [Maven](https://maven.apache.org/download.cgi)
 - [Git](https://git-scm.com/downloads)
 - [Payments API](https://github.com/companieshouse/payments.api.ch.gov.uk)
-- [PPS API](https://github.com/companieshouse/pps-pay-api)
+- [PENALTY PAYMENT API](https://github.com/companieshouse/penalty-payment-api)
 
 ### Getting Started
 

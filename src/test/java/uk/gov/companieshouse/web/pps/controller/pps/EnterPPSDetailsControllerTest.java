@@ -77,7 +77,7 @@ class EnterPPSDetailsControllerTest {
 
     private static final String ENTER_PPS_DETAILS_VIEW = "pps/details";
 
-    private static final String ENTER_PPS_DETAILS_MODEL_ATTR = "enterPPSDetails";
+    private static final String ENTER_LFP_DETAILS_MODEL_ATTR = "enterLFPDetails";
     
     private static final String PENALTY_NUMBER_ATTRIBUTE = "penaltyNumber";
 
@@ -101,7 +101,7 @@ class EnterPPSDetailsControllerTest {
         this.mockMvc.perform(get(ENTER_PPS_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
-                .andExpect(model().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(model().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
     }
 
@@ -114,8 +114,8 @@ class EnterPPSDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeErrorCount(ENTER_PPS_DETAILS_MODEL_ATTR, 1));
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeErrorCount(ENTER_LFP_DETAILS_MODEL_ATTR, 1));
     }
 
     @Test
@@ -130,7 +130,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, LOWER_CASE_LLP))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(MOCK_CONTROLLER_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(UPPER_CASE_LLP);
@@ -148,7 +148,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, UPPER_CASE_LLP))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(MOCK_CONTROLLER_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(UPPER_CASE_LLP);
@@ -163,8 +163,8 @@ class EnterPPSDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeErrorCount(ENTER_PPS_DETAILS_MODEL_ATTR, 1));
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeErrorCount(ENTER_LFP_DETAILS_MODEL_ATTR, 1));
     }
 
     @Test
@@ -175,9 +175,9 @@ class EnterPPSDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeErrorCount(ENTER_PPS_DETAILS_MODEL_ATTR, 2));
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeErrorCount(ENTER_LFP_DETAILS_MODEL_ATTR, 2));
     }
 
     @Test
@@ -189,9 +189,9 @@ class EnterPPSDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeHasFieldErrors(ENTER_PPS_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeErrorCount(ENTER_PPS_DETAILS_MODEL_ATTR, 2));
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, PENALTY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeHasFieldErrors(ENTER_LFP_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
+                .andExpect(model().attributeErrorCount(ENTER_LFP_DETAILS_MODEL_ATTR, 2));
     }
 
     @Test
@@ -205,7 +205,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(NO_PENALTY_FOUND_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -223,7 +223,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -241,7 +241,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(NO_PENALTY_FOUND_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -259,7 +259,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(DCA_PAYMENTS_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -277,7 +277,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(ALREADY_PAID_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -295,7 +295,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -314,7 +314,7 @@ class EnterPPSDetailsControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR));
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
     }
@@ -331,7 +331,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -349,7 +349,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeErrorCount(ENTER_PPS_DETAILS_MODEL_ATTR, 0))
+                .andExpect(model().attributeErrorCount(ENTER_LFP_DETAILS_MODEL_ATTR, 0))
                 .andExpect(view().name(ERROR_PAGE));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -367,7 +367,7 @@ class EnterPPSDetailsControllerTest {
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_PPS_DETAILS_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
                 .andExpect(view().name(MOCK_CONTROLLER_PATH));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
