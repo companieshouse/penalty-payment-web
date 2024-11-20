@@ -39,6 +39,15 @@ public class WebSecurity {
 
     @Bean
     @Order(4)
+    protected SecurityFilterChain whichPenaltyServiceSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/late-filing-penalty/bank-transfer/**");
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(5)
         public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(http
                 .securityMatcher("/late-filing-penalty/**")
