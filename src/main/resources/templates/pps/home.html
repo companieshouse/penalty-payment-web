@@ -14,107 +14,100 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl" id="main-heading">
-                    Pay a penalty for filing your company accounts late
+                    Pay a penalty to Companies House
                 </h1>
-                <p class="govuk-body-l">Use this service to pay
-                    a company's late filing penalty.</p>
-
+                <p class="govuk-body-l">Use this service to make an online payment by credit or debit card if you've
+                    received a penalty notice from Companies House.</p>
                 <p class="govuk-body">You'll need:</p>
                 <ul class="govuk-list govuk-list--bullet" id="list-requirements">
-                    <li>the company number</li>
-                    <li>the reference number on the penalty notice</li>
-                    <li>to sign in to or create a Companies House account, which is different from a WebFiling account</li>
+                    <li>to sign in to or create a Companies House account (this is different to a WebFiling account)
+                    </li>
                     <li>a credit or debit card</li>
+                    <li>the information on your penalty notice (that we sent you in the post)</li>
                 </ul>
 
-                <p class="govuk-body">
-                    You can
-                    <a class="govuk-link govuk-link--no-visited-state" id="appeals-link"
-                       data-event-id="lfp - appeal a penalty link" href="/appeal-a-penalty/">
-                        appeal a late filing penalty</a>
-                    , but you'll need to show that the reasons for filing late were exceptional.
-                </p>
-
-                <p class="govuk-body">It takes around 5 minutes to pay.</p>
-                <div class="form-group">
-                    <input id="next-button" class="govuk-button" data-event-id="lfp - Start now"
-                           onclick="_paq.push(['trackGoal', 3]);" type="submit" role="button" value="Start now"/>
+                <div class="govuk-!-margin-top-6">
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">I've lost my penalty notice
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <p class="govuk-body"> Email <a href="mailto:enquiries@companieshouse.gov.uk"
+                                                            class="govuk-link">enquiries@companieshouse.gov.uk</a> to
+                                let us know if you have lost your penalty notice. Use 'Lost penalty notice' as the email
+                                subject.
+                            </p>
+                            <p></p>Tell us as much information as you can about the penalty so we can pass your message
+                            to the right team.
+                        </div>
+                    </details>
                 </div>
 
-                <p class="govuk-body"></p>
-                <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                     <span class="govuk-details__summary-text">
-                         Other ways to pay a penalty
-                     </span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        <h2 class="govuk-heading-m">Pay by Bacs</h2>
-                        <p class="govuk-body">
-                            You can pay using Bacs payment.
-                        </p>
-                        <p class="govuk-body">
-                            It usually takes up to 3 working days for your payment to reach Companies House. Check your
-                            bank's transaction limits and processing times before making a payment.
-                        </p>
-                        <p class="govuk-body">
-                            You'll need to use the Companies House sort code, account number and account name.
-                        </p>
-                        <div class="govuk-details__text" aria-hidden="true" id="banking-details">
-                            <p th:text="'Sort code: ' + ${@environment.getProperty('chBankSortCode')}"></p>
-                            <p th:text="'Account number: ' + ${@environment.getProperty('chBankAccNumber')}"></p>
-                            <p th:text="'Account name: ' + ${@environment.getProperty('chBankAccName')}"></p>
+                <p class="govuk-body">You must pay the full amount.</p>
+                <p class="govuk-body">It takes around 5 minutes to pay.</p>
+
+                <a href="what-does-the-penalty-reference-start-with" role="button" draggable="false"
+                   class="govuk-button govuk-button--start" data-module="govuk-button" data-event-id="pps - Start now"
+                   onclick="_paq.push(['trackGoal', 3]);">Start now
+                    <!--Waiting for SAN-29 to complete link above (line 50)-->
+                    <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19"
+                         viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
+                    </svg>
+                </a>
+
+                <p class="govuk-body">
+                    <a href="https://www.gov.uk/government/publications/companies-house-approach-to-financial-penalties"
+                       class="govuk-link">Read the guidance for more information about Companies House penalties</a>.
+                </p>
+
+                <div class="govuk-!-margin-top-6">
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text"> Pay by bank transfer</span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <p class="govuk-body">This payment method usually takes longer to process (up to 4 working
+                                days). <a href="bank-transfer/which-penalty-service" class="govuk-link">Find out which
+                                    account details to use for a bank transfer</a>.
+                                <!--Waiting for SAN-71 to complete link above (line 72)--></p>
                         </div>
-                        <p class="govuk-body"></p>
-                        <h2 class="govuk-heading-m">Paying from an overseas account</h2>
-                        <p class="govuk-body">
-                            You can pay through a bank transfer from an overseas account.
-                        </p>
-                        <p class="govuk-body">
-                            You'll need to use Companies House swift code, account number and account name.
-                        </p>
-                        <div class="govuk-details__text" aria-hidden="true" id="overseas-banking-details">
-                            <p class="govuk-body">Swift Code: NW BK GB 2L</p>
-                            <p class="govuk-body">Account Number (IBAN): GB 79 NWBK 607080 10031154 </p>
-                            <p class="govuk-body">Account name: Late Filing Penalties Receipts</p>
+                    </details>
+                </div>
+
+                <div class="govuk-!-margin-top-6">
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text"> I want to appeal a penalty </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <h3 class="govuk-heading-s">If you have a late filing penalty</h3>
+                            This option is only for penalties for late filing of accounts. You can <a
+                                href="https://www.gov.uk/appeal-a-penalty-for-filing-your-company-accounts-late"
+                                class="govuk-link">appeal a late filing penalty (for filing accounts late) through
+                            Companies House</a>. You must show that the reasons are exceptional.<p></p>
+                            <h3 class="govuk-heading-s">If you have any other type of penalty</h3>
+                            <p></p>
+                            You can only appeal through the courts. <a
+                                href="https://www.advicenow.org.uk/guides/appealing-against-county-court-decision"
+                                class="govuk-link">Read guidance from Advicenow</a> or contact a solicitor for help with
+                            this.<p></p>
+                            You have 28 days from when the penalty was issued to make an appeal. If you've submitted an
+                            appeal to the courts, you need to <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">
+                            tell us by email or in writing </a>(within 7 days).<p></p>
+                            <p></p>
+                            You cannot appeal directly to Companies House, and we are not able to offer legal advice.
                         </div>
-                        <p class="govuk-body"></p>
-                        <p class="govuk-body">Email the LFP finance team at Companies House to tell them you've paid.
-                            Include in your email the:</p>
-                        <ul class="govuk-list govuk-list--bullet" id="list-requirements-overseas-payments">
-                            <li>company number</li>
-                            <li>company name</li>
-                            <li>reference number on the penalty notice</li>
-                            <li>amount paid</li>
-                            <li>date paid</li>
-                        </ul>
-                        <div class="govuk-details__text" aria-hidden="true" id="companies-house-finance-team-email">
-                            <p class="govuk-body">LFP finance team, Companies House <a
-                                    href="mailto:lfpfinance@companieshouse.gov.uk">lfpfinance@companieshouse.gov.uk</a>
-                            </p>
-                        </div>
-                        <p class="govuk-body"></p>
-                        <h2 class="govuk-heading-m">Pay by cheque</h2>
-                        <p class="govuk-body">You can pay by cheque through the post. Make the cheque payable to
-                            'Companies House only' and send it along with the slip on the penalty notice ('remittance
-                            advice') to Companies House.</p>
-                        <div class="govuk-details__text" aria-hidden="true" id="companies-house-address-cheque">
-                            <p>Companies House
-                                <br>
-                                PO Box 710
-                                <br>
-                                Crown Way
-                                <br>
-                                CF14 3UZ
-                            </p>
-                        </div>
-                        <p class="govuk-body"></p>
-                        <p class="govuk-body">Write the company name and number on the back of the cheque. You'll find
-                            the company number on your penalty notice.</p>
-                    </div>
-                </details>
+                    </details>
+                    <br>
+                    <p class="govuk-body"><a href="https://mcmw.abilitynet.org.uk/" class="govuk-link">Read advice from
+                        AbilityNet on how to adapt your device to meet your needs</a>. For example, changing the
+                        background colour or text size.</p>
+                </div>
             </div>
         </div>
     </form>
 </div>
 </html>
+
