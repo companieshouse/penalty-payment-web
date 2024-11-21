@@ -27,16 +27,16 @@
         <api-sdk-java.version>6.0.19</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.3.3</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>3.3.4</spring-boot-dependencies.version>
         <spring-boot-maven-plugin.version>3.3.3</spring-boot-maven-plugin.version>
 
-        <spring-test.version>6.1.9</spring-test.version>
+        <spring-test.version>6.1.14</spring-test.version>
         <spring-security.version>6.3.4</spring-security.version>
         <json.version>20240303</json.version>
         <!-- Maven and Surefire plugins -->
         <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <spring-web-version>6.1.15</spring-web-version>
+        <spring-web-version>6.1.14</spring-web-version>
         <hamcrest-version>3.0-rc1</hamcrest-version>
         <maven-plugin>3.4.0</maven-plugin>
         <jib-maven-plugin>3.4.2</jib-maven-plugin>
