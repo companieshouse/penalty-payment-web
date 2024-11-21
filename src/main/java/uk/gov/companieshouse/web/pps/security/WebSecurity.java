@@ -39,7 +39,7 @@ public class WebSecurity {
 
     @Bean
     @Order(4)
-    protected SecurityFilterChain whichPenaltyServiceSecurityFilterChain(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain bankTransferSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/late-filing-penalty/bank-transfer/**");
         return http.build();

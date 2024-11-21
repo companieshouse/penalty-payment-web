@@ -24,8 +24,8 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 public class BankTransferPenaltyReferenceController extends BaseController {
     private static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
 
-    private static final String PPS_BANK_TRANSFER_LATE_FILING_LINK = "/late-filing-penalty/bank-transfer/late-filing-details";
-    private static final String PPS_BANK_TRANSFER_SANCTIONS_LINK = "/late-filing-penalty/bank-transfer/sanctions-details";
+    private static final String PPS_BANK_TRANSFER_LATE_FILING_PATH = "/late-filing-penalty/bank-transfer/late-filing-details";
+    private static final String PPS_BANK_TRANSFER_SANCTIONS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
 
     private static final String PPS_AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     private static final String PPS_PENALTY_REF_ATTR = "penaltyReferences";
@@ -61,9 +61,9 @@ public class BankTransferPenaltyReferenceController extends BaseController {
         }
 
         if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.A.getPenaltyReference())){
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_LATE_FILING_LINK;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_LATE_FILING_PATH;
         } else if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.PN.getPenaltyReference())) {
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_SANCTIONS_LINK;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_SANCTIONS_PATH;
         }
         return ERROR_VIEW;
     }
