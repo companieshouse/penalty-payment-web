@@ -24,7 +24,11 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 public class BankTransferPenaltyReferenceController extends BaseController {
     private static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
 
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String PPS_BANK_TRANSFER_LATE_FILING_LINK = "/late-filing-penalty/bank-transfer/late-filing-details";
+    private static final String PPS_BANK_TRANSFER_SANCTIONS_LINK = "/late-filing-penalty/bank-transfer/sanctions-details";
+
+    private static final String PPS_AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
+    private static final String PPS_PENALTY_REF_ATTR = "penaltyReferences";
 
     @Override
     protected String getTemplateName() {
@@ -33,8 +37,8 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     @GetMapping
     public String getPenaltyReference(Model model) {
-        model.addAttribute("availablePenaltyReference", getAvailablePenaltyReferenceDisplay());
-        model.addAttribute("penaltyReferences", new PenaltyReferenceChoice());
+        model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR, getAvailablePenaltyReferenceDisplay());
+        model.addAttribute(PPS_PENALTY_REF_ATTR, new PenaltyReferenceChoice());
 
         addBackPageAttributeToModel(model);
 
@@ -43,7 +47,7 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     @PostMapping
     public String postPenaltyReference(
-            @Valid @ModelAttribute("penaltyReferences") PenaltyReferenceChoice penaltyReferenceChoice,
+            @Valid @ModelAttribute(PPS_PENALTY_REF_ATTR) PenaltyReferenceChoice penaltyReferenceChoice,
             BindingResult bindingResult,
             Model model
     ) {
@@ -52,14 +56,16 @@ public class BankTransferPenaltyReferenceController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            model.addAttribute("availablePenaltyReference", getAvailablePenaltyReferenceDisplay());
+            model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR, getAvailablePenaltyReferenceDisplay());
             return getTemplateName();
         }
 
         if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.A.getPenaltyReference())){
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/late-filing-penalty/bank-transfer/late-filing-details";
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_LATE_FILING_LINK;
+        } else if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.PN.getPenaltyReference())) {
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_SANCTIONS_LINK;
         }
-        return UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/late-filing-penalty/bank-transfer/sanctions-details";
+        return ERROR_VIEW;
     }
 
     private List<String> getAvailablePenaltyReferenceDisplay() {
