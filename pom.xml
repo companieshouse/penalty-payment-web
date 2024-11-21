@@ -36,7 +36,7 @@
         <!-- Maven and Surefire plugins -->
         <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <spring-web-version>6.1.12</spring-web-version>
+        <spring-web-version>6.1.15</spring-web-version>
         <hamcrest-version>3.0-rc1</hamcrest-version>
         <maven-plugin>3.4.0</maven-plugin>
         <jib-maven-plugin>3.4.2</jib-maven-plugin>
