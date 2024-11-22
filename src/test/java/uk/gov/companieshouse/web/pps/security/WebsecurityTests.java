@@ -39,4 +39,12 @@ class WebsecurityTests {
         assertEquals(webSecurity.healthcheckSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/bank-transfer/**")
+    void bankTransferSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/bank-transfer/**")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+
 }
