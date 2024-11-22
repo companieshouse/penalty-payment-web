@@ -9,8 +9,8 @@ public class AvailablePenaltyReference {
 
     public List<PenaltyReference> getAvailablePenaltyReference() {
         availablePenaltyReference = new ArrayList<>();
-        availablePenaltyReference.add(PenaltyReference.A);
-        availablePenaltyReference.add(PenaltyReference.PN);
+        availablePenaltyReference.add(PenaltyReference.LATE_FILING);
+        availablePenaltyReference.add(PenaltyReference.SANCTIONS);
         return availablePenaltyReference;
     }
 

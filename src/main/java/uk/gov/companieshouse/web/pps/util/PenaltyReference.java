@@ -1,8 +1,8 @@
 package uk.gov.companieshouse.web.pps.util;
 
 public enum PenaltyReference {
-    A("A"),
-    PN("PN");
+    LATE_FILING("A"),
+    SANCTIONS("PN");
 
     private String penaltyReference;
 
