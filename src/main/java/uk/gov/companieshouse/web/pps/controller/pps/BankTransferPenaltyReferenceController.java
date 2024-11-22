@@ -60,9 +60,11 @@ public class BankTransferPenaltyReferenceController extends BaseController {
             return getTemplateName();
         }
 
-        if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.A.getPenaltyReference())){
+        if (penaltyReferenceChoice.getSelectedPenaltyReference()
+                .equals(PenaltyReference.LATE_FILING.getPenaltyReference())){
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_LATE_FILING_PATH;
-        } else if (penaltyReferenceChoice.getSelectedPenaltyReference().equals(PenaltyReference.PN.getPenaltyReference())) {
+        } else if (penaltyReferenceChoice.getSelectedPenaltyReference()
+                .equals(PenaltyReference.SANCTIONS.getPenaltyReference())) {
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + PPS_BANK_TRANSFER_SANCTIONS_PATH;
         }
         return ERROR_VIEW;
