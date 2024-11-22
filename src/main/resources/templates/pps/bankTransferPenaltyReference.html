@@ -26,7 +26,7 @@
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('selectedPenaltyReference')} ? 'govuk-form-group--error' : ''">
           <fieldset class="govuk-fieldset">
             <span class="govuk-error-message"
-                  id="selectedPaymentMethod-errorId"
+                  id="selectedPenaltyReference-errorId"
                   th:if="${#fields.hasErrors('selectedPenaltyReference')}"
                   th:each="e : ${#fields.errors('selectedPenaltyReference')}" th:text="${e}">
             </span>
