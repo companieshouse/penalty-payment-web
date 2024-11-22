@@ -19,14 +19,14 @@ public class WebSecurity {
     @Bean
     @Order(1)
     public SecurityFilterChain temporaryStartPageSecurityFilterChain(HttpSecurity http) throws Exception {
-        return ChsCsrfMitigationHttpSecurityBuilder.configureApiCsrfMitigations(
+        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty")).build();
     }
 
     @Bean
     @Order(2)
         protected SecurityFilterChain accessibilityStatementPageSecurityConfig(HttpSecurity http) throws Exception {
-        return ChsCsrfMitigationHttpSecurityBuilder.configureApiCsrfMitigations(
+        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/accessibility-statement")).build();
     }
 
@@ -40,7 +40,7 @@ public class WebSecurity {
     @Bean
     @Order(4)
         public SecurityFilterChain lFPWebSecurityFilterConfig (HttpSecurity http) throws Exception {
-        return ChsCsrfMitigationHttpSecurityBuilder.configureApiCsrfMitigations(http
+        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(http
                 .securityMatcher("/late-filing-penalty/**")
                 .addFilterBefore(new SessionHandler(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
