@@ -24,6 +24,14 @@ public class WebSecurity {
     }
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/late-filing-penalty/ref-starts-with");
+        return http.build();
+    }
+
+    @Bean
     @Order(2)
         protected SecurityFilterChain accessibilityStatementPageSecurityConfig(HttpSecurity http) throws Exception {
         http
@@ -46,7 +54,6 @@ public class WebSecurity {
                 .securityMatcher("/late-filing-penalty/bank-transfer/**");
         return http.build();
     }
-
 
     @Bean
     @Order(5)

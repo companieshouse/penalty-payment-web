@@ -1,20 +1,24 @@
 package uk.gov.companieshouse.web.pps.models;
 
-import java.util.ArrayList;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
 import java.util.List;
+import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
+@Component
 public class AvailablePenaltyReference {
-    private List<PenaltyReference> availablePenaltyReference;
 
     public List<PenaltyReference> getAvailablePenaltyReference() {
-        availablePenaltyReference = new ArrayList<>();
-        availablePenaltyReference.add(PenaltyReference.LATE_FILING);
-        availablePenaltyReference.add(PenaltyReference.SANCTIONS);
-        return availablePenaltyReference;
+        return List.of(LATE_FILING, SANCTIONS);
     }
 
-    public void setAvailablePenaltyReference(List<PenaltyReference> availablePenaltyReference) {
-        this.availablePenaltyReference = availablePenaltyReference;
+    public List<String> getAvailablePenaltyReferenceDisplay() {
+        return getAvailablePenaltyReference()
+                .stream()
+                .map(PenaltyReference::getPenaltyReference)
+                .toList();
     }
+
 }

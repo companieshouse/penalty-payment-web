@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.companieshouse.web.pps.interceptor.UserDetailsInterceptor;
 import uk.gov.companieshouse.web.pps.interceptor.LoggingInterceptor;
 
-
 @SpringBootApplication
 public class PPSWebApplication implements WebMvcConfigurer {
 
@@ -31,8 +30,11 @@ public class PPSWebApplication implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loggingInterceptor);
-        registry.addInterceptor(userDetailsInterceptor).excludePathPatterns("/late-filing-penalty",
-                "/late-filing-penalty/accessibility-statement",
-                "/late-filing-penalty/bank-transfer/**");
+        registry.addInterceptor(userDetailsInterceptor)
+                .excludePathPatterns("/late-filing-penalty",
+                        "/late-filing-penalty/accessibility-statement",
+                        "/late-filing-penalty/ref-starts-with",
+                        "/late-filing-penalty/bank-transfer/**"
+                );
     }
 }
