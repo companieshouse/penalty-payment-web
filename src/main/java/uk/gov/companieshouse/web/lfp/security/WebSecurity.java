@@ -42,7 +42,6 @@ public class WebSecurity {
         public SecurityFilterChain lFPWebSecurityFilterConfig (HttpSecurity http) throws Exception {
         return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(http
                 .securityMatcher("/late-filing-penalty/**")
-                .addFilterBefore(new SessionHandler(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new UserAuthFilter(), BasicAuthenticationFilter.class)).build();
         }
