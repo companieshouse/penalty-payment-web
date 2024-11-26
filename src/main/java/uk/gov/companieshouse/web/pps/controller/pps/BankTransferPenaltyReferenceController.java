@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,9 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
-import uk.gov.companieshouse.web.pps.models.AvailablePenaltyReference;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
@@ -24,11 +24,17 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 public class BankTransferPenaltyReferenceController extends BaseController {
     private static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
 
-    private static final String PPS_BANK_TRANSFER_LATE_FILING_PATH = "/late-filing-penalty/bank-transfer/late-filing-details";
-    private static final String PPS_BANK_TRANSFER_SANCTIONS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
+    static final String PPS_AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
+    static final String PPS_PENALTY_REF_ATTR = "penaltyReferences";
 
-    private static final String PPS_AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
-    private static final String PPS_PENALTY_REF_ATTR = "penaltyReferences";
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+
+    public BankTransferPenaltyReferenceController(
+            NavigatorService navigatorService,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        this.navigatorService = navigatorService;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+    }
 
     @Override
     protected String getTemplateName() {
@@ -37,7 +43,8 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     @GetMapping
     public String getPenaltyReference(Model model) {
-        model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR, getAvailablePenaltyReferenceDisplay());
+        model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR,
+                penaltyConfigurationProperties.getAllowedRefStartsWith());
         model.addAttribute(PPS_PENALTY_REF_ATTR, new PenaltyReferenceChoice());
 
         addBackPageAttributeToModel(model);
@@ -56,27 +63,22 @@ public class BankTransferPenaltyReferenceController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR, getAvailablePenaltyReferenceDisplay());
+            model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR,
+                    penaltyConfigurationProperties.getAllowedRefStartsWith());
             return getTemplateName();
         }
 
         String penaltyRefChoiceString = penaltyReferenceChoice.getSelectedPenaltyReference();
         String redirectUrlPrefix = UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
-        if (penaltyRefChoiceString.equals(PenaltyReference.LATE_FILING.getPenaltyReference())){
-            return redirectUrlPrefix + PPS_BANK_TRANSFER_LATE_FILING_PATH;
-        } else if (penaltyRefChoiceString.equals(PenaltyReference.SANCTIONS.getPenaltyReference())) {
-            return redirectUrlPrefix + PPS_BANK_TRANSFER_SANCTIONS_PATH;
+        if (penaltyRefChoiceString.equals(PenaltyReference.LATE_FILING.getStartsWith())) {
+            return redirectUrlPrefix
+                    + penaltyConfigurationProperties.getBankTransferLateFilingDetailsPath();
+        } else if (penaltyRefChoiceString.equals(PenaltyReference.SANCTIONS.getStartsWith())) {
+            return redirectUrlPrefix
+                    + penaltyConfigurationProperties.getBankTransferSanctionsPath();
         }
         return ERROR_VIEW;
     }
 
-    private List<String> getAvailablePenaltyReferenceDisplay() {
-        AvailablePenaltyReference availablePenaltyReference = new AvailablePenaltyReference();
-        List<String> availablePenaltyReferenceDisplay = new ArrayList<>();
-        for (PenaltyReference penaltyReference : availablePenaltyReference.getAvailablePenaltyReference()) {
-            availablePenaltyReferenceDisplay.add(penaltyReference.getPenaltyReference());
-        }
-        return availablePenaltyReferenceDisplay;
-    }
 }

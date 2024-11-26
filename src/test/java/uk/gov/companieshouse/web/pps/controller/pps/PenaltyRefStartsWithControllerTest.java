@@ -8,13 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.AVAILABLE_PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.ENTER_DETAILS_PATH;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_PATH;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.companieshouse.web.pps.models.AvailablePenaltyReference;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,18 +38,28 @@ class PenaltyRefStartsWithControllerTest {
     @Mock
     private NavigatorService mockNavigatorService;
 
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     @BeforeEach
     void setup() {
+        penaltyConfigurationProperties = new PenaltyConfigurationProperties();
+        penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
+                "A", "PN"));
+        penaltyConfigurationProperties.setRefStartsWithPath(
+                "/late-filing-penalty/ref-starts-with");
+        penaltyConfigurationProperties.setEnterDetailsPath(
+                "/late-filing-penalty/enter-details");
+
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
-                new AvailablePenaltyReference());
+                penaltyConfigurationProperties);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
     void getPenaltyRefStartsWith() throws Exception {
         configurePreviousController();
-        mockMvc.perform(get(PENALTY_REF_STARTS_WITH_PATH))
+        mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
@@ -59,7 +68,7 @@ class PenaltyRefStartsWithControllerTest {
 
     @Test
     void postPenaltyRefStartsWithWhenNoneSelected() throws Exception {
-        mockMvc.perform(post(PENALTY_REF_STARTS_WITH_PATH))
+        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
@@ -69,20 +78,22 @@ class PenaltyRefStartsWithControllerTest {
 
     @Test
     void postPenaltyRefStartsWithWhenLateFilingSelected() throws Exception {
-        mockMvc.perform(post(PENALTY_REF_STARTS_WITH_PATH)
-                .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.getPenaltyReference()))
+        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
+                        .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.getStartsWith()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:" + ENTER_DETAILS_PATH));
+                .andExpect(view().name(
+                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()));
     }
 
     @Test
     void postPenaltyRefStartsWithWhenSanctionSelected() throws Exception {
-        mockMvc.perform(post(PENALTY_REF_STARTS_WITH_PATH)
-                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.getPenaltyReference()))
+        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
+                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.getStartsWith()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:" + ENTER_DETAILS_PATH));
+                .andExpect(view().name(
+                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()));
     }
 
     private void configurePreviousController() {

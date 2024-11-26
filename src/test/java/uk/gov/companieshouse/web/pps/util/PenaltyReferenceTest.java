@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 class PenaltyReferenceTest {
 
     @Test
-    void getPenaltyReferenceWhenLateFiling() {
-        assertEquals("A", LATE_FILING.getPenaltyReference());
+    void getStartsWithWhenLateFiling() {
+        assertEquals("A", LATE_FILING.getStartsWith());
     }
 
     @Test
-    void getPenaltyReferenceWhenSanction() {
-        assertEquals("PN", SANCTIONS.getPenaltyReference());
+    void getStartsWithWhenSanction() {
+        assertEquals("PN", SANCTIONS.getStartsWith());
     }
 
     @Test
@@ -31,9 +31,9 @@ class PenaltyReferenceTest {
     }
 
     @Test
-    void fromStartsWithWhenUnexpected() {
+    void fromStartsWithWhenInvalidThrowsException() {
         Throwable exception = assertThrows(IllegalArgumentException.class, () -> fromStartsWith("X"));
-        assertEquals("Penalty Reference Starts With is invalid", exception.getMessage());
+        assertEquals("Penalty Reference Starts With 'X' is invalid", exception.getMessage());
     }
 
 }
