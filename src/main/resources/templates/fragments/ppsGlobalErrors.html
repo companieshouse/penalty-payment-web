@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+</head>
+<body>
+<div th:fragment="globalErrors" th:if="${#fields.hasErrors('*')}">
+    <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">
+        <h2 class="govuk-error-summary__title" id="error-summary-heading">There is a problem</h2>
+        <ul class="govuk-list govuk-error-summary__list" id="error-text">
+            <li th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? globalerr : fielderr">
+                <div>
+                    <!-- Display 'fieldName: message' if fieldName message property is not null -->
+                    <a th:if="${#messages.msgOrNull(e.fieldName) != null}"
+                       th:href="'#' + ${e.fieldName} + '-errorId'"
+                       th:id="${e.fieldName} + '-globalErrorId'"
+                       th:text="#{${e.fieldName}} + ' ' + ${#strings.unCapitalize(e.message)}">
+                    </a>
+                    <!-- If fieldName message property is null, just display message -->
+                    <a th:if="${#messages.msgOrNull(e.fieldName) == null}"
+                       th:href="'#' + ${e.fieldName} + '-errorId'"
+                       th:id="${e.fieldName} + '-globalErrorId'"
+                       th:text="${e.message}">
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
