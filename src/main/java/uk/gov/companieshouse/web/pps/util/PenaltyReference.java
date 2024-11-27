@@ -4,13 +4,24 @@ public enum PenaltyReference {
     LATE_FILING("A"),
     SANCTIONS("PN");
 
-    private String penaltyReference;
+    private final String startsWith;
 
-    private PenaltyReference(String penaltyReference) {
-        this.penaltyReference = penaltyReference;
+    PenaltyReference(String startsWith) {
+        this.startsWith = startsWith;
     }
 
-    public String getPenaltyReference() {
-        return penaltyReference;
+    public String getStartsWith() {
+        return startsWith;
     }
+
+    public static PenaltyReference fromStartsWith(String startsWith) {
+        for (PenaltyReference pr : values()) {
+            if (pr.getStartsWith().equals(startsWith)) {
+                return pr;
+            }
+        }
+        throw new IllegalArgumentException(
+                String.format("Penalty Reference Starts With '%s' is invalid", startsWith));
+    }
+
 }
