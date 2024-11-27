@@ -18,7 +18,7 @@ import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.models.EnterPPSDetails;
+import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 
@@ -27,12 +27,12 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @Controller
-@PreviousController(PPSStartController.class)
+@PreviousController(StartController.class)
 @NextController(ViewPenaltiesController.class)
 @RequestMapping("/late-filing-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
 
-    private static final String PPS_ENTER_DETAILS = "pps/details";
+    private static final String ENTER_DETAILS = "pps/details";
 
     @Autowired
     private PenaltyPaymentService penaltyPaymentService;
@@ -40,29 +40,29 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private CompanyService companyService;
 
-    private static final String PPS_NO_PENALTY_FOUND = "/no-penalties-found";
+    private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
-    private static final String PPS_PENALTY_PAID = "/penalty-paid";
+    private static final String PENALTY_PAID = "/penalty-paid";
 
-    private static final String PPS_DCA = "/legal-fees-required";
+    private static final String DCA = "/legal-fees-required";
 
-    private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
 
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
-    private static final String ENTER_LFP_DETAILS_MODEL_ATTR = "enterLFPDetails";
+    private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
     private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
 
-    @Value("${penalty.search.notFound}")
+    @Value("${penalty.error-details-not-found}")
     private String detailsNotFound;
 
     @Override protected String getTemplateName() {
-        return PPS_ENTER_DETAILS;
+        return ENTER_DETAILS;
     }
 
     @GetMapping
-    public String getPPSEnterDetails(Model model) {
-        model.addAttribute(ENTER_LFP_DETAILS_MODEL_ATTR, new EnterPPSDetails());
+    public String getEnterDetails(Model model) {
+        model.addAttribute(ENTER_DETAILS_MODEL_ATTR, new EnterDetails());
 
         addBackPageAttributeToModel(model);
 
@@ -70,7 +70,7 @@ public class EnterDetailsController extends BaseController {
     }
 
     @PostMapping
-    public String postPPSEnterDetails(@ModelAttribute(ENTER_LFP_DETAILS_MODEL_ATTR) @Valid EnterPPSDetails enterPPSDetails,
+    public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
                                       BindingResult bindingResult,
                                       HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
 
@@ -82,8 +82,8 @@ public class EnterDetailsController extends BaseController {
             return getTemplateName();
         }
 
-        String companyNumber = companyService.appendToCompanyNumber(enterPPSDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterPPSDetails.getPenaltyNumber();
+        String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
+        String penaltyNumber = enterDetails.getPenaltyNumber();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
@@ -92,7 +92,7 @@ public class EnterDetailsController extends BaseController {
 
                 redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
                 redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
-                redirectAttributes.addFlashAttribute(ENTER_LFP_DETAILS_MODEL_ATTR, enterPPSDetails);
+                redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
             // If there are no payable late filing penalties either the company does not exist or has no penalties.
             if (payableLateFilingPenalties.isEmpty()) {
@@ -107,7 +107,7 @@ public class EnterDetailsController extends BaseController {
             if (payableLateFilingPenalties.size() > 1) {
                 LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payableLateFilingPenalties.size()
                         + " payable penalties for company no. " + companyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_ONLINE_PAYMENT_UNAVAILABLE;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
             LateFilingPenalty lateFilingPenalty;
@@ -117,19 +117,19 @@ public class EnterDetailsController extends BaseController {
             } else {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
                         + " does not have the provided penalty number " + penaltyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_NO_PENALTY_FOUND;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + NO_PENALTY_FOUND;
             }
 
             // If the payable penalty has DCA payments.
             if (Boolean.TRUE.equals(lateFilingPenalty.getDca())) {
                 LOGGER.info("Penalty has DCA payments");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_DCA;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + DCA;
             }
 
             // If the penalty is already paid.
             if (Boolean.TRUE.equals(lateFilingPenalty.getPaid())) {
                 LOGGER.info("Penalty has already been paid");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_PENALTY_PAID;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PENALTY_PAID;
             }
 
             // If the penalty has a 0 or negative outstanding amount,
@@ -141,7 +141,7 @@ public class EnterDetailsController extends BaseController {
                 LOGGER.info("Penalty has has 0 or negative outstanding amount : " + (lateFilingPenalty.getOutstanding() <= 0)
                         + "Or is outstanding amount different to original amount: " + (!lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding()))
                         + "Or is not of type penalty, type : " + lateFilingPenalty.getType() );
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_ONLINE_PAYMENT_UNAVAILABLE;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
             }
             return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyNumber);
 

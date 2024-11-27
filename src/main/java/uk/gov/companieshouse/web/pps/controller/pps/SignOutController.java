@@ -22,7 +22,7 @@ import java.util.Map;
 
 
 @Controller
-@NextController(PPSStartController.class)
+@NextController(StartController.class)
 @PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/sign-out")
 public class SignOutController extends BaseController {

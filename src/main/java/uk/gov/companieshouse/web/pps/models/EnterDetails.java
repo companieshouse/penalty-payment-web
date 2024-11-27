@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import uk.gov.companieshouse.web.pps.annotation.Penalty;
 
-public class EnterPPSDetails {
+public class EnterDetails {
 
     /**
      * Returns different error messages depending on entered penalty.
