@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -20,17 +23,16 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
 @PreviousController(PPSStartController.class)
-@RequestMapping("/late-filing-penalty/bank-transfer/which-penalty-service")
-public class BankTransferPenaltyReferenceController extends BaseController {
-    private static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
+@RequestMapping("/late-filing-penalty/ref-starts-with")
+public class PenaltyRefStartsWithController extends BaseController {
 
-    static final String PPS_AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
-    static final String PPS_PENALTY_REF_ATTR = "penaltyReferences";
+    static final String PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";
+    static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
+    static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
-    public BankTransferPenaltyReferenceController(
-            NavigatorService navigatorService,
+    public PenaltyRefStartsWithController(NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
@@ -38,14 +40,14 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     @Override
     protected String getTemplateName() {
-        return PPS_BANK_TRANSFER_PENALTY_REFERENCE;
+        return PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getPenaltyReference(Model model) {
-        model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR,
+    public String getPenaltyRefStartsWith(Model model) {
+        model.addAttribute(AVAILABLE_PENALTY_REF_ATTR,
                 penaltyConfigurationProperties.getAllowedRefStartsWith());
-        model.addAttribute(PPS_PENALTY_REF_ATTR, new PenaltyReferenceChoice());
+        model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
         addBackPageAttributeToModel(model);
 
@@ -53,31 +55,26 @@ public class BankTransferPenaltyReferenceController extends BaseController {
     }
 
     @PostMapping
-    public String postPenaltyReference(
-            @Valid @ModelAttribute(PPS_PENALTY_REF_ATTR) PenaltyReferenceChoice penaltyReferenceChoice,
+    public String postPenaltyRefStartsWith(
+            @Valid @ModelAttribute(PENALTY_REFERENCE_CHOICE_ATTR) PenaltyReferenceChoice penaltyReferenceChoice,
             BindingResult bindingResult,
-            Model model
-    ) {
+            Model model) {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            model.addAttribute(PPS_AVAILABLE_PENALTY_REF_ATTR,
+            model.addAttribute(AVAILABLE_PENALTY_REF_ATTR,
                     penaltyConfigurationProperties.getAllowedRefStartsWith());
             return getTemplateName();
         }
 
-        String penaltyRefChoiceString = penaltyReferenceChoice.getSelectedPenaltyReference();
-        String redirectUrlPrefix = UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
-        if (penaltyRefChoiceString.equals(PenaltyReference.LATE_FILING.getStartsWith())) {
-            return redirectUrlPrefix
-                    + penaltyConfigurationProperties.getBankTransferLateFilingDetailsPath();
-        } else if (penaltyRefChoiceString.equals(PenaltyReference.SANCTIONS.getStartsWith())) {
-            return redirectUrlPrefix
-                    + penaltyConfigurationProperties.getBankTransferSanctionsPath();
+        PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceChoice.getSelectedPenaltyReference());
+        if (penaltyReference == LATE_FILING || penaltyReference == SANCTIONS) {
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getEnterDetailsPath();
         }
+
         return ERROR_VIEW;
     }
 

@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 @Controller
-@NextController(EnterPPSDetailsController.class)
+@NextController(PenaltyRefStartsWithController.class)
 @RequestMapping("/late-filing-penalty")
 public class PPSStartController extends BaseController {
 
