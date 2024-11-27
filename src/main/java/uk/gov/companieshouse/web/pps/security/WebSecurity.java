@@ -25,29 +25,35 @@ public class WebSecurity {
 
     @Bean
     @Order(2)
+    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(HttpSecurity http)
+            throws Exception {
+        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/ref-starts-with")).build();
+    }
+
+    @Bean
+    @Order(3)
         protected SecurityFilterChain accessibilityStatementPageSecurityConfig(HttpSecurity http) throws Exception {
         return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/accessibility-statement")).build();
     }
 
     @Bean
-    @Order(3)
+    @Order(4)
         protected SecurityFilterChain healthcheckSecurityFilterChain(HttpSecurity http) throws Exception {
         return ChsCsrfMitigationHttpSecurityBuilder.configureApiCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/healthcheck")).build();
     }
 
     @Bean
-    @Order(4)
+    @Order(5)
     protected SecurityFilterChain bankTransferSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/late-filing-penalty/bank-transfer/**");
-        return http.build();
+        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/bank-transfer/**")).build();
     }
 
-
     @Bean
-    @Order(5)
+    @Order(6)
         public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(http
                 .securityMatcher("/late-filing-penalty/**")
@@ -55,5 +61,6 @@ public class WebSecurity {
                 .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new UserAuthFilter(), BasicAuthenticationFilter.class)).build();
         }
+
 }
 
