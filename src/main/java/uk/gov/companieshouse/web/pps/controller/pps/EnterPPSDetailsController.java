@@ -1,10 +1,12 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +53,9 @@ public class EnterPPSDetailsController extends BaseController {
     private static final String ENTER_LFP_DETAILS_MODEL_ATTR = "enterLFPDetails";
     private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
 
+    @Value("${penalty.search.notFound}")
+    private String detailsNotFound;
+
     @Override protected String getTemplateName() {
         return PPS_ENTER_DETAILS;
     }
@@ -93,7 +98,9 @@ public class EnterPPSDetailsController extends BaseController {
             if (payableLateFilingPenalties.isEmpty()) {
                 LOGGER.info("No late filing penalties for company no. "  +  companyNumber
                         + " and penalty: " +   penaltyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PPS_NO_PENALTY_FOUND;
+                ObjectError error = new ObjectError("globalError", detailsNotFound);
+                bindingResult.addError(error);
+                return getTemplateName();
             }
 
             // If there is more than one payable penalty.
@@ -105,8 +112,8 @@ public class EnterPPSDetailsController extends BaseController {
 
             LateFilingPenalty lateFilingPenalty;
             // If the only penalty in the List does not have the provided penalty number return Penalty Not Found.
-            if (payableLateFilingPenalties.get(0).getId().equals(penaltyNumber)) {
-                lateFilingPenalty = payableLateFilingPenalties.get(0);
+            if (payableLateFilingPenalties.getFirst().getId().equals(penaltyNumber)) {
+                lateFilingPenalty = payableLateFilingPenalties.getFirst();
             } else {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
                         + " does not have the provided penalty number " + penaltyNumber);

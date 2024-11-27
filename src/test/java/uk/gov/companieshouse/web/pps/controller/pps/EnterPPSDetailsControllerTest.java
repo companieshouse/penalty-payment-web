@@ -203,10 +203,8 @@ class EnterPPSDetailsControllerTest {
         this.mockMvc.perform(post(ENTER_PPS_DETAILS_PATH)
                 .param(PENALTY_NUMBER_ATTRIBUTE, VALID_PENALTY_NUMBER)
                 .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_LFP_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(NO_PENALTY_FOUND_PATH));
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_PPS_DETAILS_VIEW));
 
         verify(mockCompanyService, times(1)).appendToCompanyNumber(VALID_COMPANY_NUMBER);
     }

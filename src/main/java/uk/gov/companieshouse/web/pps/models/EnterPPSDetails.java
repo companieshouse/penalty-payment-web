@@ -22,7 +22,7 @@ public class EnterPPSDetails {
      * Doesn't allow spaces or empty strings
      */
     @NotNull
-    @Pattern(regexp = "^([a-zA-Z0-9]{8}|[0-9]{1,8})$", message = "{enterPpsDetails.companyNumber.wrongLength}")
+    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterPpsDetails.companyNumber.wrongLength}")
     private String companyNumber;
 
     public String getPenaltyNumber() {
