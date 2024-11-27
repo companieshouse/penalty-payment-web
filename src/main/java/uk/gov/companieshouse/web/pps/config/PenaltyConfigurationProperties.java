@@ -28,13 +28,19 @@ public class PenaltyConfigurationProperties {
     }
 
     public void setAllowedRefStartsWith(List<String> allowedRefStartsWith) {
-        this.allowedRefStartsWith = allowedRefStartsWith
+        this.allowedRefStartsWith = filterAllowedRefStartsWithByEnum(allowedRefStartsWith);
+    }
+
+    private static List<String> filterAllowedRefStartsWithByEnum(
+            List<String> allowedRefStartsWith) {
+        return allowedRefStartsWith
                 .stream()
                 .map(startsWith -> {
                     try {
                         return PenaltyReference.fromStartsWith(startsWith).getStartsWith();
                     } catch (IllegalArgumentException e) {
-                        LOGGER.info("Penalty Configuration - allowedRefStartsWith '" + startsWith + "' is invalid, ignoring for 'penaltyRefStartsWith' screen");
+                        LOGGER.info("Penalty Configuration - allowedRefStartsWith '" + startsWith
+                                + "' is invalid, ignoring for 'penaltyRefStartsWith' screen");
                         return null;
                     }
                 })

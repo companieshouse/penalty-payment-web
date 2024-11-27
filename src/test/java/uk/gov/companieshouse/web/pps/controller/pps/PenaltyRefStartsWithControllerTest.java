@@ -15,6 +15,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -57,6 +58,7 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     @Test
+    @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWith() throws Exception {
         configurePreviousController();
         mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
@@ -67,6 +69,7 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     @Test
+    @DisplayName("Post 'penaltyRefStartsWith' screen - error: none selected")
     void postPenaltyRefStartsWithWhenNoneSelected() throws Exception {
         mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
@@ -77,6 +80,7 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     @Test
+    @DisplayName("Post 'penaltyRefStartsWith' screen - success: late filing selected")
     void postPenaltyRefStartsWithWhenLateFilingSelected() throws Exception {
         mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
                         .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.getStartsWith()))
@@ -87,6 +91,7 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     @Test
+    @DisplayName("Post 'penaltyRefStartsWith' screen - success: sanction selected")
     void postPenaltyRefStartsWithWhenSanctionSelected() throws Exception {
         mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
                         .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.getStartsWith()))
