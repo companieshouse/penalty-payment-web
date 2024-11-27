@@ -7,16 +7,16 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
 @RequestMapping("/late-filing-penalty/bank-transfer/sanctions-details")
-public class BankTransferConfirmationStatementController extends BaseController {
+public class BankTransferSanctionsDetailsController extends BaseController {
 
-    private static final String PPS_BANK_TRANSFER_CONFIRM_STATEMENT = "pps/bankTransferConfirmationStatement";
+    private static final String PPS_BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
 
     @Override protected String getTemplateName() {
-        return PPS_BANK_TRANSFER_CONFIRM_STATEMENT;
+        return PPS_BANK_TRANSFER_SANCTIONS_DETAILS;
     }
 
     @GetMapping
-    public String getPpsBankTransferConfirmStatement() {
+    public String getPpsBankTransferSanctionsDetails() {
         return getTemplateName();
     }
 }

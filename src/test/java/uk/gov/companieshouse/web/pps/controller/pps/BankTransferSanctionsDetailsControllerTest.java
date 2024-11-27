@@ -16,16 +16,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class BankTransferConfirmationStatementControllerTest {
+public class BankTransferSanctionsDetailsControllerTest {
 
     private MockMvc mockMvc;
 
     @InjectMocks
-    private BankTransferConfirmationStatementController controller;
+    private BankTransferSanctionsDetailsController controller;
 
-    private static final String PPS_BANK_TRANSFER_CONFIRM_STATEMENT_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
+    private static final String PPS_BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
 
-    private static final String PPS_BANK_TRANSFER_CONFIRM_STATEMENT = "pps/bankTransferConfirmationStatement";
+    private static final String PPS_BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
 
     @BeforeEach
     void setup() {
@@ -33,12 +33,12 @@ public class BankTransferConfirmationStatementControllerTest {
     }
 
     @Test
-    @DisplayName("Get Accessibility Statement - success path")
+    @DisplayName("Get Bank Transfer Sanctions Details - success path")
     void getRequestSuccess() throws Exception {
 
-        this.mockMvc.perform(get(PPS_BANK_TRANSFER_CONFIRM_STATEMENT_PATH))
+        this.mockMvc.perform(get(PPS_BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_BANK_TRANSFER_CONFIRM_STATEMENT));
+                .andExpect(view().name(PPS_BANK_TRANSFER_SANCTIONS_DETAILS));
     }
 
 }
