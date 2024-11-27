@@ -30,7 +30,7 @@ import java.util.List;
 @PreviousController(PPSStartController.class)
 @NextController(ViewPenaltiesController.class)
 @RequestMapping("/late-filing-penalty/enter-details")
-public class EnterPPSDetailsController extends BaseController {
+public class EnterDetailsController extends BaseController {
 
     private static final String PPS_ENTER_DETAILS = "pps/details";
 

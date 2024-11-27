@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class EnterPPSDetailsControllerTest {
+class EnterDetailsControllerTest {
 
     private MockMvc mockMvc;
 
@@ -49,7 +49,7 @@ class EnterPPSDetailsControllerTest {
     private NavigatorService mockNavigatorService;
 
     @InjectMocks
-    private EnterPPSDetailsController controller;
+    private EnterDetailsController controller;
 
     private static final String VALID_PENALTY_NUMBER = "12345678";
 
