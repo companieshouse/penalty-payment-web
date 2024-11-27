@@ -9,7 +9,7 @@ import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
-@PreviousController(EnterPPSDetailsController.class)
+@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/legal-fees-required")
 public class DcaRequiredController extends BaseController {
 

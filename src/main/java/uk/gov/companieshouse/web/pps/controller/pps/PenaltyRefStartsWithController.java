@@ -22,7 +22,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
-@PreviousController(PPSStartController.class)
+@PreviousController(StartController.class)
 @RequestMapping("/late-filing-penalty/ref-starts-with")
 public class PenaltyRefStartsWithController extends BaseController {
 

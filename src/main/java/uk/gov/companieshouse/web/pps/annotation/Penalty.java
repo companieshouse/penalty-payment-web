@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @ReportAsSingleViolation
 public @interface Penalty {
 
-    String message() default "You must enter a penalty reference";
+    String message() default "Enter the reference number";
 
     String messageNotLongEnough() default "Enter your penalty reference exactly as shown on your penalty letter";
 

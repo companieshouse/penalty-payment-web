@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({WebSecurity.class})
-class PPSStartControllerTest {
+class StartControllerTest {
 
     private MockMvc mockMvc;
 
@@ -49,7 +49,7 @@ class PPSStartControllerTest {
     private NavigatorService mockNavigatorService;
 
     @InjectMocks
-    private PPSStartController controller;
+    private StartController controller;
 
     @BeforeEach
     void setup() {

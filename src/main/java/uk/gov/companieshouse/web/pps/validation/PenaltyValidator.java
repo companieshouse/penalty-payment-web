@@ -20,7 +20,7 @@ public class PenaltyValidator implements ConstraintValidator<Penalty, String> {
     @Override
     public boolean isValid(String penaltyNumber, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
-        if(penaltyNumber == null || StringUtils.isEmpty(penaltyNumber)) {
+        if(StringUtils.isEmpty(penaltyNumber)) {
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
             return false;
         } else if (!penaltyNumber.matches("^([A-Z0-9]{8,16})$")) {

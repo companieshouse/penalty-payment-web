@@ -15,7 +15,7 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-@PreviousController(EnterPPSDetailsController.class)
+@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/penalty-paid")
 public class PenaltyPaidController extends BaseController {
 
