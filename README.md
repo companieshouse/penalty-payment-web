@@ -24,7 +24,7 @@ In order to run this Web App locally you will need to install:
 
 Key                | Description
 -------------------|------------------------------------
-`PPS_WEB_PORT` |The port of the Penalty-Payment-WEB service
+`PPS_PAY_WEB_PORT` |The port of the Penalty-Payment-WEB service
 `HUMAN_LOG`        |For human readable logs
 `CH_BANK_ACC_NUM`  |Companies House Bank account number (for penalty start page)
 `CH_BANK_SORT_CODE`|Companies House Bank sort code (for penalty start page)
