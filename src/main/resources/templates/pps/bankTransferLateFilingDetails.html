@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+<head>
+    <title>
+        Pay by bank transfer (LFP: A)
+    </title>
+</head>
+
+<div id="bank-transfer-late-filing-details-main-content" layout:fragment="content">
+    <form th:action="@{''}" method="post" class="form" id="bank-transfer-late-filing-details-form">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 id="page-title" class="govuk-heading-xl">
+                    <span id="page-title-heading">Pay by bank transfer or cheque</span>
+                </h1>
+                <p class="govuk-body">
+                    You've told us that <span class="govuk-!-font-weight-bold">your penalty reference starts with A</span>. This means it's a late filing penalty.
+                </p>
+                <p class="govuk-body">
+                    You can pay this type of penalty by Bacs or cheque.
+                </p>
+                <div class="govuk-inset-text">
+                    Use these details to pay this penalty. Check the details carefully, as they may be different from other transactions you've made with us.
+                </div>
+
+                <h3 class="govuk-heading-s">Bacs payments</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li><span class="govuk-!-font-weight-bold">Account name</span>: Companies House</li>
+                    <li><span class="govuk-!-font-weight-bold">Sort code</span>: 60 70 80</li>
+                    <li><span class="govuk-!-font-weight-bold">Account number</span>: 10031154</li>
+                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference.</li>
+                </ul>
+                <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
+
+                <h3 class="govuk-heading-s">Overseas payments</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li><span class="govuk-!-font-weight-bold">IBAN</span>: GB79NWBK60708010031154</li>
+                    <li><span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>: NW BK GB 2L</li>
+                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference.</li>
+                </ul>
+
+                <h3 class="govuk-heading-s">Payments by cheque</h3>
+                <p class="govuk-body">
+                    You can pay by cheque through the post. Make the cheque payable to ‘Companies House only’ and send it to Companies House, with the slip on your penalty notice (‘remittance advice’).
+                </p>
+                <div class="govuk-inset-text">
+                    Companies House
+                    <br>PO Box 710
+                    <br>Crown Way
+                    <br>CF14 3UZ
+                </div>
+                <p class="govuk-body">
+                    Write the company name and number on the back of the cheque. You’ll find the company number on your penalty notice.
+                </p>
+
+                <h3 class="govuk-heading-s">Our contact details</h3>
+                <p class="govuk-body">
+                    If you have any questions, you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</html>
