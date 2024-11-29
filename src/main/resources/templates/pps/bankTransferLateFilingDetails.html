@@ -29,18 +29,44 @@
 
                 <h3 class="govuk-heading-s">Bacs payments</h3>
                 <ul class="govuk-list govuk-list--bullet">
-                    <li><span class="govuk-!-font-weight-bold">Account name</span>: Companies House</li>
-                    <li><span class="govuk-!-font-weight-bold">Sort code</span>: 60 70 80</li>
-                    <li><span class="govuk-!-font-weight-bold">Account number</span>: 10031154</li>
-                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference.</li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account name</span>:
+                        <span id="late-filing-account-name"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-name')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Sort code</span>:
+                        <span id="late-filing-sort-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.sort-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account number</span>:
+                        <span id="late-filing-account-number"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-number')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>:
+                        Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference.
+                    </li>
                 </ul>
                 <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
 
                 <h3 class="govuk-heading-s">Overseas payments</h3>
                 <ul class="govuk-list govuk-list--bullet">
-                    <li><span class="govuk-!-font-weight-bold">IBAN</span>: GB79NWBK60708010031154</li>
-                    <li><span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>: NW BK GB 2L</li>
-                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference.</li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">IBAN</span>:
+                        <span id="late-filing-iban"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.iban')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
+                        <span id="late-filing-swift-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.swift-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid.
+                        Your payment may be delayed if you use the wrong reference.
+                    </li>
                 </ul>
 
                 <h3 class="govuk-heading-s">Payments by cheque</h3>

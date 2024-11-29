@@ -21,25 +21,57 @@
                     You've told us that <span class="govuk-!-font-weight-bold">your penalty reference starts with PN</span>.
                 </p>
                 <div class="govuk-inset-text">
-                    Use these account details to pay this penalty. Check the details carefully, as they may be different from other transactions you've made with us.​
+                    Use these account details to pay this penalty. Check the details carefully, as
+                    they may be different from other transactions you've made with us.
                 </div>
                 <h3 class="govuk-heading-s">Bacs payments</h3>
                 <ul class="govuk-list govuk-list--bullet">
-                    <li><span class="govuk-!-font-weight-bold">Account name</span>: Companies House</li>
-                    <li><span class="govuk-!-font-weight-bold">Sort code</span>: 60 70 80</li>
-                    <li><span class="govuk-!-font-weight-bold">Account number</span>: 10033599</li>
-                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference. </li></ul>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account name</span>:
+                        <span id="sanctions-account-name"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-name')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Sort code</span>:
+                        <span id="sanctions-sort-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.sort-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account number</span>:
+                        <span id="sanctions-account-number"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-number')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
+                        penalty reference, so that we know which penalty you've paid. Your payment
+                        may be delayed if you use the wrong reference.
+                    </li>
+                </ul>
 
                 <h3 class="govuk-heading-s">Overseas payments</h3>
                 <ul class="govuk-list govuk-list--bullet">
-                    <li><span class="govuk-!-font-weight-bold">IBAN</span>: GB24NWBK60708010033599</li>
-                    <li><span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>: NW BK GB 2L</li>
-                    <li><span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so that we know which penalty you've paid. Your payment may be delayed if you use the wrong reference. </li></ul>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">IBAN</span>:
+                        <span id="sanctions-iban"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.iban')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
+                        <span id="sanctions-swift-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.swift-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
+                        penalty reference, so that we know which penalty you've paid. Your payment
+                        may be delayed if you use the wrong reference.
+                    </li>
+                </ul>
 
                 <h3 class="govuk-heading-s">What happens next</h3>
-                <p class="govuk-body">Your payment may take up to 4 working days to process. </p>
-                <p class="govuk-body">
-                    If you have any questions, you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.
+                <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
+                <p class="govuk-body">If you have any questions, you can <a
+                        href="https://www.gov.uk/contact-companies-house" class="govuk-link">
+                    contact us</a>.
                 </p>
             </div>
         </div>
