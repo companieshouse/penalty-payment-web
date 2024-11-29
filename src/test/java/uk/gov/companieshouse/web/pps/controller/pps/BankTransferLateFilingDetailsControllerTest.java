@@ -16,16 +16,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BankTransferSanctionsDetailsControllerTest {
+class BankTransferLateFilingDetailsControllerTest {
 
     private MockMvc mockMvc;
 
     @InjectMocks
-    private BankTransferSanctionsDetailsController controller;
+    private BankTransferLateFilingDetailsController controller;
 
-    private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
+    private static final String BANK_TRANSFER_LATE_FILING_DETAILS_PATH = "/late-filing-penalty/bank-transfer/late-filing-details";
 
-    private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
+    private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
 
     @BeforeEach
     void setup() {
@@ -33,12 +33,12 @@ class BankTransferSanctionsDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Get Bank Transfer Sanctions Details - success path")
-    void getRequestSuccess() throws Exception {
+    @DisplayName("Get Bank Transfer Late Filing Details - success")
+    void getBankTransferLateFilingDetailsSuccess() throws Exception {
 
-        this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
+        this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS));
+                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS));
     }
 
 }
