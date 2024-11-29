@@ -1,4 +1,4 @@
-artifact_name       := lfp-pay-web
+artifact_name       := penalty-payment-web
 version             := "unversioned"
 
 dependency_check_base_suppressions:=common_suppressions_spring_6.xml
