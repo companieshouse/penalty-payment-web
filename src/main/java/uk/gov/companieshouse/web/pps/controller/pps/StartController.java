@@ -23,7 +23,7 @@ import java.util.Optional;
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
 @RequestMapping("/late-filing-penalty")
-public class PPSStartController extends BaseController {
+public class StartController extends BaseController {
 
     private static final String PPS_TEMP_HOME = "pps/home";
     private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
