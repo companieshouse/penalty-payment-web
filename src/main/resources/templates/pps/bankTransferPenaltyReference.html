@@ -9,14 +9,14 @@
         What type of penalty do you need to pay?
     </title>
 </head>
-<div id="pps-penalty-reference" layout:fragment="content">
-    <form id="ppspenaltyreference" th:action="@{''}" th:object="${penaltyReferences}" method="post" class="form">
+<div id="bank-transfer-penalty-reference-main-content" layout:fragment="content">
+    <form id="bank-transfer-penalty-reference-form" th:action="@{''}" th:object="${penaltyReferences}" method="post" class="form">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
 
                 <div th:replace="~{fragments/ppsGlobalErrors :: globalErrors}"></div>
 
-                <h1 id="page-title " class="govuk-heading-xl">
+                <h1 id="page-title" class="govuk-heading-xl">
                     <span id="page-title-heading">Find out which bank details to use</span>
                 </h1>
                 <p class="govuk-body">We need to ask you about your penalty reference, so that we can show you the correct bank details for the type of penalty you’re paying.</p>
@@ -56,7 +56,7 @@
                             <p>
                                 You'll find the penalty reference at the top of your penalty notice.
                             </p>
-                            <p> Email <a href="mailto:enquiries@companieshouse.gov.uk">enquiries@companieshouse.gov.uk</a> for help if:
+                            <p> Email <a href="mailto:enquiries@companieshouse.gov.uk" class="govuk-link">enquiries@companieshouse.gov.uk</a> for help if:
                             <ul class="govuk-list govuk-list--bullet">
                                 <li>your penalty reference does not start with any of these letters</li>
                                 <li>you have lost your penalty notice - use 'Lost penalty notice' as the email subject, and tell us as much information as you can about the penalty so we can pass your message to the right team</li></ul>

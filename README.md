@@ -1,7 +1,9 @@
-# Companies House Penalties Payment Web Service
-The Companies House Web Service for handling payments of penalties. This application is written using the [Spring Boot](http://projects.spring.io/spring-boot/) Java framework.
+# Penalty Payment Web
 
-- Retrieves Payable penalties from the Penalty-Payment-API service
+Web application for handling payments of penalties. This application is written using
+the [Spring Boot](http://projects.spring.io/spring-boot/) Java framework.
+
+- Retrieves payable penalties from the Penalty Payment Service
 - Displays payable penalties and redirects to the Payments Service to take payment.
 
 ### Requirements
@@ -11,7 +13,7 @@ In order to run this Web App locally you will need to install:
 - [Maven](https://maven.apache.org/download.cgi)
 - [Git](https://git-scm.com/downloads)
 - [Payments API](https://github.com/companieshouse/payments.api.ch.gov.uk)
-- [PENALTY PAYMENT API](https://github.com/companieshouse/penalty-payment-api)
+- [Penalty Payment API](https://github.com/companieshouse/penalty-payment-api)
 
 ### Getting Started
 
@@ -22,21 +24,27 @@ In order to run this Web App locally you will need to install:
 
 ### Configuration
 
-Key                | Description
--------------------|------------------------------------
-`PPS_PAY_WEB_PORT` |The port of the Penalty-Payment-WEB service
-`HUMAN_LOG`        |For human readable logs
-`CH_BANK_ACC_NUM`  |Companies House Bank account number (for penalty start page)
-`CH_BANK_SORT_CODE`|Companies House Bank sort code (for penalty start page)
-`CH_BANK_ACC_NAME` |Companies House Bank Bank account name (for penalty start page)
-
+ Key                            | Description                                             
+--------------------------------|---------------------------------------------------------
+ `PPS_PAY_WEB_PORT`             | The port of the penalty-payment-web application         
+ `HUMAN_LOG`                    | For human readable logs                                 
+ `CH_BANK_ACC_NAME`             | Bacs payments - Account name (late filing penalty: A)   
+ `CH_BANK_SORT_CODE`            | Bacs payments - Sort code (late filing penalty: A)      
+ `CH_BANK_ACC_NUM`              | Bacs payments - Account number (late filing penalty: A) 
+ `CH_BANK_IBAN`                 | Overseas payments - IBAN (late filing penalty: A)       
+ `CH_BANK_SWIFT_CODE`           | Overseas payments - SWIFT code (late filing penalty: A) 
+ `CH_SANCTIONS_BANK_ACC_NAME`   | Bacs payments - Account name (sanction: PN)             
+ `CH_SANCTIONS_BANK_SORT_CODE`  | Bacs payments - Sort code (sanction: PN)                
+ `CH_SANCTIONS_BANK_ACC_NUM`    | Bacs payments - Account number (sanction: PN)           
+ `CH_SANCTIONS_BANK_IBAN`       | Overseas payments - IBAN (sanction: PN)                 
+ `CH_SANCTIONS_BANK_SWIFT_CODE` | Overseas payments - SWIFT code (sanction: PN)           
 
 ### Web Pages
 
-Page                                     | Address
------------------------------------------|-----------------------------
-Start page for Penalty Service           | `/late-filing-penalty`
-Tell us your penalty details             | `/late-filing-penalty/enter-details`
+ Page                                        | Address                                
+---------------------------------------------|----------------------------------------
+ Start page for Penalty Payment Service      | `/late-filing-penalty`                 
+ What does the penalty reference start with? | `/late-filing-penalty/ref-starts-with` 
 
 ## Terraform ECS
 
@@ -45,13 +53,11 @@ Tell us your penalty details             | `/late-filing-penalty/enter-details`
 The code present in this repository is used to define and deploy a dockerised container in AWS ECS.
 This is done by calling a [module](https://github.com/companieshouse/terraform-modules/tree/main/aws/ecs) from terraform-modules. Application specific attributes are injected and the service is then deployed using Terraform via the CICD platform 'Concourse'.
 
-
-Application specific attributes | Value                                                                                                                                                                                                                                                      | Description
-:---------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------
-**ECS Cluster**        | company-requests                                                                                                                                                                                                                                           | ECS cluster (stack) the service belongs to
-**Load balancer**      | {env}-chs-chgovuk                                                                                                                                                                                                                                          | The load balancer that sits in front of the service
-**Concourse pipeline**     | [Pipeline link](https://ci-platform.companieshouse.gov.uk/teams/team-development/pipelines/penalty-payment-web) <br> [Pipeline code](https://github.com/companieshouse/ci-pipelines/blob/master/pipelines/ssplatform/team-development/penalty-payment-web) | Concourse pipeline link in shared services
-
+ Application specific attributes | Value                                                                                                                                                                                                                                                      | Description                                         
+:--------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------
+ **ECS Cluster**                 | company-requests                                                                                                                                                                                                                                           | ECS cluster (stack) the service belongs to          
+ **Load balancer**               | {env}-chs-chgovuk                                                                                                                                                                                                                                          | The load balancer that sits in front of the service 
+ **Concourse pipeline**          | [Pipeline link](https://ci-platform.companieshouse.gov.uk/teams/team-development/pipelines/penalty-payment-web) <br> [Pipeline code](https://github.com/companieshouse/ci-pipelines/blob/master/pipelines/ssplatform/team-development/penalty-payment-web) | Concourse pipeline link in shared services          
 
 ### Contributing
 - Please refer to the [ECS Development and Infrastructure Documentation](https://companieshouse.atlassian.net/wiki/spaces/DEVOPS/pages/4390649858/Copy+of+ECS+Development+and+Infrastructure+Documentation+Updated) for detailed information on the infrastructure being deployed.

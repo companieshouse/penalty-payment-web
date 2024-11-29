@@ -9,7 +9,7 @@ import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
-@PreviousController(EnterPPSDetailsController.class)
+@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 

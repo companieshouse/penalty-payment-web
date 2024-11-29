@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import uk.gov.companieshouse.web.pps.annotation.Penalty;
 
-public class EnterPPSDetails {
+public class EnterDetails {
 
     /**
      * Returns different error messages depending on entered penalty.
@@ -22,7 +22,7 @@ public class EnterPPSDetails {
      * Doesn't allow spaces or empty strings
      */
     @NotNull
-    @Pattern(regexp = "^([a-zA-Z0-9]{8}|[0-9]{1,8})$", message = "{enterPpsDetails.companyNumber.wrongLength}")
+    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterPpsDetails.companyNumber.wrongLength}")
     private String companyNumber;
 
     public String getPenaltyNumber() {

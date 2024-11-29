@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Controller
-@PreviousController(EnterPPSDetailsController.class)
+@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
