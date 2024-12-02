@@ -25,6 +25,17 @@ public class EnterDetails {
     @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterPpsDetails.companyNumber.wrongLength}")
     private String companyNumber;
 
+    @NotNull
+    private String latePenaltyNumber;
+
+    public String getLatePenaltyNumber() {
+        return latePenaltyNumber;
+    }
+
+    public void setLatePenaltyNumber(String latePenaltyNumber) {
+        this.latePenaltyNumber = latePenaltyNumber;
+    }
+
     public String getPenaltyNumber() {
         return penaltyNumber;
     }
