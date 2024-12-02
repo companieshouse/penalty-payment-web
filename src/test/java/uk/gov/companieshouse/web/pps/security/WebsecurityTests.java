@@ -27,12 +27,6 @@ class WebsecurityTests {
         when(httpSecurity.securityMatcher("/late-filing-penalty")).thenReturn(httpSecurity);
         assertEquals(webSecurity.temporaryStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
-    @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/accessibility-statement")
-    void accessibilityStatementPageSecurityConfigTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/accessibility-statement")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.accessibilityStatementPageSecurityConfig(httpSecurity), httpSecurity.build());
-    }
 
     @Test
     @DisplayName(" apply security filter to /late-filing-penalty/ref-starts-with")
@@ -41,6 +35,13 @@ class WebsecurityTests {
                 .thenReturn(httpSecurity);
         assertEquals(webSecurity.penaltyRefStartsWithPageSecurityFilterChain(httpSecurity),
                 httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/accessibility-statement")
+    void accessibilityStatementPageSecurityConfigTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/accessibility-statement")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.accessibilityStatementPageSecurityConfig(httpSecurity), httpSecurity.build());
     }
 
     @Test
