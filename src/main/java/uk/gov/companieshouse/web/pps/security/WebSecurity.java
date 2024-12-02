@@ -26,10 +26,10 @@ public class WebSecurity {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(HttpSecurity http)
-            throws Exception {
-        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/ref-starts-with")).build();
+    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/late-filing-penalty/ref-starts-with");
+        return http.build();
     }
 
     @Bean
@@ -51,8 +51,9 @@ public class WebSecurity {
     @Bean
     @Order(5)
     protected SecurityFilterChain bankTransferSecurityFilterChain(HttpSecurity http) throws Exception {
-        return ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/bank-transfer/**")).build();
+        http
+                .securityMatcher("/late-filing-penalty/bank-transfer/**");
+        return http.build();
     }
 
     @Bean
