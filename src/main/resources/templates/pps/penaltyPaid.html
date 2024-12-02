@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title th:text="'Late filing penalties for ' + ${companyName}"></title>
+    <title th:text="'Penalties for ' + ${companyName}"></title>
 </head>
 
 <div id="no-payment-found-main-content" layout:fragment="content">
@@ -13,14 +13,11 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    Late filing penalty for
-                    <span class="govuk-heading-xl" id="company-name" th:text="${companyName}"></span>
+                    This penalty has already been paid
                 </h1>
-                <p class="govuk-body-l">
-                    The penalty with a reference of
-                    <span class="govuk-!-font-weight-bold" th:text="${penaltyNumber}"></span>
-                    has been paid. No further action is required.
-                </p>
+                <p class="govuk-body-l"> Penalty
+                    <span class="govuk-!-font-weight-bold" th:text="${penaltyNumber}"></span> has been paid.</p>
+                <p class="govuk-body-l">If you have any questions, you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
             </div>
         </div>
     </form>
