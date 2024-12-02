@@ -35,19 +35,19 @@ class WebsecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/healthcheck")
-    void healthcheckSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/healthcheck")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.healthcheckSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
     @DisplayName(" apply security filter to /late-filing-penalty/ref-starts-with")
     void penaltyRefStartsWithPageSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/late-filing-penalty/ref-starts-with"))
                 .thenReturn(httpSecurity);
         assertEquals(webSecurity.penaltyRefStartsWithPageSecurityFilterChain(httpSecurity),
                 httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/healthcheck")
+    void healthcheckSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/healthcheck")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.healthcheckSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
