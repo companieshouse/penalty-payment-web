@@ -104,12 +104,23 @@ public class ConfirmationController extends BaseController {
         model.addAttribute(PENALTY_NUMBER_ATTR, penaltyId);
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(REASON_ATTR, LATE_FILING_PENALTY_REASON);
-        model.addAttribute(PAYMENT_DATE_ATTR, payableLateFilingPenalty.getPayment().getPaidAt() != null ?
-                LocalDateTime.parse(payableLateFilingPenalty.getPayment().getPaidAt(),
-                                DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK))
-                        .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)) : null);
-        model.addAttribute(PENALTY_AMOUNT_ATTR, "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)");
+        model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payableLateFilingPenalty));
+        model.addAttribute(PENALTY_AMOUNT_ATTR, setUpPaymentAmountDisplay(payableLateFilingPenalty));
 
         return getTemplateName();
+    }
+
+    private String setUpPaymentDateDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
+        return (payableLateFilingPenalty.getPayment() == null
+                || payableLateFilingPenalty.getPayment().getPaidAt() == null) ?
+                null : LocalDateTime.parse(payableLateFilingPenalty.getPayment().getPaidAt(),
+                        DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK))
+                .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
+    }
+
+    private String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
+        return (payableLateFilingPenalty.getPayment() == null
+                || payableLateFilingPenalty.getPayment().getPaidAt() == null) ?
+                null : "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)";
     }
 }
