@@ -28,12 +28,21 @@ import java.util.Optional;
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyId}/confirmation")
 public class ConfirmationController extends BaseController {
 
-    private static final String PPS_CONFIRMATION_PAGE = "pps/confirmationPage";
+    private static final String CONFIRMATION_PAGE = "pps/confirmationPage";
 
     private static final String PAYMENT_STATE = "payment_state";
 
+    private static final String COMPANY_NAME_ATTR = "companyName";
+    private static final String COMPANY_NUMBER_ATTR = "companyNumber";
+    private static final String PAYMENT_DATE_ATTR = "paymentDate";
+    private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
+    private static final String REASON_ATTR = "reason";
+    private static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
+
+    private static final String LATE_FILING_PENALTY_REASON = "Late filing of accounts";
+
     @Override protected String getTemplateName() {
-        return PPS_CONFIRMATION_PAGE;
+        return CONFIRMATION_PAGE;
     }
 
     @Autowired
@@ -91,17 +100,16 @@ public class ConfirmationController extends BaseController {
 
         }
 
-        model.addAttribute("companyNumber", companyNumber);
-        model.addAttribute("penaltyNumber", penaltyId);
-        model.addAttribute("companyName", companyProfileApi.getCompanyName());
-        model.addAttribute("reason", "Late filing of accounts");
-        model.addAttribute("paymentDate", payableLateFilingPenalty.getPayment().getPaidAt() != null ?
+        model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
+        model.addAttribute(PENALTY_NUMBER_ATTR, penaltyId);
+        model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
+        model.addAttribute(REASON_ATTR, LATE_FILING_PENALTY_REASON);
+        model.addAttribute(PAYMENT_DATE_ATTR, payableLateFilingPenalty.getPayment().getPaidAt() != null ?
                 LocalDateTime.parse(payableLateFilingPenalty.getPayment().getPaidAt(),
                                 DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK))
                         .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)) : null);
-        model.addAttribute("penaltyAmount", "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)");
+        model.addAttribute(PENALTY_AMOUNT_ATTR, "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)");
 
         return getTemplateName();
-
     }
 }
