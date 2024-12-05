@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="http://www.w3.org/1999/html"
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
@@ -15,59 +15,82 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <div class="govuk-panel govuk-panel--confirmation" id="confirmation-details">
-
                     <div class="govuk-panel__body govuk-!-margin-bottom-6" id="confirmation-company-name-number">
                         <h1 class="govuk-panel__title">
-                            Payment received by Companies House
+                            Penalty Paid
                         </h1>
                         <div class="govuk-panel__body">
-                            Your reference number is your company number
+                            Penalty reference:
                             <br>
-                            <span class="govuk-!-font-weight-bold" th:text="*{companyNumber}"/>
-
+                            <span class="govuk-!-font-weight-bold" th:text="*{penaltyNumber}"/>
                         </div>
                     </div>
                 </div>
-
-                <p class="govuk-body-l">
-                    We've sent a confirmation email containing this reference number to
-                    <span class="govuk-!-font-weight-bold" th:text="${userEmail}">keyvalue</span>.
-                </p>
-                <p class="govuk-body">
-                    <a href="javascript:window.print()" class="govuk-link">Print this page</a>
-                </p>
+                <table class="govuk-table">
+                    <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Issued to</th>
+                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${companyName}"></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Company number</th>
+                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${companyNumber}"></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Reason for penalty</th>
+                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${reason}"></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Paid on</th>
+                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${paymentDate}"></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Amount</th>
+                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${penaltyAmount}"></td>
+                    </tr>
+                    </tbody>
+                </table>
                 <h2 class="govuk-heading-m">
                     What happens next
                 </h2>
                 <p class="govuk-body">
-                    Your penalty has been paid and you don't need to do anything else.
-
-                    It may take up to 24 hours for your payment to be allocated to your account.
+                    We'll update your account within 24 hours.
                 </p>
+                <p class="govuk-body">
+                    We've emailed these details to
+                    <span class="govuk-!-font-weight-bold" th:text="${userEmail}">keyvalue</span>.
+                    GOV.UK Pay will also send an email confirming that your payment was successful.
+                </p>
+                <p class="govuk-body">
+                    You do not need to contact us to tell us that you've paid.
+                </p>
+                <div class="govuk-cookie-banner">
+                    <div class="govuk-cookie-banner__message govuk-width-container">
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-full govuk-!-padding-right-7 govuk-!-padding-left-7" >
+                                <h2 class="govuk-cookie-banner__heading govuk-heading-m">
+                                    Sign up for email remainders
+                                </h2>
+                                <div class="govuk-cookie-banner__content">
+                                    <p class="govuk-body">You can sign up to receive an
+                                        <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminder</a>
+                                        to file your company accounts. This will help you file on time in future and avoid penalties.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
                 <h2 class="govuk-heading-m">
-                    Questions about this payment
+                    If you have another penalty to pay
                 </h2>
                 <p class="govuk-body">
-                    You can contact Companies House if you have questions about this payment.
-                </p>
-                <p class="govuk-body">
-                    <a href="mailto:enquiries@companieshouse.gov.uk" class="govuk-link">enquiries@companieshouse.gov.uk</a><br>
-                    Telephone: 0303 1234 500<br>
-                    Minicom/Textphone: 02920 381 245<br>
-                    Welsh language: 02920 380 065<br>
-                    Monday to Friday, 8:30am to 5pm<br>
-                </p>
-                <p class="govuk-body">
-                    If you need to contact us about your payment, use the payment reference number <span class="govuk-!-font-weight-bold" th:text="${penaltyNumber}"></span>
-                </p>
-                <h2 class="govuk-heading-m">Sign up for an Email reminder</h2>
-                <p class="govuk-body">
-                    You can sign up to receive an
-                    <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminder</a> to file your company accounts. This will help you file on time in future and avoid penalties.
+                    You can use this service again to
+                    <a class="govuk-link" href="/late-filing-penalty/ref-starts-with" th:target="_blank">pay another penalty</a>.
                 </p>
                 <p class="govuk-body">
                     <a class="govuk-link" href="https://www.smartsurvey.co.uk/s/pay-lfp-confirmation/" th:target="_blank">What did you think of this service?</a>
-                    (takes 2 minutes)
+                    (takes 30 seconds)
                 </p>
             </div>
         </div>

@@ -1,5 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,9 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
@@ -29,6 +35,9 @@ public class ConfirmationController extends BaseController {
     @Override protected String getTemplateName() {
         return PPS_CONFIRMATION_PAGE;
     }
+
+    @Autowired
+    private CompanyService companyService;
 
     @Autowired
     private PayablePenaltyService payablePenaltyService;
@@ -63,19 +72,20 @@ public class ConfirmationController extends BaseController {
             return ERROR_VIEW;
         }
 
-
         // If the payment is anything but paid return user to beginning of journey
+        PayableLateFilingPenalty payableLateFilingPenalty;
+        CompanyProfileApi companyProfileApi;
+        try {
+            companyProfileApi = companyService.getCompanyProfile(companyNumber);
+            payableLateFilingPenalty = payablePenaltyService
+                    .getPayableLateFilingPenalty(companyNumber, penaltyId);
+        } catch (ServiceException ex) {
+            LOGGER.errorRequest(request, ex.getMessage(), ex);
+            return ERROR_VIEW;
+        }
+
         if (!paymentStatus.equals("paid")) {
             LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
-            PayableLateFilingPenalty payableLateFilingPenalty;
-            try {
-                payableLateFilingPenalty = payablePenaltyService
-                        .getPayableLateFilingPenalty(companyNumber, penaltyId);
-            } catch (ServiceException ex) {
-                LOGGER.errorRequest(request, ex.getMessage(), ex);
-                return ERROR_VIEW;
-            }
-
             Map<String, String> links = payableLateFilingPenalty.getLinks();
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + links.get("resume_journey_uri");
 
@@ -83,6 +93,13 @@ public class ConfirmationController extends BaseController {
 
         model.addAttribute("companyNumber", companyNumber);
         model.addAttribute("penaltyNumber", penaltyId);
+        model.addAttribute("companyName", companyProfileApi.getCompanyName());
+        model.addAttribute("reason", "Late filing of accounts");
+        model.addAttribute("paymentDate", payableLateFilingPenalty.getPayment().getPaidAt() != null ?
+                LocalDateTime.parse(payableLateFilingPenalty.getPayment().getPaidAt(),
+                                DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK))
+                        .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)) : null);
+        model.addAttribute("penaltyAmount", "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)");
 
         return getTemplateName();
 
