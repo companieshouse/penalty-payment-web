@@ -15,41 +15,39 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <div class="govuk-panel govuk-panel--confirmation" id="confirmation-details">
-                    <div class="govuk-panel__body govuk-!-margin-bottom-6" id="confirmation-company-name-number">
+                    <div class="govuk-panel__body" id="confirmation-company-name-number">
                         <h1 class="govuk-panel__title">
-                            Penalty Paid
+                            Penalty paid
                         </h1>
                         <div class="govuk-panel__body">
                             Penalty reference:
-                            <br>
                             <span class="govuk-!-font-weight-bold" th:text="*{penaltyNumber}"/>
                         </div>
                     </div>
                 </div>
-                <table class="govuk-table">
-                    <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Issued to</th>
-                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${companyName}"></td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Company number</th>
-                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${companyNumber}"></td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Reason for penalty</th>
-                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${reason}"></td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Paid on</th>
-                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${paymentDate}"></td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-grid-column-one-third">Amount</th>
-                        <td class="govuk-table__cell govuk-grid-column-two-thirds" th:text="${penaltyAmount}"></td>
-                    </tr>
-                    </tbody>
-                </table>
+                <br>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Issued to</dt>
+                        <dd class="govuk-summary-list__value" th:text="${companyName}"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Company number</dt>
+                        <dd class="govuk-summary-list__value" th:text="${companyNumber}"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Reason for penalty</dt>
+                        <dd class="govuk-summary-list__value" th:text="${reason}"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Paid on</dt>
+                        <dd class="govuk-summary-list__value" th:text="${paymentDate}"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Amount</dt>
+                        <dd class="govuk-summary-list__value" th:text="${penaltyAmount}"></dd>
+                    </div>
+                </dl>
                 <h2 class="govuk-heading-m">
                     What happens next
                 </h2>
