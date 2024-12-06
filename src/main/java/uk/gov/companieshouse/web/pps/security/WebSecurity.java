@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import uk.gov.companieshouse.auth.filter.HijackFilter;
 import uk.gov.companieshouse.auth.filter.UserAuthFilter;
 
+import static uk.gov.companieshouse.csrf.config.ChsCsrfMitigationHttpSecurityBuilder.configureApiCsrfMitigations;
 import static uk.gov.companieshouse.csrf.config.ChsCsrfMitigationHttpSecurityBuilder.configureWebCsrfMitigations;
 
 @Configuration
@@ -44,7 +45,7 @@ public class WebSecurity {
     @Bean
     @Order(4)
     public SecurityFilterChain healthcheckSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
+        return configureApiCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/healthcheck")
         ).build();
     }
