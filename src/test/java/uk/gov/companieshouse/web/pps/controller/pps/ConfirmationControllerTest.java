@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
@@ -40,6 +41,10 @@ class ConfirmationControllerTest {
     @Mock
     private PayablePenaltyService mockPayablePenaltyService;
 
+    @Mock
+    private CompanyService mockCompanyService;
+
+
     @InjectMocks
     private ConfirmationController controller;
 
@@ -52,7 +57,13 @@ class ConfirmationControllerTest {
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
     private static final String ERROR_VIEW = "error";
-    private static final String PENALTY_ID_MODEL_ATTR = "penaltyNumber";
+
+    private static final String COMPANY_NAME_MODEL_ATTR = "companyName";
+    private static final String COMPANY_NUMBER_MODEL_ATTR = "companyNumber";
+    private static final String PAYMENT_DATE_MODEL_ATTR = "paymentDate";
+    private static final String PENALTY_NUMBER_MODEL_ATTR = "penaltyNumber";
+    private static final String REASON_MODEL_ATTR = "reason";
+    private static final String PENALTY_AMOUNT_MODEL_ATTR = "penaltyAmount";
 
     private static final String REF = "ref";
     private static final String STATE = "state";
@@ -71,6 +82,10 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - success path")
     void getRequestSuccess() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -82,7 +97,12 @@ class ConfirmationControllerTest {
         .param("status", PAYMENT_STATUS_PAID))
                 .andExpect(view().name(CONFIRMATION_VIEW))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists(PENALTY_ID_MODEL_ATTR));
+                .andExpect(model().attributeExists(COMPANY_NUMBER_MODEL_ATTR))
+                .andExpect(model().attributeExists(PENALTY_NUMBER_MODEL_ATTR))
+                .andExpect(model().attributeExists(COMPANY_NAME_MODEL_ATTR))
+                .andExpect(model().attributeExists(REASON_MODEL_ATTR))
+                .andExpect(model().attributeExists(PAYMENT_DATE_MODEL_ATTR))
+                .andExpect(model().attributeExists(PENALTY_AMOUNT_MODEL_ATTR));
 
         verify(sessionData).remove(PAYMENT_STATE);
     }
@@ -125,6 +145,8 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - payment status cancelled")
     void getRequestStatusIsCancelled() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -147,6 +169,8 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - payment status cancelled - error retrieving payment session")
     void getRequestStatusIsCancelledErrorRetrievingPaymentSession() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 

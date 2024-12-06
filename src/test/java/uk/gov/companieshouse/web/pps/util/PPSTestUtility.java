@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import uk.gov.companieshouse.api.model.latefilingpenalty.Payment;
 
 public class PPSTestUtility {
 
@@ -21,6 +22,7 @@ public class PPSTestUtility {
     public static final String LEGAL_FEES_TYPE = "legal-fees";
     public static final String DATE = "2018-12-12";
     public static final String PENALTY_ID = "EXAMPLE1234";
+    public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
 
     private PPSTestUtility() {
         throw new IllegalAccessError("Utility class");
@@ -44,9 +46,14 @@ public class PPSTestUtility {
     public static PayableLateFilingPenalty validPayableLateFilingPenalty(String companyNumber, String ID) {
         PayableLateFilingPenalty payableLateFilingPenalty = new PayableLateFilingPenalty();
         payableLateFilingPenalty.setCompanyNumber(companyNumber);
+
+        Payment payment = new Payment();
+        payment.setPaidAt(DATE_TIME);
+        payment.setAmount(VALID_AMOUNT.toString());
         String resumeURI = "/late-filing-penalty/company/" + companyNumber + "/penalty/" + ID + "/view-penalties";
 
         payableLateFilingPenalty.setLinks(new HashMap<String, String>(){{put("resume_journey_uri", resumeURI);}});
+        payableLateFilingPenalty.setPayment(payment);
 
         return payableLateFilingPenalty;
     }
