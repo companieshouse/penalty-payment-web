@@ -77,8 +77,9 @@
                     If you have another penalty to pay
                 </h2>
                 <p class="govuk-body">
-                    You can use this service again to
-                    <a class="govuk-link" href="/late-filing-penalty/ref-starts-with" th:target="_blank">pay another penalty</a>.
+                    You can use this service again to <a id="penalty-ref-starts-with-link"
+                                                         th:href="${@environment.getProperty('penalty.ref-starts-with-url')}"
+                                                         class="govuk-link">pay another penalty</a>.
                 </p>
                 <br><br>
                 <p class="govuk-body">
