@@ -65,6 +65,16 @@
                     You can sign up to receive an
                     <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminder</a> to file your company accounts. This will help you file on time in future and avoid penalties.
                 </p>
+
+                <h2 class="govuk-heading-m">
+                    If you have another penalty to pay
+                </h2>
+                <p class="govuk-body">
+                    You can use this service again to <a id="penalty-ref-starts-with-link"
+                                                         th:href="${@environment.getProperty('penalty.ref-starts-with-url')}"
+                                                         class="govuk-link">pay another penalty</a>.
+                </p>
+
                 <p class="govuk-body">
                     <a class="govuk-link" href="https://www.smartsurvey.co.uk/s/pay-lfp-confirmation/" th:target="_blank">What did you think of this service?</a>
                     (takes 2 minutes)
