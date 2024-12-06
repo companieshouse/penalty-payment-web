@@ -3,7 +3,7 @@
 Web application for handling payments of penalties. This application is written using
 the [Spring Boot](http://projects.spring.io/spring-boot/) Java framework.
 
-- Retrieves payable penalties from the Penalty Payment Service
+- Retrieves payable penalties from the Penalty Payment Service.
 - Displays payable penalties and redirects to the Payments Service to take payment.
 
 ### Requirements
