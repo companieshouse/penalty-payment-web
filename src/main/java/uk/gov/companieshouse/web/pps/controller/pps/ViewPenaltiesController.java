@@ -18,8 +18,11 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -84,15 +87,17 @@ public class ViewPenaltiesController extends BaseController {
             return ERROR_VIEW;
         }
 
-        model.addAttribute("outstanding", lateFilingPenalty.getOutstanding());
-        model.addAttribute("madeUpDate",
-                LocalDate.parse(lateFilingPenalty.getMadeUpDate(),
-                        DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.UK))
-                        .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)));
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        String formattedOutstanding = formatter.format(lateFilingPenalty.getOutstanding());
+
+        model.addAttribute("referenceTitle", penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference");
+        model.addAttribute("outstanding", formattedOutstanding);
         model.addAttribute("dueDate",
                 LocalDate.parse(lateFilingPenalty.getDueDate(),
                         DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.UK))
                         .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)));
+        model.addAttribute("penaltyReference", penaltyNumber);
+        model.addAttribute("reasonForPenalty", PenaltyUtils.getPenaltyReason(penaltyNumber));
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 
