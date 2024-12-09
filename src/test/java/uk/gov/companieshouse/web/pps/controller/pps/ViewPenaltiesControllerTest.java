@@ -68,9 +68,10 @@ class ViewPenaltiesControllerTest {
     private static final String ERROR_VIEW = "error";
 
     private static final String OUTSTANDING_MODEL_ATTR = "outstanding";
-    private static final String MADE_UP_DATE_MODEL_ATTR = "madeUpDate";
     private static final String DUE_DATE_MODEL_ATTR = "dueDate";
     private static final String COMPANY_NAME_MODEL_ATTR = "companyName";
+    private static final String PENALTY_REFERENCE_ATTR = "penaltyReference";
+    private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
     private static final String REDIRECT_PATH = "redirect:";
@@ -94,8 +95,9 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(OUTSTANDING_MODEL_ATTR))
-                .andExpect(model().attributeExists(MADE_UP_DATE_MODEL_ATTR))
                 .andExpect(model().attributeExists(DUE_DATE_MODEL_ATTR))
+                .andExpect(model().attributeExists(PENALTY_REFERENCE_ATTR))
+                .andExpect(model().attributeExists(REASON_FOR_PENALTY_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_MODEL_ATTR));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
