@@ -29,9 +29,9 @@ public class PPSTestUtility {
     }
 
 
-    public static LateFilingPenalty validLateFilingPenalty(String ID) {
+    public static LateFilingPenalty validLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(false);
         lateFilingPenalty.setDca(false);
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
@@ -43,32 +43,32 @@ public class PPSTestUtility {
         return lateFilingPenalty;
     }
 
-    public static PayableLateFilingPenalty validPayableLateFilingPenalty(String companyNumber, String ID) {
+    public static PayableLateFilingPenalty validPayableLateFilingPenalty(String companyNumber, String id) {
         PayableLateFilingPenalty payableLateFilingPenalty = new PayableLateFilingPenalty();
         payableLateFilingPenalty.setCompanyNumber(companyNumber);
 
         Payment payment = new Payment();
         payment.setPaidAt(DATE_TIME);
         payment.setAmount(VALID_AMOUNT.toString());
-        String resumeURI = "/late-filing-penalty/company/" + companyNumber + "/penalty/" + ID + "/view-penalties";
+        String resumeURI = "/late-filing-penalty/company/" + companyNumber + "/penalty/" + id + "/view-penalties";
 
-        payableLateFilingPenalty.setLinks(new HashMap<String, String>(){{put("resume_journey_uri", resumeURI);}});
+        payableLateFilingPenalty.setLinks(new HashMap<>(){{put("resume_journey_uri", resumeURI);}});
         payableLateFilingPenalty.setPayment(payment);
 
         return payableLateFilingPenalty;
     }
 
-    public static CompanyProfileApi validCompanyProfile(String ID) {
+    public static CompanyProfileApi validCompanyProfile(String id) {
         CompanyProfileApi companyProfileApi = new CompanyProfileApi();
-        companyProfileApi.setCompanyNumber(ID);
+        companyProfileApi.setCompanyNumber(id);
         companyProfileApi.setCompanyName("TEST_COMPANY");
 
         return companyProfileApi;
     }
 
-    public static LateFilingPenalty dcaLateFilingPenalty(String ID) {
+    public static LateFilingPenalty dcaLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(false);
         lateFilingPenalty.setDca(true);
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
@@ -78,9 +78,9 @@ public class PPSTestUtility {
         return lateFilingPenalty;
     }
 
-    public static LateFilingPenalty paidLateFilingPenalty(String ID) {
+    public static LateFilingPenalty paidLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(true);
         lateFilingPenalty.setDca(false);
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
@@ -90,9 +90,9 @@ public class PPSTestUtility {
         return lateFilingPenalty;
     }
 
-    public static LateFilingPenalty negativeOustandingLateFilingPenalty(String ID) {
+    public static LateFilingPenalty negativeOustandingLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(false);
         lateFilingPenalty.setDca(false);
         lateFilingPenalty.setOriginalAmount(-VALID_AMOUNT);
@@ -102,9 +102,9 @@ public class PPSTestUtility {
         return lateFilingPenalty;
     }
 
-    public static LateFilingPenalty partialPaidLateFilingPenalty(String ID) {
+    public static LateFilingPenalty partialPaidLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(false);
         lateFilingPenalty.setDca(false);
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
@@ -114,9 +114,9 @@ public class PPSTestUtility {
         return lateFilingPenalty;
     }
 
-    public static LateFilingPenalty notPenaltyTypeLateFilingPenalty(String ID) {
+    public static LateFilingPenalty notPenaltyTypeLateFilingPenalty(String id) {
         LateFilingPenalty lateFilingPenalty = new LateFilingPenalty();
-        lateFilingPenalty.setId(ID);
+        lateFilingPenalty.setId(id);
         lateFilingPenalty.setPaid(false);
         lateFilingPenalty.setDca(false);
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
