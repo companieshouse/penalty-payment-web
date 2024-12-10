@@ -31,12 +31,12 @@ public class ConfirmationController extends BaseController {
 
     private static final String PAYMENT_STATE = "payment_state";
 
-    public static final String COMPANY_NAME_ATTR = "companyName";
-    public static final String COMPANY_NUMBER_ATTR = "companyNumber";
-    public static final String PAYMENT_DATE_ATTR = "paymentDate";
-    public static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
-    public static final String REASON_ATTR = "reason";
-    public static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
+    static final String COMPANY_NAME_ATTR = "companyName";
+    static final String COMPANY_NUMBER_ATTR = "companyNumber";
+    static final String PAYMENT_DATE_ATTR = "paymentDate";
+    static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
+    static final String REASON_ATTR = "reason";
+    static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
     private static final String PENALTY_REASON = "Late filing of accounts";
 

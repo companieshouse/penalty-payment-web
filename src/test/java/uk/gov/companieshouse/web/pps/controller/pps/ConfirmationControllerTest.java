@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,10 +49,6 @@ class ConfirmationControllerTest {
     @Mock
     private CompanyService mockCompanyService;
 
-
-    @InjectMocks
-    private ConfirmationController controller;
-
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_NUMBER = "EXAMPLE12345";
 
@@ -74,7 +69,12 @@ class ConfirmationControllerTest {
 
     @BeforeEach
     void setup() {
+        ConfirmationController controller = new ConfirmationController(
+                mockCompanyService,
+                mockPayablePenaltyService,
+                sessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
     }
 
     @Test
