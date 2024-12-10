@@ -68,7 +68,6 @@ class ViewPenaltiesControllerTest {
     private static final String ERROR_VIEW = "error";
 
     private static final String OUTSTANDING_MODEL_ATTR = "outstanding";
-    private static final String DUE_DATE_MODEL_ATTR = "dueDate";
     private static final String COMPANY_NAME_MODEL_ATTR = "companyName";
     private static final String PENALTY_REFERENCE_ATTR = "penaltyReference";
     private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
@@ -95,7 +94,6 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
                 .andExpect(model().attributeExists(OUTSTANDING_MODEL_ATTR))
-                .andExpect(model().attributeExists(DUE_DATE_MODEL_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REFERENCE_ATTR))
                 .andExpect(model().attributeExists(REASON_FOR_PENALTY_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_MODEL_ATTR));
