@@ -5,12 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
@@ -24,6 +25,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.COMPANY_NUMBER_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PAYMENT_DATE_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_AMOUNT_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_NUMBER_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.REASON_ATTR;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,8 +47,8 @@ class ConfirmationControllerTest {
     @Mock
     private PayablePenaltyService mockPayablePenaltyService;
 
-    @InjectMocks
-    private ConfirmationController controller;
+    @Mock
+    private CompanyService mockCompanyService;
 
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_ID = "EXAMPLE12345";
@@ -52,7 +59,6 @@ class ConfirmationControllerTest {
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
     private static final String ERROR_VIEW = "error";
-    private static final String PENALTY_ID_MODEL_ATTR = "penaltyNumber";
 
     private static final String REF = "ref";
     private static final String STATE = "state";
@@ -64,13 +70,22 @@ class ConfirmationControllerTest {
 
     @BeforeEach
     void setup() {
+        ConfirmationController controller = new ConfirmationController(
+                mockCompanyService,
+                mockPayablePenaltyService,
+                sessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
     }
 
     @Test
     @DisplayName("Get View Confirmation Screen - success path")
     void getRequestSuccess() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -82,7 +97,41 @@ class ConfirmationControllerTest {
         .param("status", PAYMENT_STATUS_PAID))
                 .andExpect(view().name(CONFIRMATION_VIEW))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists(PENALTY_ID_MODEL_ATTR));
+                .andExpect(model().attributeExists(COMPANY_NUMBER_ATTR))
+                .andExpect(model().attributeExists(PENALTY_NUMBER_ATTR))
+                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
+                .andExpect(model().attributeExists(REASON_ATTR))
+                .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
+                .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
+
+        verify(sessionData).remove(PAYMENT_STATE);
+    }
+
+    @Test
+    @DisplayName("Get View Confirmation Screen - success path")
+    void getRequestSuccessNullPenalty() throws Exception {
+
+        PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+        mockPenalty.setPayment(null);
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(mockPenalty);
+        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
+
+        when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
+
+        this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
+                .andExpect(view().name(CONFIRMATION_VIEW))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
+                .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR))
+                .andExpect(model().attribute(PAYMENT_DATE_ATTR, ""))
+                .andExpect(model().attribute(PENALTY_AMOUNT_ATTR, ""));
 
         verify(sessionData).remove(PAYMENT_STATE);
     }
@@ -125,6 +174,8 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - payment status cancelled")
     void getRequestStatusIsCancelled() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -147,6 +198,8 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - payment status cancelled - error retrieving payment session")
     void getRequestStatusIsCancelledErrorRetrievingPaymentSession() throws Exception {
 
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
