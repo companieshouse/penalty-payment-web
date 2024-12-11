@@ -87,7 +87,8 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
-                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()));
+                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
+                                + "?ref-starts-with=LATE_FILING"));
     }
 
     @Test
@@ -98,7 +99,8 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
-                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()));
+                        "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
+                                + "?ref-starts-with=SANCTIONS"));
     }
 
     private void configurePreviousController() {
