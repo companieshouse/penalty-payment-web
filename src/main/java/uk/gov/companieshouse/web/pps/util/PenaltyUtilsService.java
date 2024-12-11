@@ -23,7 +23,7 @@ public class PenaltyUtilsService {
         return formatter.format(outstanding);
     }
 
-    public String getReferenceTitle(final String penaltyNumber){
+    public String getReferenceTitle(final String penaltyNumber) {
         return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
     }
 }
