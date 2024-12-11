@@ -1,14 +1,12 @@
 package uk.gov.companieshouse.web.pps.util;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PenaltyUtilsTest {
 
-    @Autowired
-    private PenaltyUtils penaltyUtils = new PenaltyUtils("Late filing of accounts");
+    private final PenaltyUtils penaltyUtils = new PenaltyUtils("Late filing of accounts");
 
     @Test
     void testGetViewPenaltiesLateFilingReason() {

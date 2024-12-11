@@ -10,6 +10,8 @@ public class PenaltyUtils {
 
     private final String viewPenaltiesLateFilingReason;
 
+    private static final DecimalFormat OUTSTANDING_AMOUNT_FORMATTER = new DecimalFormat("#,###");
+
     public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason){
         this.viewPenaltiesLateFilingReason = viewPenaltiesLateFilingReason;
     }
@@ -18,9 +20,8 @@ public class PenaltyUtils {
         return viewPenaltiesLateFilingReason;
     }
 
-    public String getFormattedOutstanding(final Integer outstanding) {
-        final DecimalFormat formatter = new DecimalFormat("#,###");
-        return formatter.format(outstanding);
+    public String getFormattedOutstanding(final Integer outstandingAmount) {
+        return OUTSTANDING_AMOUNT_FORMATTER.format(outstandingAmount);
     }
 
     public String getReferenceTitle(final String penaltyNumber) {
