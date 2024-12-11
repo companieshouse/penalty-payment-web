@@ -50,11 +50,11 @@ class ConfirmationControllerTest {
     private CompanyService mockCompanyService;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "EXAMPLE12345";
+    private static final String PENALTY_ID = "EXAMPLE12345";
 
-    private static final String VIEW_CONFIRMATION_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/confirmation";
+    private static final String VIEW_CONFIRMATION_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_ID + "/confirmation";
 
-    private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/view-penalties";
+    private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_ID + "/view-penalties";
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
     private static final String ERROR_VIEW = "error";
@@ -83,8 +83,8 @@ class ConfirmationControllerTest {
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -151,8 +151,8 @@ class ConfirmationControllerTest {
 
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)
@@ -176,7 +176,7 @@ class ConfirmationControllerTest {
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
         doThrow(ServiceException.class)
-                .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+                .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)

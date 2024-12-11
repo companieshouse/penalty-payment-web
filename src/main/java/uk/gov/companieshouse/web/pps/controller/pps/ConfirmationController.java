@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/confirmation")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyId}/confirmation")
 public class ConfirmationController extends BaseController {
 
     private static final String CONFIRMATION_PAGE = "pps/confirmationPage";
@@ -61,7 +61,7 @@ public class ConfirmationController extends BaseController {
 
     @GetMapping
     public String getConfirmation(@PathVariable String companyNumber,
-                                  @PathVariable String penaltyNumber,
+                                  @PathVariable String penaltyId,
                                   @RequestParam("state") String paymentState,
                                   @RequestParam("status") String paymentStatus,
                                   HttpServletRequest request,
@@ -91,7 +91,7 @@ public class ConfirmationController extends BaseController {
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
             payablePenalty = payablePenaltyService
-                    .getPayableLateFilingPenalty(companyNumber, penaltyNumber);
+                    .getPayableLateFilingPenalty(companyNumber, penaltyId);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return ERROR_VIEW;
@@ -104,7 +104,7 @@ public class ConfirmationController extends BaseController {
         }
 
         model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
-        model.addAttribute(PENALTY_NUMBER_ATTR, penaltyNumber);
+        model.addAttribute(PENALTY_NUMBER_ATTR, penaltyId);
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(REASON_ATTR, PENALTY_REASON);
         model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
