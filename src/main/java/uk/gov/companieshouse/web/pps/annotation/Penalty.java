@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.annotation;
 
-import uk.gov.companieshouse.web.pps.validation.PenaltyValidator;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
@@ -10,6 +8,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import uk.gov.companieshouse.web.pps.validation.PenaltyValidator;
 
 @Documented
 @Constraint(validatedBy = PenaltyValidator.class)
@@ -18,7 +17,7 @@ import java.lang.annotation.Target;
 @ReportAsSingleViolation
 public @interface Penalty {
 
-    String message() default "Enter the reference number";
+    String message() default "Enter the penalty reference";
 
     String messageNotLongEnough() default "Enter your penalty reference exactly as shown on your penalty letter";
 

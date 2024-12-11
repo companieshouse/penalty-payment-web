@@ -1,5 +1,21 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,24 +30,9 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -93,12 +94,27 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Get Details view success path")
-    void getRequestSuccess() throws Exception {
+    @DisplayName("Get Details - Late Filing view success path")
+    void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
 
         configurePreviousController();
 
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH))
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", LATE_FILING.name()))
+                .andExpect(status().isOk())
+                .andExpect(view().name(ENTER_DETAILS_VIEW))
+                .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
+                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+    }
+
+    @Test
+    @DisplayName("Get Details - Sanction view success path")
+    void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
+
+        configurePreviousController();
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", SANCTIONS.name()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))

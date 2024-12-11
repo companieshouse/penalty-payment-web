@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
@@ -21,13 +25,10 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import java.util.List;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
-@PreviousController(StartController.class)
+@PreviousController(PenaltyRefStartsWithController.class)
 @NextController(ViewPenaltiesController.class)
 @RequestMapping("/late-filing-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
@@ -61,8 +62,10 @@ public class EnterDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getEnterDetails(Model model) {
-        model.addAttribute(ENTER_DETAILS_MODEL_ATTR, new EnterDetails());
+    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
+            Model model) {
+        model.addAttribute(ENTER_DETAILS_MODEL_ATTR,
+                new EnterDetails(PenaltyReference.valueOf(penaltyReferenceName)));
 
         addBackPageAttributeToModel(model);
 
@@ -89,10 +92,9 @@ public class EnterDetailsController extends BaseController {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
                     .getLateFilingPenalties(companyNumber, penaltyNumber);
 
-
-                redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
-                redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
-                redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
+            redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
+            redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
+            redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
             // If there are no payable late filing penalties either the company does not exist or has no penalties.
             if (payableLateFilingPenalties.isEmpty()) {
