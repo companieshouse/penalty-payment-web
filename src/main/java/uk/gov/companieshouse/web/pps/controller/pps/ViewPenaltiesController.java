@@ -18,12 +18,11 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 import java.util.List;
-import java.util.Locale;
 
 @Controller
 @PreviousController(EnterDetailsController.class)
@@ -50,6 +49,9 @@ public class ViewPenaltiesController extends BaseController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
     @GetMapping
     public String getViewPenalties(@PathVariable String companyNumber,
                                    @PathVariable String penaltyNumber,
@@ -65,7 +67,7 @@ public class ViewPenaltiesController extends BaseController {
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
             lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber);
-            lateFilingPenalty = lateFilingPenalties.get(0);
+            lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return ERROR_VIEW;
@@ -84,15 +86,10 @@ public class ViewPenaltiesController extends BaseController {
             return ERROR_VIEW;
         }
 
-        model.addAttribute("outstanding", lateFilingPenalty.getOutstanding());
-        model.addAttribute("madeUpDate",
-                LocalDate.parse(lateFilingPenalty.getMadeUpDate(),
-                        DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.UK))
-                        .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)));
-        model.addAttribute("dueDate",
-                LocalDate.parse(lateFilingPenalty.getDueDate(),
-                        DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.UK))
-                        .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)));
+        model.addAttribute("referenceTitle", penaltyUtils.getReferenceTitle(penaltyNumber));
+        model.addAttribute("outstanding", penaltyUtils.getFormattedOutstanding(lateFilingPenalty.getOutstanding()));
+        model.addAttribute("penaltyReference", penaltyNumber);
+        model.addAttribute("reasonForPenalty", penaltyUtils.getViewPenaltiesLateFilingReason());
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 
@@ -108,7 +105,7 @@ public class ViewPenaltiesController extends BaseController {
 
         try {
             // Call penalty details for create request
-            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber).get(0);
+            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber).getFirst();
 
             // Create payable session
             payableLateFilingPenaltySession = payablePenaltyService.createLateFilingPenaltySession(
