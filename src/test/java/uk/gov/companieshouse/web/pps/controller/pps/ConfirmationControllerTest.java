@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -102,6 +103,35 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
+
+        verify(sessionData).remove(PAYMENT_STATE);
+    }
+
+    @Test
+    @DisplayName("Get View Confirmation Screen - success path")
+    void getRequestSuccessNullPenalty() throws Exception {
+
+        PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+        mockPenalty.setPayment(null);
+        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
+                .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID))
+                .thenReturn(mockPenalty);
+        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
+
+        when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
+
+        this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
+                .andExpect(view().name(CONFIRMATION_VIEW))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
+                .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR))
+                .andExpect(model().attribute(PAYMENT_DATE_ATTR, ""))
+                .andExpect(model().attribute(PENALTY_AMOUNT_ATTR, ""));
 
         verify(sessionData).remove(PAYMENT_STATE);
     }
