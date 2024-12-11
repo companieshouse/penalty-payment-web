@@ -1,8 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -70,12 +67,9 @@ public class PenaltyRefStartsWithController extends BaseController {
         }
 
         PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceChoice.getSelectedPenaltyReference());
-        if (penaltyReference == LATE_FILING || penaltyReference == SANCTIONS) {
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX
-                    + penaltyConfigurationProperties.getEnterDetailsPath();
-        }
-
-        return ERROR_VIEW;
+        return UrlBasedViewResolver.REDIRECT_URL_PREFIX
+                + penaltyConfigurationProperties.getEnterDetailsPath()
+                + "?ref-starts-with=" + penaltyReference.name();
     }
 
 }
