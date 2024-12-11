@@ -18,7 +18,7 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtilsService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -50,7 +50,7 @@ public class ViewPenaltiesController extends BaseController {
     private PaymentService paymentService;
 
     @Autowired
-    private PenaltyUtilsService penaltyUtilsService;
+    private PenaltyUtils penaltyUtils;
 
     @GetMapping
     public String getViewPenalties(@PathVariable String companyNumber,
@@ -86,10 +86,10 @@ public class ViewPenaltiesController extends BaseController {
             return ERROR_VIEW;
         }
 
-        model.addAttribute("referenceTitle", penaltyUtilsService.getReferenceTitle(penaltyNumber));
-        model.addAttribute("outstanding", penaltyUtilsService.getFormattedOutstanding(lateFilingPenalty.getOutstanding()));
+        model.addAttribute("referenceTitle", penaltyUtils.getReferenceTitle(penaltyNumber));
+        model.addAttribute("outstanding", penaltyUtils.getFormattedOutstanding(lateFilingPenalty.getOutstanding()));
         model.addAttribute("penaltyReference", penaltyNumber);
-        model.addAttribute("reasonForPenalty", penaltyUtilsService.getPenaltyReason());
+        model.addAttribute("reasonForPenalty", penaltyUtils.getViewPenaltiesLateFilingReason());
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 

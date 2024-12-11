@@ -20,7 +20,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyServic
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtilsService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ class ViewPenaltiesControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtilsService mockPenaltyUtilsService;
+    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private ViewPenaltiesController controller;
@@ -94,9 +94,9 @@ class ViewPenaltiesControllerTest {
         configureValidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
 
-        when(mockPenaltyUtilsService.getFormattedOutstanding(any())).thenReturn("Mocked Outstanding Value"); // Adjust to your actual method
-        when(mockPenaltyUtilsService.getReferenceTitle(any())).thenReturn("Mocked Penalty Reference");
-        when(mockPenaltyUtilsService.getPenaltyReason()).thenReturn("Mocked Reason for Penalty");
+        when(mockPenaltyUtils.getFormattedOutstanding(any())).thenReturn("Mocked Outstanding Value"); // Adjust to your actual method
+        when(mockPenaltyUtils.getReferenceTitle(any())).thenReturn("Mocked Penalty Reference");
+        when(mockPenaltyUtils.getViewPenaltiesLateFilingReason()).thenReturn("Mocked Reason for Penalty");
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
@@ -108,9 +108,9 @@ class ViewPenaltiesControllerTest {
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
-        verify(mockPenaltyUtilsService, times(1)).getFormattedOutstanding(any()); // Verify PenaltyUtilsService method call
-        verify(mockPenaltyUtilsService, times(1)).getReferenceTitle(any());  // Verify PenaltyUtilsService method call
-        verify(mockPenaltyUtilsService, times(1)).getPenaltyReason(); // Verify PenaltyUtilsService method call
+        verify(mockPenaltyUtils, times(1)).getFormattedOutstanding(any()); // Verify PenaltyUtilsService method call
+        verify(mockPenaltyUtils, times(1)).getReferenceTitle(any());  // Verify PenaltyUtilsService method call
+        verify(mockPenaltyUtils, times(1)).getViewPenaltiesLateFilingReason(); // Verify PenaltyUtilsService method call
     }
 
     @Test

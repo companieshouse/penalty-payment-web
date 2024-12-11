@@ -1,20 +1,20 @@
 package uk.gov.companieshouse.web.pps.util;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
 
-@Service
-public class PenaltyUtilsService {
+@Component
+public class PenaltyUtils {
 
-    public final String viewPenaltiesLateFilingReason;
+    private final String viewPenaltiesLateFilingReason;
 
-    public PenaltyUtilsService(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason){
+    public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason){
         this.viewPenaltiesLateFilingReason = viewPenaltiesLateFilingReason;
     }
 
-    public String getPenaltyReason() {
+    public String getViewPenaltiesLateFilingReason() {
         return viewPenaltiesLateFilingReason;
     }
 
