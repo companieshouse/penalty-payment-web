@@ -3,15 +3,11 @@ package uk.gov.companieshouse.web.pps.models;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import uk.gov.companieshouse.web.pps.annotation.Penalty;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 public class EnterDetails {
 
-    private PenaltyReference penaltyReference;
-
-    public EnterDetails(PenaltyReference penaltyReference) {
-        this.penaltyReference = penaltyReference;
-    }
+    @NotNull
+    private String penaltyReferenceName;
 
     /**
      * Returns different error messages depending on entered penalty.
@@ -32,8 +28,12 @@ public class EnterDetails {
     @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterDetails.companyNumber.wrongLength}")
     private String companyNumber;
 
-    public PenaltyReference getPenaltyReference() {
-        return penaltyReference;
+    public String getPenaltyReferenceName() {
+        return penaltyReferenceName;
+    }
+
+    public void setPenaltyReferenceName(String penaltyReferenceName) {
+        this.penaltyReferenceName = penaltyReferenceName;
     }
 
     public String getPenaltyNumber() {

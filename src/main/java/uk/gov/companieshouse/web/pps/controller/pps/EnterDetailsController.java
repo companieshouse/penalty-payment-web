@@ -64,8 +64,9 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
             Model model) {
-        model.addAttribute(ENTER_DETAILS_MODEL_ATTR,
-                new EnterDetails(PenaltyReference.valueOf(penaltyReferenceName)));
+        EnterDetails enterDetails = new EnterDetails();
+        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
+        model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
         addBackPageAttributeToModel(model);
 
@@ -74,8 +75,10 @@ public class EnterDetailsController extends BaseController {
 
     @PostMapping
     public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
-                                      BindingResult bindingResult,
-                                      HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+            BindingResult bindingResult,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
