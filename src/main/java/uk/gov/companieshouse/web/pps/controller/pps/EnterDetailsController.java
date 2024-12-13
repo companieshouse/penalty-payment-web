@@ -67,7 +67,7 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
             Model model) {
-        EnterDetails enterDetails = new EnterDetails();
+        var enterDetails = new EnterDetails();
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
