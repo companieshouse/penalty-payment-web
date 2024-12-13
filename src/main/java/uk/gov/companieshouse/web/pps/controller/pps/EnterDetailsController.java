@@ -25,7 +25,7 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
 @PreviousController(PenaltyRefStartsWithController.class)
@@ -40,6 +40,9 @@ public class EnterDetailsController extends BaseController {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private EnterDetailsValidator enterDetailsValidator;
 
     private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
@@ -80,6 +83,8 @@ public class EnterDetailsController extends BaseController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        enterDetailsValidator.isValid(enterDetails, bindingResult);
+
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
             for (FieldError error : errors) {
@@ -89,7 +94,7 @@ public class EnterDetailsController extends BaseController {
         }
 
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterDetails.getPenaltyNumber();
+        String penaltyNumber = enterDetails.getPenaltyRef();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService

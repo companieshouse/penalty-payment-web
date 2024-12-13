@@ -52,7 +52,7 @@
                                    type="text"
                                    maxlength="8">
                         </div>
-                        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyNumber')} ? 'govuk-form-group--error' : ''">
+                        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyRef')} ? 'govuk-form-group--error' : ''">
                             <h1 class="govuk-label-wrapper">
                                 <div th:switch="*{penaltyReferenceName}">
                                     <label class="govuk-label govuk-label--m" for="penalty-ref"
@@ -67,9 +67,9 @@
                             </h1>
 
                             <span class="govuk-error-message"
-                                  id="penaltyNumber-errorId"
-                                  th:if="${#fields.hasErrors('penaltyNumber')}"
-                                  th:each="e : ${#fields.errors('penaltyNumber')}" th:text="${e}">
+                                  id="penaltyRef-errorId"
+                                  th:if="${#fields.hasErrors('penaltyRef')}"
+                                  th:each="e : ${#fields.errors('penaltyRef')}" th:text="${e}">
                             </span>
 
                             <div id="penalty-ref-hint.LATE_FILING" class="govuk-hint" th:if="*{penaltyReferenceName == 'LATE_FILING'}"
@@ -83,7 +83,7 @@
 
                             <input class="govuk-input govuk-input--width-10"
                                    id="penalty-ref"
-                                   th:field="*{penaltyNumber}"
+                                   th:field="*{penaltyRef}"
                                    th:errorclass="govuk-input--error"
                                    name="penalty-ref"
                                    type="text"
