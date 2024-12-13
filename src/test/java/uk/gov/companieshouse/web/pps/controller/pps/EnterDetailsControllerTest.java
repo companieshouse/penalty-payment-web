@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.util.Locale.UK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
@@ -42,6 +44,9 @@ import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 class EnterDetailsControllerTest {
 
     private MockMvc mockMvc;
+
+    @Mock
+    private MessageSource mockMessageSource;
 
     @Mock
     private EnterDetailsValidator mockEnterDetailsValidator;
@@ -206,6 +211,25 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+    }
+
+    @Test
+    @DisplayName("Post Details failure path - no payable sanction penalties found")
+    void postRequestNoPayableSanctionPenaltyFound() throws Exception {
+
+        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS.name())
+                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_DETAILS_VIEW));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
     }
 
     @Test
