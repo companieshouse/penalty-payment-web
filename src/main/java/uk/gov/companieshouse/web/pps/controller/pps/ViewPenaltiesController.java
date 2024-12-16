@@ -58,6 +58,8 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
+        addPhaseBannerToModel(model);
+        addUserModel(model);
         addBackPageAttributeToModel(model);
 
         List<LateFilingPenalty> lateFilingPenalties;

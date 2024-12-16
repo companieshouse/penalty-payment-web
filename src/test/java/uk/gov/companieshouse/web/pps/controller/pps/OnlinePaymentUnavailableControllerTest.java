@@ -38,7 +38,7 @@ class OnlinePaymentUnavailableControllerTest {
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/online-payment-unavailable";
 
     private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
@@ -56,7 +56,7 @@ class OnlinePaymentUnavailableControllerTest {
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_ONLINE_PAYMENT_UNAVAILABLE))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
     }
 
     private void configurePreviousController() {

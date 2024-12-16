@@ -46,6 +46,8 @@ public class PenaltyPaidController extends BaseController {
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
         model.addAttribute("penaltyNumber", penaltyNumber);
 
+        addPhaseBannerToModel(model);
+        addUserModel(model);
         addBackPageAttributeToModel(model);
 
         return getTemplateName();

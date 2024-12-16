@@ -38,7 +38,7 @@ class DcaRequiredControllerTest {
     private static final String DCA_REQUIRED_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/legal-fees-required";
 
     private static final String PPS_DCA_REQUIRED = "pps/legalFeesDCA";
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
@@ -56,7 +56,7 @@ class DcaRequiredControllerTest {
         this.mockMvc.perform(get(DCA_REQUIRED_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_DCA_REQUIRED))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
     }
 

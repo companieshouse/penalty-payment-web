@@ -63,7 +63,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private static final String RADIO = "radio";
     private static final String PREVIOUS_PATH = "/late-filing-penalty/enter-details";
     private static final String SIGN_OUT = System.getProperty("ACCOUNT_LOCAL_URL");
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
 
     @BeforeEach
@@ -80,7 +80,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR))
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(view().name(SIGN_OUT_VIEW));
 
     }
@@ -96,7 +96,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         this.mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR))
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(view().name(SIGN_OUT_VIEW));
 
 

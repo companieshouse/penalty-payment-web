@@ -18,7 +18,7 @@
         <java.version>21</java.version>
         <structured-logging.version>3.0.9</structured-logging.version>
         <log4j-bom.version>3.0.0-beta2</log4j-bom.version>
-        <common-web-java.version>3.0.17</common-web-java.version>
+        <common-web-java.version>3.0.33</common-web-java.version>
         <java-session-handler.version>4.1.0</java-session-handler.version>
         <web-security-java.version>3.1.0</web-security-java.version>
         <junit-jupiter-engine.version>5.11.0</junit-jupiter-engine.version>

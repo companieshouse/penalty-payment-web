@@ -109,6 +109,8 @@ public class ConfirmationController extends BaseController {
         model.addAttribute(REASON_ATTR, PENALTY_REASON);
         model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
         model.addAttribute(PENALTY_AMOUNT_ATTR, setUpPaymentAmountDisplay(payablePenalty));
+        addPhaseBannerToModel(model);
+        addUserModel(model);
 
         return getTemplateName();
     }

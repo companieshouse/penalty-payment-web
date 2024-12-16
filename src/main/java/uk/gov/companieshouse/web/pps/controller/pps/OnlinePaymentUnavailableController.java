@@ -24,6 +24,7 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                        @PathVariable String penaltyNumber,
                                        Model model) {
 
+        addPhaseBannerToModel(model);
         addBackPageAttributeToModel(model);
 
         return getTemplateName();

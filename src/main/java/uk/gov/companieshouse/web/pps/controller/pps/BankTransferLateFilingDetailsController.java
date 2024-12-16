@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
@@ -18,7 +19,9 @@ public class BankTransferLateFilingDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getBankTransferLateFilingDetails() {
+    public String getBankTransferLateFilingDetails(Model model) {
+        addPhaseBannerToModel(model);
+        addBackPageAttributeToModel(model);
         return getTemplateName();
     }
 

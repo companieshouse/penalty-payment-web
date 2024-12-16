@@ -25,7 +25,17 @@ public abstract class BaseController {
     protected abstract String getTemplateName();
 
     protected void addBackPageAttributeToModel(Model model, String... pathVars) {
+        model.addAttribute("backLink", navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
+    }
 
-        model.addAttribute("backButton", navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
+    protected void addUserModel(Model model) {
+        model.addAttribute("userBar", "1");
+        model.addAttribute("hideYourDetails", "1");
+        model.addAttribute("hideRecentFilings", "1");
+    }
+
+    protected void addPhaseBannerToModel(Model model) {
+        model.addAttribute("phaseBanner", "beta");
+        model.addAttribute("phaseBannerLink", "https://www.smartsurvey.co.uk/s/pay-lfp-feedback/");
     }
 }

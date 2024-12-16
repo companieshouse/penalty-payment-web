@@ -1,11 +1,14 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
+@PreviousController(BankTransferPenaltyReferenceController.class)
 @RequestMapping("/late-filing-penalty/bank-transfer/sanctions-details")
 public class BankTransferSanctionsDetailsController extends BaseController {
 
@@ -16,7 +19,9 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getBankTransferSanctionsDetails() {
+    public String getBankTransferSanctionsDetails(Model model) {
+        addPhaseBannerToModel(model);
+        addBackPageAttributeToModel(model);
         return getTemplateName();
     }
 }
