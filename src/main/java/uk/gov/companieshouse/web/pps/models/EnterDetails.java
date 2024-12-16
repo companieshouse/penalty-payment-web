@@ -2,26 +2,11 @@ package uk.gov.companieshouse.web.pps.models;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import uk.gov.companieshouse.web.pps.annotation.Penalty;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 public class EnterDetails {
 
-    private PenaltyReference penaltyReference;
-
-    public EnterDetails(PenaltyReference penaltyReference) {
-        this.penaltyReference = penaltyReference;
-    }
-
-    /**
-     * Returns different error messages depending on entered penalty.
-     * No entered penalty returns `message`
-     * Entered penalty but not a matching length to stringSize returns `messageNotLongEnough`
-     */
-    @Penalty(messageNotLongEnough = "{enterDetails.penaltyNumber.wrongLength}",
-            message = "{enterDetails.penaltyNumber.emptyField}",
-            stringSize = 8)
-    private String penaltyNumber;
+    @NotNull
+    private String penaltyReferenceName;
 
     /**
      * Allows any length of number under 8. e.g "6400" is allowed.
@@ -29,19 +14,17 @@ public class EnterDetails {
      * Doesn't allow spaces or empty strings
      */
     @NotNull
-    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterDetails.companyNumber.wrongLength}")
+    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterDetails.companyNumber.notValid}")
     private String companyNumber;
 
-    public PenaltyReference getPenaltyReference() {
-        return penaltyReference;
+    private String penaltyRef;
+
+    public String getPenaltyReferenceName() {
+        return penaltyReferenceName;
     }
 
-    public String getPenaltyNumber() {
-        return penaltyNumber;
-    }
-
-    public void setPenaltyNumber(String penaltyNumber) {
-        this.penaltyNumber = penaltyNumber;
+    public void setPenaltyReferenceName(String penaltyReferenceName) {
+        this.penaltyReferenceName = penaltyReferenceName;
     }
 
     public String getCompanyNumber() {
@@ -50,6 +33,14 @@ public class EnterDetails {
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
+    }
+
+    public String getPenaltyRef() {
+        return penaltyRef;
+    }
+
+    public void setPenaltyRef(String penaltyRef) {
+        this.penaltyRef = penaltyRef;
     }
 
 }
