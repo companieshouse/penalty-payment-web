@@ -1,15 +1,16 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.util.Locale.UK;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
 @PreviousController(PenaltyRefStartsWithController.class)
@@ -41,6 +43,12 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private EnterDetailsValidator enterDetailsValidator;
+
+    @Autowired
+    private MessageSource messageSource;
+
     private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
     private static final String PENALTY_PAID = "/penalty-paid";
@@ -54,9 +62,6 @@ public class EnterDetailsController extends BaseController {
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
-    @Value("${penalty.error-details-not-found}")
-    private String detailsNotFound;
-
     @Override protected String getTemplateName() {
         return ENTER_DETAILS;
     }
@@ -64,8 +69,9 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
             Model model) {
-        model.addAttribute(ENTER_DETAILS_MODEL_ATTR,
-                new EnterDetails(PenaltyReference.valueOf(penaltyReferenceName)));
+        var enterDetails = new EnterDetails();
+        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
+        model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
         addPhaseBannerToModel(model);
         addUserModel(model);
@@ -76,8 +82,12 @@ public class EnterDetailsController extends BaseController {
 
     @PostMapping
     public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
-                                      BindingResult bindingResult,
-                                      HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+            BindingResult bindingResult,
+            HttpServletRequest request,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        enterDetailsValidator.isValid(enterDetails, bindingResult);
 
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -88,7 +98,7 @@ public class EnterDetailsController extends BaseController {
         }
 
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterDetails.getPenaltyNumber();
+        String penaltyNumber = enterDetails.getPenaltyRef();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
@@ -102,8 +112,13 @@ public class EnterDetailsController extends BaseController {
             if (payableLateFilingPenalties.isEmpty()) {
                 LOGGER.info("No late filing penalties for company no. "  +  companyNumber
                         + " and penalty: " +   penaltyNumber);
-                ObjectError error = new ObjectError("globalError", detailsNotFound);
-                bindingResult.addError(error);
+
+                String penaltyDetailsNotFoundError = switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
+                    case LATE_FILING -> messageSource.getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+                    case SANCTIONS -> messageSource.getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
+                };
+                bindingResult.reject("globalError", penaltyDetailsNotFoundError);
+
                 return getTemplateName();
             }
 

@@ -5,17 +5,18 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title th:text="'Penalty details (' + ${enterDetails.penaltyReference.name} + ')'">
+    <title th:text="'Penalty details (' + ${enterDetails.penaltyReferenceName} + ')'">
         Penalty details
     </title>
 </head>
 
-    <div id="enter-details"  layout:fragment="content">
+    <div id="enter-details" layout:fragment="content">
         <form id="enterdetails" th:action="@{''}" th:object="${enterDetails}" method="post" class="form">
+            <input type="hidden" th:field="*{penaltyReferenceName}" name="penaltyReferenceName"/>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
 
-                    <div th:replace="fragments/ppsGlobalErrors :: globalErrors"></div>
+                    <div th:replace="~{fragments/ppsGlobalErrors :: globalErrors}"></div>
 
                     <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Penalty details</h1>
 
@@ -51,9 +52,9 @@
                                    type="text"
                                    maxlength="8">
                         </div>
-                        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyNumber')} ? 'govuk-form-group--error' : ''">
+                        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyRef')} ? 'govuk-form-group--error' : ''">
                             <h1 class="govuk-label-wrapper">
-                                <div th:switch="${enterDetails.penaltyReference.name()}">
+                                <div th:switch="*{penaltyReferenceName}">
                                     <label class="govuk-label govuk-label--m" for="penalty-ref"
                                            th:case="'LATE_FILING'" th:text="#{details.penalty-ref-label.LATE_FILING}">
                                         What is the reference number?
@@ -66,23 +67,23 @@
                             </h1>
 
                             <span class="govuk-error-message"
-                                  id="penaltyNumber-errorId"
-                                  th:if="${#fields.hasErrors('penaltyNumber')}"
-                                  th:each="e : ${#fields.errors('penaltyNumber')}" th:text="${e}">
+                                  id="penaltyRef-errorId"
+                                  th:if="${#fields.hasErrors('penaltyRef')}"
+                                  th:each="e : ${#fields.errors('penaltyRef')}" th:text="${e}">
                             </span>
 
-                            <div id="penalty-ref-hint.LATE_FILING" class="govuk-hint" th:if="${enterDetails.penaltyReference.name() == 'LATE_FILING'}"
+                            <div id="penalty-ref-hint.LATE_FILING" class="govuk-hint" th:if="*{penaltyReferenceName == 'LATE_FILING'}"
                                  th:text="#{details.penalty-ref-hint.LATE_FILING}">
                                 This starts with A, followed by 7 numbers. For example, A1234567.
                             </div>
-                            <div id="penalty-ref-hint.SANCTIONS" class="govuk-hint" th:if="${enterDetails.penaltyReference.name() == 'SANCTIONS'}"
+                            <div id="penalty-ref-hint.SANCTIONS" class="govuk-hint" th:if="*{penaltyReferenceName == 'SANCTIONS'}"
                                  th:text="#{details.penalty-ref-hint.SANCTIONS}">
                                 This starts with PN, followed by 8 numbers. For example, PN12345678.
                             </div>
 
                             <input class="govuk-input govuk-input--width-10"
                                    id="penalty-ref"
-                                   th:field="*{penaltyNumber}"
+                                   th:field="*{penaltyRef}"
                                    th:errorclass="govuk-input--error"
                                    name="penalty-ref"
                                    type="text"
@@ -96,9 +97,9 @@
                                     </span>
                                 </summary>
                                 <div class="govuk-details__text">
-                                    <p th:if="${enterDetails.penaltyReference.name() == 'LATE_FILING'}" th:text="#{details.penalty-notice-text.LATE_FILING}">
+                                    <p th:if="*{penaltyReferenceName == 'LATE_FILING'}" th:text="#{details.penalty-notice-text.LATE_FILING}">
                                         You'll find these numbers at the top of the penalty notice we sent to you.</p>
-                                    <p th:if="${enterDetails.penaltyReference.name() == 'SANCTIONS'}" th:text="#{details.penalty-notice-text.SANCTIONS}">
+                                    <p th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:text="#{details.penalty-notice-text.SANCTIONS}">
                                         You'll find these numbers at the top of your penalty notice.</p>
                                     <div id="penalty-notice-image">
                                         <img th:src="@{images/penalty-notice.png}" alt="penalty notice">
