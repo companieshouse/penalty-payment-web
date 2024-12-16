@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +21,6 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.List;
 
 @Controller
 @PreviousController(EnterDetailsController.class)
@@ -121,8 +119,8 @@ public class ViewPenaltiesController extends BaseController {
 
         try {
             // Return the payment session URL and add query parameter to indicate Review Payments screen isn't wanted
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX +
-                    paymentService.createPaymentSession(payableLateFilingPenaltySession, companyNumber) + "?summary=false";
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
+                    payableLateFilingPenaltySession, companyNumber, penaltyNumber) + "?summary=false";
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
