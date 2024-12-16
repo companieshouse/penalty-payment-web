@@ -48,7 +48,8 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter the reference number", Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
+        assertEquals("Enter the reference number",
+                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
     @Test
@@ -61,7 +62,8 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter your reference number exactly as shown on your penalty letter", Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
+        assertEquals("Enter your reference number exactly as shown on your penalty letter",
+                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
     @Test
@@ -85,7 +87,8 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter the penalty reference", Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
+        assertEquals("Enter the penalty reference",
+                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
     @Test
@@ -98,7 +101,8 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter your penalty reference exactly as shown on your penalty letter", Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
+        assertEquals("Enter your penalty reference exactly as shown on your penalty letter",
+                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
 }
