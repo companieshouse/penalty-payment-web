@@ -24,10 +24,10 @@ public class EnterDetailsValidator {
     public void isValid(final EnterDetails enterDetails, final BindingResult bindingResult) {
         String penaltyRef = enterDetails.getPenaltyRef();
         String penaltyRefErrorText = switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
-            case LATE_FILING -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.isEmpty.LATE_FILING",
-                    LATE_FILING_PENALTY_REF_REGEX, "enterDetails.penaltyRef.isWrong.LATE_FILING");
-            case SANCTIONS -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.isEmpty.SANCTIONS",
-                    SANCTIONS_PENALTY_REF_REGEX, "enterDetails.penaltyRef.isWrong.SANCTIONS");
+            case LATE_FILING -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.notEmpty.LATE_FILING",
+                    LATE_FILING_PENALTY_REF_REGEX, "enterDetails.penaltyRef.notValid.LATE_FILING");
+            case SANCTIONS -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.notEmpty.SANCTIONS",
+                    SANCTIONS_PENALTY_REF_REGEX, "enterDetails.penaltyRef.notValid.SANCTIONS");
         };
 
         if (penaltyRefErrorText != null) {
@@ -35,13 +35,13 @@ public class EnterDetailsValidator {
         }
     }
 
-    private String getPenaltyRefErrorText(String penaltyRef, String penaltyRefIsEmptyErrorMessageKey,
-            String penaltyRefRegex, String penaltyRefIsWrongErrorMessageKey) {
+    private String getPenaltyRefErrorText(String penaltyRef, String penaltyRefNotEmptyErrorMessageKey,
+            String penaltyRefRegex, String penaltyRefNotValidErrorMessageKey) {
         String penaltyRefErrorText = null;
         if (penaltyRef.isEmpty()) {
-            penaltyRefErrorText = bundle.getString(penaltyRefIsEmptyErrorMessageKey);
+            penaltyRefErrorText = bundle.getString(penaltyRefNotEmptyErrorMessageKey);
         } else if (!penaltyRef.matches(penaltyRefRegex)) {
-            penaltyRefErrorText = bundle.getString(penaltyRefIsWrongErrorMessageKey);
+            penaltyRefErrorText = bundle.getString(penaltyRefNotValidErrorMessageKey);
         }
         return penaltyRefErrorText;
     }

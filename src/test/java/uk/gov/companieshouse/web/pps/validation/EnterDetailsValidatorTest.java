@@ -9,13 +9,10 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 
-@ExtendWith(MockitoExtension.class)
 class EnterDetailsValidatorTest {
 
     private static final String ENTER_DETAILS_MODEL = "enterDetails";
@@ -42,7 +39,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithLateFilingAndIsEmpty() {
+    void isValidWhenRefStartsWithLateFilingAndMissing() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setPenaltyRef("");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -55,7 +52,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithLateFilingAndIsWrong() {
+    void isValidWhenRefStartsWithLateFilingAndNotValid() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setPenaltyRef("A123456");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -79,7 +76,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithSanctionsAndIsEmpty() {
+    void isValidWhenRefStartsWithSanctionsAndMissing() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
         enterDetails.setPenaltyRef("");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -92,7 +89,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithSanctionsAndIsWrong() {
+    void isValidWhenRefStartsWithSanctionsAndNotValid() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
         enterDetails.setPenaltyRef("PN1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);

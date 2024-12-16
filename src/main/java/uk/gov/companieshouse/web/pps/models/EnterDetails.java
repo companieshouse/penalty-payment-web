@@ -14,7 +14,7 @@ public class EnterDetails {
      * Doesn't allow spaces or empty strings
      */
     @NotNull
-    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterDetails.companyNumber.wrongLength}")
+    @Pattern(regexp = "^([a-zA-Z0-9]{8}|\\d{1,8})$", message = "{enterDetails.companyNumber.notValid}")
     private String companyNumber;
 
     private String penaltyRef;
