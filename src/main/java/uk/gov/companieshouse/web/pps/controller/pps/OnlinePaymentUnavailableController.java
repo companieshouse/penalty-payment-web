@@ -13,16 +13,16 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
-    private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
 
     @Override protected String getTemplateName() {
-        return PPS_ONLINE_PAYMENT_UNAVAILABLE;
+        return ONLINE_PAYMENT_UNAVAILABLE;
     }
 
     @GetMapping
-    public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
-                                       @PathVariable String penaltyNumber,
-                                       Model model) {
+    public String getOnlinePaymentUnavailable(@PathVariable String companyNumber,
+                                              @PathVariable String penaltyNumber,
+                                              Model model) {
 
         addBackPageAttributeToModel(model);
 
