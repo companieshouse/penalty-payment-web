@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class PenaltyUtilsTest {
 
@@ -40,5 +41,16 @@ class PenaltyUtilsTest {
             }
         };
         assertEquals(email, penaltyUtils.getLoginEmail(sessionService));
+    }
+
+    @Test
+    void testGetLoginEmailSuccessful_ReturnNull() {
+        SessionService sessionService = new SessionService() {
+            @Override
+            public Map<String, Object> getSessionDataFromContext() {
+                return Map.of("id", "test");
+            }
+        };
+        assertNull(penaltyUtils.getLoginEmail(sessionService));
     }
 }
