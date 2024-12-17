@@ -3,8 +3,10 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +61,21 @@ class BankTransferSanctionsDetailsControllerTest {
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS));
+                .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
+                .andExpect(model().attributeExists(USER_BAR_ATTR));
+    }
+
+    @Test
+    @DisplayName("Get Bank Transfer Sanctions Details - success path without login")
+    void getRequestSuccessWithoutLogin() throws Exception {
+
+        configurePreviousController();
+        configureMockEmailNotExist();
+
+        this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
+                .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
     private void configurePreviousController() {
@@ -68,7 +84,10 @@ class BankTransferSanctionsDetailsControllerTest {
     }
 
     private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test");
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 
+    private void configureMockEmailNotExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn(null);
+    }
 }
