@@ -44,11 +44,23 @@ class PenaltyUtilsTest {
     }
 
     @Test
-    void testGetLoginEmailSuccessful_ReturnNull() {
+    void testGetLoginEmailSuccessful_NullSignInInfo() {
         SessionService sessionService = new SessionService() {
             @Override
             public Map<String, Object> getSessionDataFromContext() {
                 return Map.of("id", "test");
+            }
+        };
+        assertNull(penaltyUtils.getLoginEmail(sessionService));
+    }
+
+    @Test
+    void testGetLoginEmailSuccessful_NullUserProfile() {
+        Map<String, Object> signInInfo = Map.of("id", "test");
+        SessionService sessionService = new SessionService() {
+            @Override
+            public Map<String, Object> getSessionDataFromContext() {
+                return Map.of("signin_info", signInInfo);
             }
         };
         assertNull(penaltyUtils.getLoginEmail(sessionService));
