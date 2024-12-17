@@ -58,7 +58,7 @@ class BankTransferLateFilingDetailsControllerTest {
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
-                .andExpect(model().attributeExists(USER_BAR_ATTR));;
+                .andExpect(model().attributeExists(USER_BAR_ATTR));
     }
 
     @Test
