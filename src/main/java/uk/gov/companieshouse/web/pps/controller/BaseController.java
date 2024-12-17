@@ -32,6 +32,7 @@ public abstract class BaseController {
         model.addAttribute("userBar", "1");
         model.addAttribute("hideYourDetails", "1");
         model.addAttribute("hideRecentFilings", "1");
+        model.addAttribute("userSignoutUrl", "/late-filing-penalty/sign-out");
     }
 
     protected void addPhaseBannerToModel(Model model) {

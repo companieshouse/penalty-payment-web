@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -27,6 +28,9 @@ class BankTransferLateFilingDetailsControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
+
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private BankTransferLateFilingDetailsController controller;
@@ -47,6 +51,7 @@ class BankTransferLateFilingDetailsControllerTest {
     void getBankTransferLateFilingDetailsSuccess() throws Exception {
 
         configurePreviousController();
+        configureMockEmailExist();
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
@@ -57,4 +62,9 @@ class BankTransferLateFilingDetailsControllerTest {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
     }
+
+    private void configureMockEmailExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test");
+    }
+
 }
