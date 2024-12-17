@@ -21,7 +21,7 @@ import java.util.Collections;
 public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     private static final UriTemplate GET_PAYABLE_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{penaltyId}");
+            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{payableRef}");
 
     private static final UriTemplate POST_LFP_URI =
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
@@ -30,12 +30,12 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     private ApiClientService apiClientService;
 
     @Override
-    public PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String penaltyId) throws ServiceException {
+    public PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String payableRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         PayableLateFilingPenalty payableLateFilingPenalty;
 
         try {
-            String uri = GET_PAYABLE_LFP_URI.expand(companyNumber, penaltyId).toString();
+            String uri = GET_PAYABLE_LFP_URI.expand(companyNumber, payableRef).toString();
             payableLateFilingPenalty = apiClient.payableLateFilingPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Payable Late Filing Penalty from API", ex);

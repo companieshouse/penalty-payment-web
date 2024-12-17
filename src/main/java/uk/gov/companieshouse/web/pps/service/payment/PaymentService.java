@@ -12,7 +12,7 @@ public interface PaymentService {
     String createPaymentSession(
             PayableLateFilingPenaltySession payableLateFilingPenaltySession,
             String companyNumber,
-            String penaltyReference
+            String penaltyRef
     )
         throws ServiceException;
 }

@@ -83,7 +83,7 @@ class PaymentServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_REFERENCE = "00531369";
+    private static final String PENALTY_REF = "00531369";
 
     @BeforeEach
     void setUp() {
@@ -114,7 +114,7 @@ class PaymentServiceImplTest {
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
         String journeyUrl = mockPaymentService.createPaymentSession(
-                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REFERENCE);
+                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
@@ -130,7 +130,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REFERENCE));
+                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }
@@ -144,7 +144,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REFERENCE));
+                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }

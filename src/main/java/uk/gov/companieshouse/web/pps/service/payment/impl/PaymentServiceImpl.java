@@ -56,7 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
     public String createPaymentSession(
             PayableLateFilingPenaltySession payableLateFilingPenaltySession,
             String companyNumber,
-            String penaltyReference)
+            String penaltyRef)
             throws ServiceException {
 
         String paymentState = UUID.randomUUID().toString();
@@ -66,8 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
                 + "/late-filing-penalty/company/"
                 + companyNumber
                 + "/penalty/"
-                + penaltyReference
-                + "/payment/"
+                + penaltyRef
+                + "/payable/"
                 + payableLateFilingPenaltySession.getId()
                 + "/confirmation";
         paymentSessionApi.setRedirectUri(redirectUrl);

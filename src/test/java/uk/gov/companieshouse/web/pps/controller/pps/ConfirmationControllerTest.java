@@ -50,12 +50,12 @@ class ConfirmationControllerTest {
     private CompanyService mockCompanyService;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_ID = "EXAMPLE12345";
-    private static final String PAYMENT_REFERENCE = "PAYMENT_REFERENCE_123456";
+    private static final String PENALTY_REF = "EXAMPLE12345";
+    private static final String PAYABLE_REF = "PR_123456";
 
-    private static final String VIEW_CONFIRMATION_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_ID + "/payment/" + PAYMENT_REFERENCE + "/confirmation";
+    private static final String VIEW_CONFIRMATION_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
 
-    private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_ID + "/view-penalties";
+    private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/view-penalties";
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
     private static final String ERROR_VIEW = "error";
@@ -84,8 +84,8 @@ class ConfirmationControllerTest {
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYMENT_REFERENCE))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -111,11 +111,11 @@ class ConfirmationControllerTest {
     @DisplayName("Get View Confirmation Screen - success path")
     void getRequestSuccessNullPenalty() throws Exception {
 
-        PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+        PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF);
         mockPenalty.setPayment(null);
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYMENT_REFERENCE))
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(mockPenalty);
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
@@ -179,8 +179,8 @@ class ConfirmationControllerTest {
 
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYMENT_REFERENCE))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)
@@ -202,7 +202,7 @@ class ConfirmationControllerTest {
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
         doThrow(ServiceException.class)
-                .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYMENT_REFERENCE);
+                .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)

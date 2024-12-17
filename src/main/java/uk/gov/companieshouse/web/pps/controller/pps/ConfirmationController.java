@@ -23,7 +23,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyServic
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyId}/payment/{paymentReference}/confirmation")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
 public class ConfirmationController extends BaseController {
 
     private static final String CONFIRMATION_PAGE = "pps/confirmationPage";
@@ -60,8 +60,8 @@ public class ConfirmationController extends BaseController {
 
     @GetMapping
     public String getConfirmation(@PathVariable String companyNumber,
-                                  @PathVariable String penaltyId,
-                                  @PathVariable String paymentReference,
+                                  @PathVariable String penaltyRef,
+                                  @PathVariable String payableRef,
                                   @RequestParam("state") String paymentState,
                                   @RequestParam("status") String paymentStatus,
                                   HttpServletRequest request,
@@ -87,7 +87,7 @@ public class ConfirmationController extends BaseController {
 
         try {
             PayableLateFilingPenalty payablePenalty = payablePenaltyService
-                    .getPayableLateFilingPenalty(companyNumber, paymentReference);
+                    .getPayableLateFilingPenalty(companyNumber, payableRef);
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
@@ -98,7 +98,7 @@ public class ConfirmationController extends BaseController {
             CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
 
             model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
-            model.addAttribute(PENALTY_NUMBER_ATTR, penaltyId);
+            model.addAttribute(PENALTY_NUMBER_ATTR, penaltyRef);
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(REASON_ATTR, PENALTY_REASON);
             model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
