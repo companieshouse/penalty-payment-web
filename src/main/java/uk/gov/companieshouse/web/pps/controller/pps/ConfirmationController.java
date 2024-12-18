@@ -33,7 +33,7 @@ public class ConfirmationController extends BaseController {
     static final String COMPANY_NAME_ATTR = "companyName";
     static final String COMPANY_NUMBER_ATTR = "companyNumber";
     static final String PAYMENT_DATE_ATTR = "paymentDate";
-    static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
+    static final String PENALTY_REF_ATTR = "penaltyRef";
     static final String REASON_ATTR = "reason";
     static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
@@ -98,7 +98,7 @@ public class ConfirmationController extends BaseController {
             CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
 
             model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
-            model.addAttribute(PENALTY_NUMBER_ATTR, penaltyRef);
+            model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(REASON_ATTR, PENALTY_REASON);
             model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
