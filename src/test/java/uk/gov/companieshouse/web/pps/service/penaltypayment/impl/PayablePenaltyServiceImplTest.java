@@ -61,13 +61,13 @@ class PayablePenaltyServiceImplTest {
 
     private static final String PENALTY_NUMBER = "98765432";
 
-    private static final String PENALTY_ID = "EXAMPLE1234";
+    private static final String PAYABLE_REF = "EXAMPLE1234";
 
     private static final Integer AMOUNT = 750;
 
     private static final String POST_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable";
 
-    private static final String GET_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable/" + PENALTY_ID;
+    private static final String GET_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable/" + PAYABLE_REF;
 
     @BeforeEach
     void init() {
@@ -84,7 +84,7 @@ class PayablePenaltyServiceImplTest {
     @DisplayName("Get Payable Late Filing Penalties - Success Path")
     void getPayableLateFilingPenaltiesSuccess() throws ServiceException, ApiErrorResponseException, URIValidationException {
 
-        PayableLateFilingPenalty validLateFilingPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+        PayableLateFilingPenalty validLateFilingPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
 
         when(payableLateFilingPenaltyResourceHandler.get(GET_PAYABLE_LFP_URI)).thenReturn(payableLateFilingPenaltyGet);
         when(payableLateFilingPenaltyGet.execute()).thenReturn(payableLateFilingPenaltyApiResponse);
@@ -92,7 +92,7 @@ class PayablePenaltyServiceImplTest {
         when(payableLateFilingPenaltyApiResponse.getData()).thenReturn(validLateFilingPenalty);
 
         PayableLateFilingPenalty payableLateFilingPenalty =
-                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID);
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
 
         assertEquals(payableLateFilingPenalty, validLateFilingPenalty);
     }
@@ -105,7 +105,7 @@ class PayablePenaltyServiceImplTest {
         when(payableLateFilingPenaltyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF));
     }
 
     @Test
@@ -116,7 +116,7 @@ class PayablePenaltyServiceImplTest {
         when(payableLateFilingPenaltyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_ID));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF));
     }
 
     /**

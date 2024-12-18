@@ -6,7 +6,7 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 
 public interface PayablePenaltyService {
 
-    PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String penaltyId) throws ServiceException;
+    PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String payableRef) throws ServiceException;
 
     PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyNumber, Integer amount)
             throws ServiceException;

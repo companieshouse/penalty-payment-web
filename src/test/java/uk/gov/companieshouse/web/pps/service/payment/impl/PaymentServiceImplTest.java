@@ -83,6 +83,8 @@ class PaymentServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
+    private static final String PENALTY_REF = "00531369";
+
     @BeforeEach
     void setUp() {
 
@@ -111,7 +113,8 @@ class PaymentServiceImplTest {
 
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
-        String journeyUrl = mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
+        String journeyUrl = mockPaymentService.createPaymentSession(
+                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
@@ -126,7 +129,8 @@ class PaymentServiceImplTest {
         when(paymentCreate.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER));
+                mockPaymentService.createPaymentSession(
+                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }
@@ -139,7 +143,8 @@ class PaymentServiceImplTest {
         when(paymentCreate.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER));
+                mockPaymentService.createPaymentSession(
+                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }
