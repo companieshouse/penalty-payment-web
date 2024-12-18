@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +23,6 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -196,7 +195,7 @@ class ViewPenaltiesControllerTest {
         verify(mockPayablePenaltyService, times(1))
                 .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
 
     }
 
@@ -250,7 +249,7 @@ class ViewPenaltiesControllerTest {
         verify(mockPayablePenaltyService, times(1))
                 .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
     }
 
 
@@ -320,7 +319,7 @@ class ViewPenaltiesControllerTest {
     private void configureCreatingPaymentSession(PayableLateFilingPenaltySession payableLateFilingPenaltySession)
             throws ServiceException {
 
-        when(mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER))
+        when(mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER))
                 .thenReturn(MOCK_PAYMENTS_URL);
     }
 
@@ -328,7 +327,7 @@ class ViewPenaltiesControllerTest {
             throws ServiceException {
 
         doThrow(ServiceException.class).when(mockPaymentService)
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
     }
 
 }

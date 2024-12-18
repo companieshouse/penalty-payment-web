@@ -9,6 +9,10 @@ public interface PaymentService {
     /**
      * Creates a payment session in order to pay for the Late Filing Penalty.
      */
-    String createPaymentSession(PayableLateFilingPenaltySession payableLateFilingPenaltySession, String companyNumber)
+    String createPaymentSession(
+            PayableLateFilingPenaltySession payableLateFilingPenaltySession,
+            String companyNumber,
+            String penaltyRef
+    )
         throws ServiceException;
 }
