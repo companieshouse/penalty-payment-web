@@ -102,7 +102,8 @@
                                     <p th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:text="#{details.penalty-notice-text.SANCTIONS}">
                                         You'll find these numbers at the top of your penalty notice.</p>
                                     <div id="penalty-notice-image">
-                                        <img th:src="@{images/penalty-notice.png}" alt="penalty notice">
+                                        <img th:if="*{penaltyReferenceName == 'LATE_FILING'}" th:src="@{images/penalty-notice.png}" alt="penalty notice">
+                                        <img th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:src="@{images/sanction-penalty-notice.png}" alt="penalty notice">
                                     </div>
                                 </div>
                             </details>
