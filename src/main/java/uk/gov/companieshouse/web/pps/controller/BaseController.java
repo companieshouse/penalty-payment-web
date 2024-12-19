@@ -33,6 +33,7 @@ public abstract class BaseController {
     protected abstract String getTemplateName();
 
     protected void addBackPageAttributeToModel(Model model, String... pathVars) {
+        // Set a value for showing back link
         model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
     }
 
@@ -48,6 +49,7 @@ public abstract class BaseController {
     }
 
     protected void addUserModel(Model model) {
+        // Set a value for showing user bar part
         model.addAttribute(USER_BAR_ATTR, "1");
         model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
         model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
