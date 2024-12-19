@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -10,12 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
@@ -28,11 +30,17 @@ public class PenaltyRefStartsWithController extends BaseController {
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final List<PenaltyReference> availablePenaltyReference;
 
     public PenaltyRefStartsWithController(NavigatorService navigatorService,
-            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            FeatureFlagChecker featureFlagChecker) {
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
+                .stream()
+                .filter(featureFlagChecker::isPenaltyRefEnabled)
+                .toList();
     }
 
     @Override
@@ -42,8 +50,7 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
-        model.addAttribute(AVAILABLE_PENALTY_REF_ATTR,
-                penaltyConfigurationProperties.getAllowedRefStartsWith());
+        model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
         addBackPageAttributeToModel(model);
@@ -61,15 +68,12 @@ public class PenaltyRefStartsWithController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            model.addAttribute(AVAILABLE_PENALTY_REF_ATTR,
-                    penaltyConfigurationProperties.getAllowedRefStartsWith());
+            model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
             return getTemplateName();
         }
 
-        PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceChoice.getSelectedPenaltyReference());
-        return UrlBasedViewResolver.REDIRECT_URL_PREFIX
-                + penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + penaltyReference.name();
+        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
+                + "?ref-starts-with=" + penaltyReferenceChoice.getSelectedPenaltyReference().name();
     }
 
 }
