@@ -99,7 +99,7 @@ class EnterDetailsControllerTest {
 
     private static final String COMPANY_NUMBER_ATTRIBUTE = "companyNumber";
 
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
@@ -119,7 +119,7 @@ class EnterDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
         verifyNoInteractions(mockEnterDetailsValidator);
     }
@@ -135,7 +135,7 @@ class EnterDetailsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
         verifyNoInteractions(mockEnterDetailsValidator);
     }

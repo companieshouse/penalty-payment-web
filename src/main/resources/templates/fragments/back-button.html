@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+</head>
+<body>
+<a id="back-button-link"
+   data-th-text="#{button.back}"
+   data-event-id="back-button-link"
+   th:fragment="backLink"
+   th:if="${backLink != null}"
+   href="javascript:void(0)"
+   onclick="history.go(-1)"
+   class="govuk-back-link">
+</a>
+</body>
+</html>
