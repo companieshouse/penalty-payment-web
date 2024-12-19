@@ -1,6 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,7 +28,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
@@ -70,46 +75,67 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWith() throws Exception {
         configurePreviousController();
-        mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
+
+        MvcResult mvcResult = mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
-                .andExpect(model().attributeExists(PENALTY_REFERENCE_CHOICE_ATTR));
+                .andExpect(model().attributeExists(PENALTY_REFERENCE_CHOICE_ATTR))
+                .andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        assertEquals(List.of(LATE_FILING), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
     @Test
     @DisplayName("Post 'penaltyRefStartsWith' screen - error: none selected")
     void postPenaltyRefStartsWithWhenNoneSelected() throws Exception {
-        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath()))
+        MvcResult mvcResult = mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
                 .andExpect(model().attributeHasFieldErrors(PENALTY_REFERENCE_CHOICE_ATTR))
-                .andExpect(model().attributeErrorCount(PENALTY_REFERENCE_CHOICE_ATTR, 1));
+                .andExpect(model().attributeErrorCount(PENALTY_REFERENCE_CHOICE_ATTR, 1))
+                .andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        assertEquals(List.of(LATE_FILING), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
     @Test
     @DisplayName("Post 'penaltyRefStartsWith' screen - success: late filing selected")
     void postPenaltyRefStartsWithWhenLateFilingSelected() throws Exception {
-        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
+        MvcResult mvcResult = mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
                         .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=LATE_FILING"));
+                                + "?ref-starts-with=LATE_FILING"))
+                .andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        assertTrue(modelAndView.getModel().isEmpty());
     }
 
     @Test
     @DisplayName("Post 'penaltyRefStartsWith' screen - success: sanction selected")
     void postPenaltyRefStartsWithWhenSanctionSelected() throws Exception {
-        mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
+        MvcResult mvcResult = mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
                         .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=SANCTIONS"));
+                                + "?ref-starts-with=SANCTIONS"))
+                .andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        assertTrue(modelAndView.getModel().isEmpty());
     }
 
     private void configurePreviousController() {
