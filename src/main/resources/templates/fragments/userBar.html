@@ -10,7 +10,7 @@
                th:text="${userEmail}" style="display:none;"></a>
             <nav role="navigation" class="content">
                 <ul id="navigation" class="mobile-hidden">
-                    <li id="signed-in-user" class="user"><span th:text="${userEmail}"></span>:</li>
+                    <li id="signed-in-user" class="user"><span th:text="${userEmail}"></span></li>
                     <li th:unless="${hideYourDetails}">
                         <a id="your_details" th:href="${yourDetailsUrl}" class="govuk-link" data-event-id="your-details"
                            th:text="#{label.user-bar.account-details}">Your details</a></li>

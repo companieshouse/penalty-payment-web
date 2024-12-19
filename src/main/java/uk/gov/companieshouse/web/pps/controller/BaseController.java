@@ -36,6 +36,17 @@ public abstract class BaseController {
         model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
     }
 
+    protected void addBaseAttributesToModel(Model model) {
+        addPhaseBannerToModel(model);
+        addUserModel(model);
+        addBackPageAttributeToModel(model);
+    }
+
+    protected void addBaseAttributesNoSignOutToModel(Model model) {
+        addPhaseBannerToModel(model);
+        addBackPageAttributeToModel(model);
+    }
+
     protected void addUserModel(Model model) {
         model.addAttribute(USER_BAR_ATTR, "1");
         model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");

@@ -34,11 +34,10 @@ public class BankTransferLateFilingDetailsController extends BaseController {
         String loginEmail = penaltyUtils.getLoginEmail(sessionService);
         if (loginEmail != null) {
             model.addAttribute(USER_EMAIL, loginEmail);
-            addUserModel(model);
+            addBaseAttributesToModel(model);
+        } else {
+            addBaseAttributesNoSignOutToModel(model);
         }
-
-        addPhaseBannerToModel(model);
-        addBackPageAttributeToModel(model);
         return getTemplateName();
     }
 

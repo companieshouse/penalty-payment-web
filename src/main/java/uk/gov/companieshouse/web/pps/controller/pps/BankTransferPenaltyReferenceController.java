@@ -47,8 +47,7 @@ public class BankTransferPenaltyReferenceController extends BaseController {
                 penaltyConfigurationProperties.getAllowedRefStartsWith());
         model.addAttribute(PPS_PENALTY_REF_ATTR, new PenaltyReferenceChoice());
 
-        addPhaseBannerToModel(model);
-        addBackPageAttributeToModel(model);
+        addBaseAttributesNoSignOutToModel(model);
 
         return getTemplateName();
     }

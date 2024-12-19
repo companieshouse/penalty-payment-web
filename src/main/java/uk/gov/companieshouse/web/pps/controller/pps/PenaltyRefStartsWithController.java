@@ -46,8 +46,7 @@ public class PenaltyRefStartsWithController extends BaseController {
                 penaltyConfigurationProperties.getAllowedRefStartsWith());
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addPhaseBannerToModel(model);
-        addBackPageAttributeToModel(model);
+        addBaseAttributesNoSignOutToModel(model);
 
         return getTemplateName();
     }

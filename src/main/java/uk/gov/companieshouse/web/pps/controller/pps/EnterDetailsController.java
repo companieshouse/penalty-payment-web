@@ -73,9 +73,7 @@ public class EnterDetailsController extends BaseController {
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addPhaseBannerToModel(model);
-        addUserModel(model);
-        addBackPageAttributeToModel(model);
+        addBaseAttributesToModel(model);
 
         return getTemplateName();
     }
