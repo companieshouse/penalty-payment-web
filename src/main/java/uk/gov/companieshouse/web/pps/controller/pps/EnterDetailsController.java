@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Locale.UK;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
@@ -49,6 +51,9 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private FeatureFlagChecker featureFlagChecker;
+
     private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
     private static final String PENALTY_PAID = "/penalty-paid";
@@ -69,6 +74,11 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
             Model model) {
+
+        if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
+            return ERROR_VIEW;
+        }
+
         var enterDetails = new EnterDetails();
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);

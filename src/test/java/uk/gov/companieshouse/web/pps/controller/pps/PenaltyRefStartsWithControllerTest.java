@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,6 +15,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +26,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -45,15 +49,20 @@ class PenaltyRefStartsWithControllerTest {
     void setup() {
         penaltyConfigurationProperties = new PenaltyConfigurationProperties();
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
-                "A", "PN"));
+                LATE_FILING, SANCTIONS));
         penaltyConfigurationProperties.setRefStartsWithPath(
                 "/late-filing-penalty/ref-starts-with");
         penaltyConfigurationProperties.setEnterDetailsPath(
                 "/late-filing-penalty/enter-details");
 
+        FeatureFlagConfigurationProperties featureFlagConfigurationProperties = new FeatureFlagConfigurationProperties();
+        featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS.name(), FALSE));
+        FeatureFlagChecker featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
+
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
-                penaltyConfigurationProperties);
+                penaltyConfigurationProperties,
+                featureFlagChecker);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -83,7 +92,7 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Post 'penaltyRefStartsWith' screen - success: late filing selected")
     void postPenaltyRefStartsWithWhenLateFilingSelected() throws Exception {
         mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
-                        .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.getStartsWith()))
+                        .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
@@ -95,7 +104,7 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Post 'penaltyRefStartsWith' screen - success: sanction selected")
     void postPenaltyRefStartsWithWhenSanctionSelected() throws Exception {
         mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath())
-                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.getStartsWith()))
+                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
