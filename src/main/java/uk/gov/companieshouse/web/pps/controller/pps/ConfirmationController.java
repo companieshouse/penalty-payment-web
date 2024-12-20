@@ -62,11 +62,12 @@ public class ConfirmationController extends BaseController {
     @Autowired
     public ConfirmationController(CompanyService companyService,
                                   PayablePenaltyService payablePenaltyService,
-                                  SessionService sessionService, PenaltyPaymentService penaltyPaymentSerivce) {
+                                  SessionService sessionService,
+                                  PenaltyPaymentService penaltyPaymentService) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
-        this.penaltyPaymentService = penaltyPaymentSerivce;
+        this.penaltyPaymentService = penaltyPaymentService;
     }
 
     @GetMapping
@@ -82,7 +83,6 @@ public class ConfirmationController extends BaseController {
         List<LateFilingPenalty> lateFilingPenalties;
         LateFilingPenalty lateFilingPenalty;
 
-        // Check that the session state is present
         if (!sessionData.containsKey(PAYMENT_STATE)) {
             LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
             return ERROR_VIEW;
@@ -91,7 +91,6 @@ public class ConfirmationController extends BaseController {
         String sessionPaymentState = (String) sessionData.get(PAYMENT_STATE);
         sessionData.remove(PAYMENT_STATE);
 
-        // Check that the session state has not been tampered with
         if (!paymentState.equals(sessionPaymentState)) {
             LOGGER.errorRequest(request, "Payment state value in session is not as expected, possible tampering of session "
                     + "Expected: " + sessionPaymentState + ", Received: " + paymentState);
@@ -104,7 +103,6 @@ public class ConfirmationController extends BaseController {
             lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
             lateFilingPenalty = lateFilingPenalties.getFirst();
 
-            // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
                 LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payablePenalty.getLinks().get("resume_journey_uri");
@@ -136,7 +134,7 @@ public class ConfirmationController extends BaseController {
 
     private String setUpPaymentAmountDisplay(LateFilingPenalty payableLateFilingPenalty) {
         if (payableLateFilingPenalty.getOriginalAmount() != null) {
-            return "£" + penaltyUtils.getFormattedOutstanding(payableLateFilingPenalty.getOriginalAmount()) + " (no VAT is charged)";
+            return penaltyUtils.getFormattedOutstanding(payableLateFilingPenalty.getOriginalAmount());
         }
         return "";
     }

@@ -45,7 +45,7 @@
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Amount</dt>
-                        <dd class="govuk-summary-list__value" th:text="${penaltyAmount}"></dd>
+                        <dd class="govuk-summary-list__value" th:text="'£' + ${penaltyAmount} + ' (no VAT is charged)'"></dd>
                     </div>
                 </dl>
                 <h2 class="govuk-heading-m">

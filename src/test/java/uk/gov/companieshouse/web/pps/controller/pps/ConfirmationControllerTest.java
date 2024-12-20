@@ -146,7 +146,6 @@ class ConfirmationControllerTest {
         verify(sessionData).remove(PAYMENT_STATE);
     }
 
-
     @Test
     @DisplayName("Get Confirmation Screen - missing payment state from session")
     void getRequestMissingPaymentState() throws Exception {
