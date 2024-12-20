@@ -25,7 +25,7 @@ public class PenaltyUtils {
     }
 
     public String getReferenceTitle(final String penaltyNumber) {
-        return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
+        return "Penalty Reference";
     }
 }
 
