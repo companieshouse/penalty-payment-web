@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,16 +12,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,6 +47,9 @@ class ConfirmationControllerTest {
 
     @Mock
     private PayablePenaltyService mockPayablePenaltyService;
+
+    @Mock
+    private PenaltyPaymentService mockPenaltyPaymentSerivce;
 
     @Mock
     private CompanyService mockCompanyService;
@@ -73,7 +78,8 @@ class ConfirmationControllerTest {
         ConfirmationController controller = new ConfirmationController(
                 mockCompanyService,
                 mockPayablePenaltyService,
-                sessionService);
+                sessionService,
+                mockPenaltyPaymentSerivce);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
     }
@@ -86,6 +92,8 @@ class ConfirmationControllerTest {
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF));
+        when(mockPenaltyPaymentSerivce.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF))
+                .thenReturn(Collections.singletonList(new LateFilingPenalty()));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
 
@@ -113,13 +121,15 @@ class ConfirmationControllerTest {
 
         PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF);
         mockPenalty.setPayment(null);
+
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(mockPenalty);
+        when(mockPenaltyPaymentSerivce.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF))
+                .thenReturn(List.of(new LateFilingPenalty()));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
-
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
@@ -135,6 +145,7 @@ class ConfirmationControllerTest {
 
         verify(sessionData).remove(PAYMENT_STATE);
     }
+
 
     @Test
     @DisplayName("Get Confirmation Screen - missing payment state from session")
@@ -181,6 +192,8 @@ class ConfirmationControllerTest {
 
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF));
+        when(mockPenaltyPaymentSerivce.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF))
+                .thenReturn(List.of(new LateFilingPenalty()));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)

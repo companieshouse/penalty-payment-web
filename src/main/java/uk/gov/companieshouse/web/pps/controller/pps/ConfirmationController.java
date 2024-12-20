@@ -1,8 +1,10 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.OffsetDateTime;
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import org.thymeleaf.util.StringUtils;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
+import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
@@ -50,12 +54,19 @@ public class ConfirmationController extends BaseController {
     private final SessionService sessionService;
 
     @Autowired
+    private PenaltyUtils penaltyUtils;
+
+    @Autowired
+    private PenaltyPaymentService penaltyPaymentService;
+
+    @Autowired
     public ConfirmationController(CompanyService companyService,
-            PayablePenaltyService payablePenaltyService,
-            SessionService sessionService) {
+                                  PayablePenaltyService payablePenaltyService,
+                                  SessionService sessionService, PenaltyPaymentService penaltyPaymentSerivce) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
+        this.penaltyPaymentService = penaltyPaymentSerivce;
     }
 
     @GetMapping
@@ -68,6 +79,8 @@ public class ConfirmationController extends BaseController {
                                   Model model) {
 
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
+        List<LateFilingPenalty> lateFilingPenalties;
+        LateFilingPenalty lateFilingPenalty;
 
         // Check that the session state is present
         if (!sessionData.containsKey(PAYMENT_STATE)) {
@@ -88,6 +101,8 @@ public class ConfirmationController extends BaseController {
         try {
             PayableLateFilingPenalty payablePenalty = payablePenaltyService
                     .getPayableLateFilingPenalty(companyNumber, payableRef);
+            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
+            lateFilingPenalty = lateFilingPenalties.getFirst();
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
@@ -102,7 +117,7 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(REASON_ATTR, PENALTY_REASON);
             model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
-            model.addAttribute(PENALTY_AMOUNT_ATTR, setUpPaymentAmountDisplay(payablePenalty));
+            model.addAttribute(PENALTY_AMOUNT_ATTR, setUpPaymentAmountDisplay(lateFilingPenalty));
 
             return getTemplateName();
         } catch (ServiceException ex) {
@@ -113,17 +128,15 @@ public class ConfirmationController extends BaseController {
 
     private String setUpPaymentDateDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
         if (payableLateFilingPenalty.getPayment() != null) {
-            return StringUtils.isEmpty(payableLateFilingPenalty.getPayment().getPaidAt()) ? "" :
-                    OffsetDateTime.parse(payableLateFilingPenalty.getPayment().getPaidAt(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                            .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
+            return LocalDate.now()
+                    .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
         }
         return "";
     }
 
-    private String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getPayment() != null) {
-            return StringUtils.isEmpty(payableLateFilingPenalty.getPayment().getAmount()) ? "" :
-                    "£" + payableLateFilingPenalty.getPayment().getAmount() + " (no VAT is charged)";
+    private String setUpPaymentAmountDisplay(LateFilingPenalty payableLateFilingPenalty) {
+        if (payableLateFilingPenalty.getOriginalAmount() != null) {
+            return "£" + penaltyUtils.getFormattedOutstanding(payableLateFilingPenalty.getOriginalAmount()) + " (no VAT is charged)";
         }
         return "";
     }
