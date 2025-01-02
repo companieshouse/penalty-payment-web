@@ -41,9 +41,9 @@ public class PenaltyUtils {
         return "";
     }
 
-    public String setUpPaymentAmountDisplay(LateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getOriginalAmount() != null) {
-            return getFormattedOutstanding(payableLateFilingPenalty.getOriginalAmount());
+    public String setUpPaymentAmountDisplay(LateFilingPenalty lateFilingPenalty) {
+        if (lateFilingPenalty.getOriginalAmount() != null) {
+            return getFormattedOutstanding(lateFilingPenalty.getOriginalAmount());
         }
         return "";
     }
