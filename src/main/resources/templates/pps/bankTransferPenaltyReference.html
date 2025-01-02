@@ -32,14 +32,15 @@
                         <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios" style="margin-bottom:1em;" th:each="penaltyReference : ${availablePenaltyReference}">
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input piwik-event"
-                                       th:id="${penaltyReference}"
+                                       th:id="${penaltyReference.name}"
                                        name="available-penalty-reference"
                                        type="radio"
-                                       th:value="${penaltyReference}"
+                                       th:value="${penaltyReference.name}"
                                        th:field="*{selectedPenaltyReference}"
                                        th:errorclass="govuk-error-message"
-                                       th:attr="data-event-id=${penaltyReference}"/>
-                                <label class="govuk-label govuk-radios__label" th:for="${penaltyReference}" th:text="${penaltyReference}">keyvalue</label>
+                                       th:attr="data-event-id=${penaltyReference.name}"/>
+                                <label class="govuk-label govuk-radios__label" th:for="${penaltyReference}"
+                                       th:text="${penaltyReference.startsWith}">PenaltyReference.startsWith</label>
                             </div>
                         </div>
                     </fieldset>
