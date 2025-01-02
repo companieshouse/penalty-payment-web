@@ -32,12 +32,9 @@ public class PenaltyUtils {
         return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
     }
 
-    public String setUpPaymentDateDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getPayment() != null) {
-            return LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
-        }
-        return "";
+    public String setUpPaymentDateDisplay() {
+        return LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
     }
 
     public String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
