@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -127,7 +126,7 @@ class ConfirmationControllerTest {
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(mockPenalty);
         when(mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF))
-                .thenReturn(List.of(new LateFilingPenalty()));
+                .thenReturn(Collections.singletonList(new LateFilingPenalty()));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
@@ -192,7 +191,7 @@ class ConfirmationControllerTest {
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF));
         when(mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF))
-                .thenReturn(List.of(new LateFilingPenalty()));
+                .thenReturn(Collections.singletonList(new LateFilingPenalty()));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                 .param("ref", REF)
