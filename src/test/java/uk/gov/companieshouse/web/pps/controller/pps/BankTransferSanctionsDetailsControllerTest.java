@@ -102,6 +102,21 @@ class BankTransferSanctionsDetailsControllerTest {
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
+    @Test
+    @DisplayName("Get Bank Transfer Sanctions Details - success path null email")
+    void getRequestSuccessNullEmail() throws Exception {
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
+
+        configurePreviousController();
+        configureMockEmailNull();
+
+        this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
+                .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
+    }
+
+
     private void configurePreviousController() {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
@@ -111,7 +126,11 @@ class BankTransferSanctionsDetailsControllerTest {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 
-    private void configureMockEmailNotExist() {
+    private void configureMockEmailNull() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn(null);
+    }
+
+    private void configureMockEmailNotExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("");
     }
 }

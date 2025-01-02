@@ -74,6 +74,19 @@ class BankTransferLateFilingDetailsControllerTest {
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
+    @Test
+    @DisplayName("Get Bank Transfer Late Filing Details - success null email")
+    void getBankTransferLateFilingDetailsSuccessNullEmail() throws Exception {
+
+        configurePreviousController();
+        configureMockEmailNull();
+
+        this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
+                .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
+    }
+
     private void configurePreviousController() {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
@@ -83,7 +96,11 @@ class BankTransferLateFilingDetailsControllerTest {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 
-    private void configureMockEmailNotExist() {
+    private void configureMockEmailNull() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn(null);
+    }
+
+    private void configureMockEmailNotExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("");
     }
 }
