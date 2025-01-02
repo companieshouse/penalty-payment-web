@@ -107,7 +107,6 @@ class ViewPenaltiesControllerTest {
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
         verify(mockPenaltyUtils, times(1)).getFormattedOutstanding(any());
-        verify(mockPenaltyUtils, times(1)).getReferenceTitle();
         verify(mockPenaltyUtils, times(1)).getViewPenaltiesLateFilingReason();
     }
 

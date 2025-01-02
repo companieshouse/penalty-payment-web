@@ -20,10 +20,4 @@ class PenaltyUtilsTest {
         assertEquals("1,000", result);
     }
 
-    @Test
-    void testGetReferenceTitle(){
-        String result = penaltyUtils.getReferenceTitle();
-        assertEquals("Penalty Reference", result);
-    }
-
 }
