@@ -20,7 +20,7 @@ public abstract class BaseController {
 
     public static final String BACK_LINK_ATTR = "backLink";
     public static final String USER_BAR_ATTR = "userBar";
-    public static final String USER_SIGNOUT_URL_ATTR = "userSignoutUrl";
+    public static final String USER_SIGN_OUT_URL_ATTR = "userSignOutUrl";
     public static final String HIDE_YOUR_DETAILS_ATTR = "hideYourDetails";
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
@@ -53,7 +53,7 @@ public abstract class BaseController {
         model.addAttribute(USER_BAR_ATTR, "1");
         model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
         model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
-        model.addAttribute(USER_SIGNOUT_URL_ATTR, "/late-filing-penalty/sign-out");
+        model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
     }
 
     protected void addPhaseBannerToModel(Model model) {

@@ -32,7 +32,7 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     @GetMapping
     public String getBankTransferSanctionsDetails(Model model) {
         String loginEmail = penaltyUtils.getLoginEmail(sessionService);
-        if (loginEmail != null) {
+        if (loginEmail != null && !loginEmail.isEmpty()) {
             model.addAttribute(USER_EMAIL, loginEmail);
             addBaseAttributesToModel(model);
         } else {
