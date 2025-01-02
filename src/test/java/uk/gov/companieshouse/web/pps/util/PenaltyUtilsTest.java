@@ -15,8 +15,8 @@ class PenaltyUtilsTest {
     }
 
     @Test
-    void testGetFormattedOutstanding(){
-        String result = penaltyUtils.getFormattedOutstanding(1000);
+    void testGetFormattedAmount(){
+        String result = penaltyUtils.getFormattedAmount(1000);
         assertEquals("1,000", result);
     }
 
