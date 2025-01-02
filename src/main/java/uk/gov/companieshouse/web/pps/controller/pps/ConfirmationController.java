@@ -60,11 +60,13 @@ public class ConfirmationController extends BaseController {
     public ConfirmationController(CompanyService companyService,
                                   PayablePenaltyService payablePenaltyService,
                                   SessionService sessionService,
-                                  PenaltyPaymentService penaltyPaymentService) {
+                                  PenaltyPaymentService penaltyPaymentService,
+                                  PenaltyUtils penaltyUtils) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
         this.penaltyPaymentService = penaltyPaymentService;
+        this.penaltyUtils = penaltyUtils;
     }
 
     @GetMapping

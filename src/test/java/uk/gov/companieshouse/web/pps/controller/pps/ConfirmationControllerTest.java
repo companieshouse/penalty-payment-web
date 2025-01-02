@@ -19,6 +19,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyServic
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +54,9 @@ class ConfirmationControllerTest {
     @Mock
     private CompanyService mockCompanyService;
 
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
+
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_REF = "EXAMPLE12345";
     private static final String PAYABLE_REF = "PR_123456";
@@ -78,9 +82,10 @@ class ConfirmationControllerTest {
                 mockCompanyService,
                 mockPayablePenaltyService,
                 sessionService,
-                mockPenaltyPaymentService);
+                mockPenaltyPaymentService,
+                mockPenaltyUtils
+        );
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-
     }
 
     @Test
@@ -95,13 +100,14 @@ class ConfirmationControllerTest {
                 .thenReturn(Collections.singletonList(new LateFilingPenalty()));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
-
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
+        when(mockPenaltyUtils.setUpPaymentDateDisplay(any())).thenReturn("2025-01-01");
+        when(mockPenaltyUtils.setUpPaymentAmountDisplay(any())).thenReturn("100.00");
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
-        .param("ref", REF)
-        .param("state", STATE)
-        .param("status", PAYMENT_STATUS_PAID))
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
                 .andExpect(view().name(CONFIRMATION_VIEW))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(COMPANY_NUMBER_ATTR))
@@ -115,7 +121,7 @@ class ConfirmationControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Confirmation Screen - success path")
+    @DisplayName("Get View Confirmation Screen - success path with null penalty")
     void getRequestSuccessNullPenalty() throws Exception {
 
         PayableLateFilingPenalty mockPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PENALTY_REF);
@@ -130,6 +136,8 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
+        when(mockPenaltyUtils.setUpPaymentDateDisplay(any())).thenReturn("");
+        when(mockPenaltyUtils.setUpPaymentAmountDisplay(any())).thenReturn("");
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -153,9 +161,9 @@ class ConfirmationControllerTest {
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(false);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
-                .param("ref", REF)
-                .param("state", STATE)
-                .param("status", PAYMENT_STATUS_PAID))
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
                 .andExpect(view().name(ERROR_VIEW))
                 .andExpect(status().isOk());
     }
@@ -166,13 +174,12 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
-
         when(sessionData.get(PAYMENT_STATE)).thenReturn(MISMATCHED_STATE);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
-                .param("ref", REF)
-                .param("state", STATE)
-                .param("status", PAYMENT_STATUS_PAID))
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
                 .andExpect(view().name(ERROR_VIEW))
                 .andExpect(status().isOk());
 
@@ -185,7 +192,6 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
-
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
@@ -194,9 +200,9 @@ class ConfirmationControllerTest {
                 .thenReturn(Collections.singletonList(new LateFilingPenalty()));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
-                .param("ref", REF)
-                .param("state", STATE)
-                .param("status", PAYMENT_STATUS_CANCELLED))
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_CANCELLED))
                 .andExpect(view().name(RESUME_URL_PATH))
                 .andExpect(status().is3xxRedirection());
 
@@ -209,16 +215,15 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
-
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
         doThrow(ServiceException.class)
                 .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
-                .param("ref", REF)
-                .param("state", STATE)
-                .param("status", PAYMENT_STATUS_CANCELLED))
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_CANCELLED))
                 .andExpect(view().name(ERROR_VIEW))
                 .andExpect(status().isOk());
 
