@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,6 +91,7 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path without login")
     void getRequestSuccessWithoutLogin() throws Exception {
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
 
         configurePreviousController();
         configureMockEmailNotExist();

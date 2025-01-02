@@ -37,7 +37,7 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getBankTransferSanctionsDetails() {
+    public String getBankTransferSanctionsDetails(Model model) {
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
             return ERROR_VIEW;
         }
