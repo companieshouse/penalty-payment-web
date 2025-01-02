@@ -2,7 +2,6 @@ package uk.gov.companieshouse.web.pps.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 
 import java.text.DecimalFormat;
@@ -41,9 +40,9 @@ public class PenaltyUtils {
         return "";
     }
 
-    public String setUpPaymentAmountDisplay(LateFilingPenalty lateFilingPenalty) {
-        if (lateFilingPenalty.getOriginalAmount() != null) {
-            return getFormattedOutstanding(lateFilingPenalty.getOriginalAmount());
+    public String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
+        if (payableLateFilingPenalty.getPayment() != null) {
+            return getFormattedOutstanding(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
         }
         return "";
     }
