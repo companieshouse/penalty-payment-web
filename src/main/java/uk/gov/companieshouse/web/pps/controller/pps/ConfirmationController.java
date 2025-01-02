@@ -50,11 +50,9 @@ public class ConfirmationController extends BaseController {
 
     private final SessionService sessionService;
 
-    @Autowired
-    private PenaltyUtils penaltyUtils;
+    private final PenaltyUtils penaltyUtils;
 
-    @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
+    private final PenaltyPaymentService penaltyPaymentService;
 
     @Autowired
     public ConfirmationController(CompanyService companyService,
