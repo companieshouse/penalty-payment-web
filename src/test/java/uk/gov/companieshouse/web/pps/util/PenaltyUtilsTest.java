@@ -22,7 +22,7 @@ class PenaltyUtilsTest {
 
     @Test
     void testGetReferenceTitle(){
-        String result = penaltyUtils.getReferenceTitle("A1234567");
+        String result = penaltyUtils.getReferenceTitle();
         assertEquals("Penalty Reference", result);
     }
 

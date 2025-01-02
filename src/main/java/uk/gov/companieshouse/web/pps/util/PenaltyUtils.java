@@ -24,7 +24,7 @@ public class PenaltyUtils {
         return OUTSTANDING_AMOUNT_FORMATTER.format(outstandingAmount);
     }
 
-    public String getReferenceTitle(final String penaltyNumber) {
+    public String getReferenceTitle() {
         return "Penalty Reference";
     }
 }
