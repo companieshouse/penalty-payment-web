@@ -77,8 +77,6 @@ public class ConfirmationController extends BaseController {
                                   Model model) {
 
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
-        List<LateFilingPenalty> lateFilingPenalties;
-        LateFilingPenalty lateFilingPenalty;
 
         if (!sessionData.containsKey(PAYMENT_STATE)) {
             LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
@@ -97,8 +95,8 @@ public class ConfirmationController extends BaseController {
         try {
             PayableLateFilingPenalty payablePenalty = payablePenaltyService
                     .getPayableLateFilingPenalty(companyNumber, payableRef);
-            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
-            lateFilingPenalty = lateFilingPenalties.getFirst();
+            List<LateFilingPenalty> lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
+            LateFilingPenalty lateFilingPenalty = lateFilingPenalties.getFirst();
 
             if (!paymentStatus.equals("paid")) {
                 LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
