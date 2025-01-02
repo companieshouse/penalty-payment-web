@@ -14,7 +14,7 @@ public class PenaltyUtils {
 
     private final String viewPenaltiesLateFilingReason;
 
-    private static final DecimalFormat OUTSTANDING_AMOUNT_FORMATTER = new DecimalFormat("#,###");
+    private static final DecimalFormat AMOUNT_FORMATTER = new DecimalFormat("#,###");
 
     public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason){
         this.viewPenaltiesLateFilingReason = viewPenaltiesLateFilingReason;
@@ -24,8 +24,8 @@ public class PenaltyUtils {
         return viewPenaltiesLateFilingReason;
     }
 
-    public String getFormattedOutstanding(final Integer outstandingAmount) {
-        return OUTSTANDING_AMOUNT_FORMATTER.format(outstandingAmount);
+    public String getFormattedAmount(final Integer amount) {
+        return AMOUNT_FORMATTER.format(amount);
     }
 
     public String getReferenceTitle(final String penaltyNumber) {
@@ -42,7 +42,7 @@ public class PenaltyUtils {
 
     public String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
         if (payableLateFilingPenalty.getPayment() != null) {
-            return getFormattedOutstanding(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
+            return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
         }
         return "";
     }
