@@ -2,10 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -114,28 +111,13 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(REASON_ATTR, PENALTY_REASON);
-            model.addAttribute(PAYMENT_DATE_ATTR, setUpPaymentDateDisplay(payablePenalty));
-            model.addAttribute(PENALTY_AMOUNT_ATTR, setUpPaymentAmountDisplay(lateFilingPenalty));
+            model.addAttribute(PAYMENT_DATE_ATTR, penaltyUtils.setUpPaymentDateDisplay(payablePenalty));
+            model.addAttribute(PENALTY_AMOUNT_ATTR, penaltyUtils.setUpPaymentAmountDisplay(lateFilingPenalty));
 
             return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return ERROR_VIEW;
         }
-    }
-
-    private String setUpPaymentDateDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getPayment() != null) {
-            return LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
-        }
-        return "";
-    }
-
-    private String setUpPaymentAmountDisplay(LateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getOriginalAmount() != null) {
-            return penaltyUtils.getFormattedOutstanding(payableLateFilingPenalty.getOriginalAmount());
-        }
-        return "";
     }
 }
