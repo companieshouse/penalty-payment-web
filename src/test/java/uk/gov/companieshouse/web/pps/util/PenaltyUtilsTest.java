@@ -23,12 +23,6 @@ class PenaltyUtilsTest {
     }
 
     @Test
-    void testGetReferenceTitle(){
-        String result = penaltyUtils.getReferenceTitle("A1234567");
-        assertEquals("Reference Number", result);
-    }
-
-    @Test
     void testGetLoginEmailSuccessful() {
         String email = "test@gmail.com";
         Map<String, Object> userProfile = Map.of("email", email);

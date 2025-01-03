@@ -26,10 +26,6 @@ public class PenaltyUtils {
         return OUTSTANDING_AMOUNT_FORMATTER.format(outstandingAmount);
     }
 
-    public String getReferenceTitle(final String penaltyNumber) {
-        return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
-    }
-
     public String getLoginEmail(SessionService sessionService) {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         Map<?, ?> signInInfo = (Map<?, ?>) sessionData.get("signin_info");
