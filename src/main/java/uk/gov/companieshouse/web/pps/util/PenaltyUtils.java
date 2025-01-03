@@ -23,9 +23,5 @@ public class PenaltyUtils {
     public String getFormattedOutstanding(final Integer outstandingAmount) {
         return OUTSTANDING_AMOUNT_FORMATTER.format(outstandingAmount);
     }
-
-    public String getReferenceTitle(final String penaltyNumber) {
-        return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
-    }
 }
 
