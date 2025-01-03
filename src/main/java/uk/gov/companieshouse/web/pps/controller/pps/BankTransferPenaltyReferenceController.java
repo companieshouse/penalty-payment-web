@@ -54,7 +54,7 @@ public class BankTransferPenaltyReferenceController extends BaseController {
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addBackPageAttributeToModel(model);
+        addBaseAttributesNoSignOutToModel(model);
 
         return getTemplateName();
     }

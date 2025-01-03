@@ -52,7 +52,7 @@ class PenaltyPaidControllerTest {
 
     private static final String PPS_PENALTY_PAID = "pps/penaltyPaid";
     private static final String ERROR_VIEW = "error";
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String COMPANY_NAME_ATTR = "companyName";
     private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
 
@@ -73,7 +73,7 @@ class PenaltyPaidControllerTest {
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_PENALTY_PAID))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR))
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_NUMBER_ATTR));
 

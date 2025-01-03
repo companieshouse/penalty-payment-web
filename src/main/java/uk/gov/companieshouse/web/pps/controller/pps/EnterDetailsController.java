@@ -65,7 +65,7 @@ public class EnterDetailsController extends BaseController {
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     @Override protected String getTemplateName() {
         return ENTER_DETAILS;
@@ -83,7 +83,7 @@ public class EnterDetailsController extends BaseController {
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addBackPageAttributeToModel(model);
+        addBaseAttributesToModel(model);
 
         return getTemplateName();
     }
@@ -113,7 +113,7 @@ public class EnterDetailsController extends BaseController {
                     .getLateFilingPenalties(companyNumber, penaltyNumber);
 
             redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
-            redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
+            redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
             redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
             // If there are no payable late filing penalties either the company does not exist or has no penalties.
