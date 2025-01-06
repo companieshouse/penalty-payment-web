@@ -53,9 +53,10 @@ public class ConfirmationController extends BaseController {
 
     @Autowired
     public ConfirmationController(CompanyService companyService,
-                                  PayablePenaltyService payablePenaltyService,
-                                  SessionService sessionService,
-                                  PenaltyUtils penaltyUtils, PenaltyConfigurationProperties penaltyConfigurationProperties) {
+            PayablePenaltyService payablePenaltyService,
+            SessionService sessionService,
+            PenaltyUtils penaltyUtils,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
