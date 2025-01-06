@@ -18,6 +18,14 @@ public abstract class BaseController {
 
     protected static final String ERROR_VIEW = "error";
 
+    public static final String BACK_LINK_ATTR = "backLink";
+    public static final String USER_BAR_ATTR = "userBar";
+    public static final String USER_SIGN_OUT_URL_ATTR = "userSignOutUrl";
+    public static final String HIDE_YOUR_DETAILS_ATTR = "hideYourDetails";
+    public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
+    public static final String PHASE_BANNER_ATTR = "phaseBanner";
+    public static final String PHASE_BANNER_LINK_ATTR =  "phaseBannerLink";
+
     protected BaseController() {
     }
 
@@ -25,7 +33,31 @@ public abstract class BaseController {
     protected abstract String getTemplateName();
 
     protected void addBackPageAttributeToModel(Model model, String... pathVars) {
+        // Set a value for showing back link
+        model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
+    }
 
-        model.addAttribute("backButton", navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
+    protected void addBaseAttributesToModel(Model model) {
+        addPhaseBannerToModel(model);
+        addUserModel(model);
+        addBackPageAttributeToModel(model);
+    }
+
+    protected void addBaseAttributesNoSignOutToModel(Model model) {
+        addPhaseBannerToModel(model);
+        addBackPageAttributeToModel(model);
+    }
+
+    protected void addUserModel(Model model) {
+        // Set a value for showing user bar part
+        model.addAttribute(USER_BAR_ATTR, "1");
+        model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
+        model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
+        model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
+    }
+
+    protected void addPhaseBannerToModel(Model model) {
+        model.addAttribute(PHASE_BANNER_ATTR, "beta");
+        model.addAttribute(PHASE_BANNER_LINK_ATTR, "https://www.smartsurvey.co.uk/s/pay-lfp-feedback/");
     }
 }

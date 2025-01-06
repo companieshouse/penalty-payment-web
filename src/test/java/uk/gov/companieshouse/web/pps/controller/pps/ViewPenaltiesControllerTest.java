@@ -94,7 +94,6 @@ class ViewPenaltiesControllerTest {
         configureValidCompanyProfile(COMPANY_NUMBER);
 
         when(mockPenaltyUtils.getFormattedAmount(any())).thenReturn("Mocked Outstanding Value");
-        when(mockPenaltyUtils.getReferenceTitle(any())).thenReturn("Mocked Penalty Reference");
         when(mockPenaltyUtils.getViewPenaltiesLateFilingReason()).thenReturn("Mocked Reason for Penalty");
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
@@ -108,7 +107,6 @@ class ViewPenaltiesControllerTest {
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
         verify(mockPenaltyUtils, times(1)).getFormattedAmount(any());
-        verify(mockPenaltyUtils, times(1)).getReferenceTitle(any());
         verify(mockPenaltyUtils, times(1)).getViewPenaltiesLateFilingReason();
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Locale.UK;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
@@ -49,6 +51,9 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private FeatureFlagChecker featureFlagChecker;
+
     private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
     private static final String PENALTY_PAID = "/penalty-paid";
@@ -60,7 +65,7 @@ public class EnterDetailsController extends BaseController {
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     @Override protected String getTemplateName() {
         return ENTER_DETAILS;
@@ -69,11 +74,16 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
             Model model) {
+
+        if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
+            return ERROR_VIEW;
+        }
+
         var enterDetails = new EnterDetails();
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addBackPageAttributeToModel(model);
+        addBaseAttributesToModel(model);
 
         return getTemplateName();
     }
@@ -103,7 +113,7 @@ public class EnterDetailsController extends BaseController {
                     .getLateFilingPenalties(companyNumber, penaltyNumber);
 
             redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
-            redirectAttributes.addFlashAttribute(BACK_BUTTON_MODEL_ATTR, model.getAttribute(BACK_BUTTON_MODEL_ATTR));
+            redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
             redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
             // If there are no payable late filing penalties either the company does not exist or has no penalties.

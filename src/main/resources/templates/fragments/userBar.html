@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title></title>
+</head>
+<body>
+    <th:block th:fragment="userBar">
+        <div th:if="${userBar}" class="js-toggle-nav" id="global-nav">
+            <a href="#navigation" class="js-header-toggle" data-event-id="header-toggle"
+               th:text="${userEmail}" style="display:none;"></a>
+            <nav role="navigation" class="content">
+                <ul id="navigation" class="mobile-hidden">
+                    <li id="signed-in-user" class="user"><span th:text="${userEmail}"></span></li>
+                    <li th:unless="${hideYourDetails}">
+                        <a id="your_details" th:href="${yourDetailsUrl}" class="govuk-link" data-event-id="your-details"
+                           th:text="#{label.user-bar.account-details}">Your details</a></li>
+                    <li th:unless="${hideRecentFilings}">
+                        <a id="recent_filings" th:href="${recentFilingsUrl}" class="govuk-link" data-event-id="your-filings"
+                           th:text="#{label.user-bar.filings}">Your filings</a></li>
+                    <li th:if="${companiesYouFollowUrl}">
+                        <a id="companies_you_follow" data-event-id="companies-you-follow-link"
+                           th:href="${companiesYouFollowUrl}" class="govuk-link" th:text="#{label.user-bar.companies-following}">
+                            Companies you follow
+                        </a>
+                    </li>
+                    <li th:if="${basketWebUrl}">
+                        <a class="govuk-link" id="basket" th:href="${basketWebUrl}" data-event-id="your-basket"
+                           th:text="#{label.user-bar.basket(${basketItemsNum})}">Basket (X)</a>
+                    </li>
+                    <li><a id="user-signout" th:href="${userSignOutUrl}" class="govuk-link"
+                           data-event-id="signout-link" th:text="#{label.user-bar.sign-out}">Sign out</a></li>
+                </ul>
+            </nav>
+        </div>
+    </th:block>
+</body>
+</html>

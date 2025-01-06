@@ -56,7 +56,7 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
-        addBackPageAttributeToModel(model);
+        addBaseAttributesToModel(model);
 
         List<LateFilingPenalty> lateFilingPenalties;
         LateFilingPenalty lateFilingPenalty;
@@ -84,7 +84,6 @@ public class ViewPenaltiesController extends BaseController {
             return ERROR_VIEW;
         }
 
-        model.addAttribute("referenceTitle", penaltyUtils.getReferenceTitle(penaltyNumber));
         model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
         model.addAttribute("penaltyReference", penaltyNumber);
         model.addAttribute("reasonForPenalty", penaltyUtils.getViewPenaltiesLateFilingReason());

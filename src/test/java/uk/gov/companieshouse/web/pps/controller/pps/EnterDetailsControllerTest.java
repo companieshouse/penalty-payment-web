@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -36,7 +38,9 @@ import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +51,9 @@ class EnterDetailsControllerTest {
 
     @Mock
     private MessageSource mockMessageSource;
+
+    @Mock
+    private FeatureFlagChecker mockFeatureFlagChecker;
 
     @Mock
     private EnterDetailsValidator mockEnterDetailsValidator;
@@ -99,7 +106,7 @@ class EnterDetailsControllerTest {
 
     private static final String COMPANY_NUMBER_ATTRIBUTE = "companyNumber";
 
-    private static final String BACK_BUTTON_MODEL_ATTR = "backButton";
+    private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
@@ -114,13 +121,17 @@ class EnterDetailsControllerTest {
 
         configurePreviousController();
 
+        PenaltyReference lateFilingPenaltyRef = LATE_FILING;
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
+
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", LATE_FILING.name()))
+                        .queryParam("ref-starts-with", lateFilingPenaltyRef.name()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(lateFilingPenaltyRef);
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 
@@ -130,13 +141,35 @@ class EnterDetailsControllerTest {
 
         configurePreviousController();
 
+        PenaltyReference sanctionPenaltyRef = SANCTIONS;
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
+
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", SANCTIONS.name()))
+                        .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_BUTTON_MODEL_ATTR));
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
+        verifyNoInteractions(mockEnterDetailsValidator);
+    }
+
+    @Test
+    @DisplayName("Get Details - Sanction view error path when sanctions feature flag disabled")
+    void getEnterDetailsErrorWhenSanctionRefStartsWithRequestDisabled() throws Exception {
+
+        PenaltyReference sanctionPenaltyRef = SANCTIONS;
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
+                .andExpect(model().attributeDoesNotExist(ENTER_DETAILS_MODEL_ATTR))
+                .andExpect(view().name(ERROR_PAGE));
+
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 

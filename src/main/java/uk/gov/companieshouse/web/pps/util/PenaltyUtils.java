@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
@@ -8,6 +9,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Component
 public class PenaltyUtils {
@@ -28,8 +30,16 @@ public class PenaltyUtils {
         return AMOUNT_FORMATTER.format(amount);
     }
 
-    public String getReferenceTitle(final String penaltyNumber) {
-        return penaltyNumber.startsWith("A") ? "Reference Number" : "Penalty Reference";
+    public String getLoginEmail(SessionService sessionService) {
+        Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
+        Map<?, ?> signInInfo = (Map<?, ?>) sessionData.get("signin_info");
+        if (signInInfo != null) {
+            Map<?, ?> userProfile = (Map<?, ?>) signInInfo.get("user_profile");
+            if (userProfile != null) {
+                return userProfile.get("email").toString();
+            }
+        }
+        return "";
     }
 
     public String setUpPaymentDateDisplay() {
