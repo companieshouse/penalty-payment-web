@@ -34,7 +34,8 @@ public class PPSWebApplication implements WebMvcConfigurer {
                 .excludePathPatterns("/late-filing-penalty",
                         "/late-filing-penalty/accessibility-statement",
                         "/late-filing-penalty/ref-starts-with",
-                        "/late-filing-penalty/bank-transfer/**"
+                        "/late-filing-penalty/bank-transfer/**",
+                        "/late-filing-penalty/unscheduled-service-down"
                 );
     }
 }

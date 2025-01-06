@@ -16,6 +16,7 @@ public class PenaltyConfigurationProperties {
     private String bankTransferWhichPenaltyPath;
     private String bankTransferLateFilingDetailsPath;
     private String bankTransferSanctionsPath;
+    private String unscheduledServiceDownPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -66,4 +67,11 @@ public class PenaltyConfigurationProperties {
         this.bankTransferSanctionsPath = bankTransferSanctionsPath;
     }
 
+    public String getUnscheduledServiceDownPath() {
+        return unscheduledServiceDownPath;
+    }
+
+    public void setUnscheduledServiceDownPath(String unscheduledServiceDownPath) {
+        this.unscheduledServiceDownPath = unscheduledServiceDownPath;
+    }
 }

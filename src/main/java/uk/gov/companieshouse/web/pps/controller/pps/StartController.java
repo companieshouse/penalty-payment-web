@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheckStatus;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -27,6 +30,9 @@ public class StartController extends BaseController {
 
     private static final String PPS_TEMP_HOME = "pps/home";
     private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
+
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Autowired
     private PenaltyPaymentService penaltyPaymentService;
@@ -47,7 +53,7 @@ public class StartController extends BaseController {
             financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
