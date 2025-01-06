@@ -17,7 +17,7 @@ class PenaltyReferenceTest {
 
     @Test
     void getStartsWithWhenSanction() {
-        assertEquals("PN", SANCTIONS.getStartsWith());
+        assertEquals("P", SANCTIONS.getStartsWith());
     }
 
     @Test
@@ -27,7 +27,7 @@ class PenaltyReferenceTest {
 
     @Test
     void fromStartsWithWhenSanction() {
-        assertEquals(SANCTIONS, fromStartsWith("PN"));
+        assertEquals(SANCTIONS, fromStartsWith("P"));
     }
 
     @Test
