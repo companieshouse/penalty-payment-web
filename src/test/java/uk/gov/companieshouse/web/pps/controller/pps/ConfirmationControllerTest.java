@@ -28,7 +28,6 @@ import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationControlle
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PAYMENT_DATE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.REASON_ATTR;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -104,7 +103,6 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NUMBER_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
-                .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
 
