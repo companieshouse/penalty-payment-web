@@ -33,11 +33,11 @@ In order to run this Web App locally you will need to install:
  `CH_BANK_ACC_NUM`                                   | Bacs payments - Account number (late filing penalty: A) 
  `CH_BANK_IBAN`                                      | Overseas payments - IBAN (late filing penalty: A)       
  `CH_BANK_SWIFT_CODE`                                | Overseas payments - SWIFT code (late filing penalty: A) 
- `CH_SANCTIONS_BANK_ACC_NAME`                        | Bacs payments - Account name (sanction: PN)             
- `CH_SANCTIONS_BANK_SORT_CODE`                       | Bacs payments - Sort code (sanction: PN)                
- `CH_SANCTIONS_BANK_ACC_NUM`                         | Bacs payments - Account number (sanction: PN)           
- `CH_SANCTIONS_BANK_IBAN`                            | Overseas payments - IBAN (sanction: PN)                 
- `CH_SANCTIONS_BANK_SWIFT_CODE`                      | Overseas payments - SWIFT code (sanction: PN)           
+ `CH_SANCTIONS_BANK_ACC_NAME`                        | Bacs payments - Account name (sanction: P)              
+ `CH_SANCTIONS_BANK_SORT_CODE`                       | Bacs payments - Sort code (sanction: P)                 
+ `CH_SANCTIONS_BANK_ACC_NUM`                         | Bacs payments - Account number (sanction: P)            
+ `CH_SANCTIONS_BANK_IBAN`                            | Overseas payments - IBAN (sanction: P)                  
+ `CH_SANCTIONS_BANK_SWIFT_CODE`                      | Overseas payments - SWIFT code (sanction: P)            
  `FEATURE_FLAG_PENALTY_REF_ENABLED_SANCTIONS_191224` | Feature flag to enable Penalty Payment for Sanctions    
 
 ### Web Pages
