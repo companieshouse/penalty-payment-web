@@ -69,7 +69,7 @@ class EnterDetailsValidatorTest {
     @Test
     void isValidWhenRefStartsWithSanctions() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setPenaltyRef("PN12345678");
+        enterDetails.setPenaltyRef("P1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
