@@ -37,11 +37,8 @@ public class PenaltyUtils {
                 .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
     }
 
-    public String setUpPaymentAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
-        if (payableLateFilingPenalty.getPayment() != null) {
-            return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
-        }
-        return "";
+    public String setUpPenaltyAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
+        return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
     }
 }
 
