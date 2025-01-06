@@ -42,12 +42,12 @@ public class PenaltyUtils {
         return "";
     }
 
-    public String setUpPaymentDateDisplay() {
+    public String getPaymentDateDisplay() {
         return LocalDate.now()
                 .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
     }
 
-    public String setUpPenaltyAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
+    public String getPenaltyAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
         return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
     }
 }

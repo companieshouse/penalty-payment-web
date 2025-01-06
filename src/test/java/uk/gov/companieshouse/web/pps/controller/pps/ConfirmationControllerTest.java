@@ -91,8 +91,8 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
-        when(mockPenaltyUtils.setUpPaymentDateDisplay()).thenReturn("2025-01-01");
-        when(mockPenaltyUtils.setUpPenaltyAmountDisplay(any())).thenReturn("100.00");
+        when(mockPenaltyUtils.getPaymentDateDisplay()).thenReturn("2025-01-01");
+        when(mockPenaltyUtils.getPenaltyAmountDisplay(any())).thenReturn("100.00");
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -123,8 +123,8 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
-        when(mockPenaltyUtils.setUpPaymentDateDisplay()).thenReturn("");
-        when(mockPenaltyUtils.setUpPenaltyAmountDisplay(any())).thenReturn("");
+        when(mockPenaltyUtils.getPaymentDateDisplay()).thenReturn("");
+        when(mockPenaltyUtils.getPenaltyAmountDisplay(any())).thenReturn("");
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
