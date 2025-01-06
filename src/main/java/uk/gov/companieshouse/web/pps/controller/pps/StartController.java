@@ -32,10 +32,10 @@ public class StartController extends BaseController {
     private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
 
     @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private PenaltyPaymentService penaltyPaymentService;
 
     @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Autowired
     private Environment environment;
