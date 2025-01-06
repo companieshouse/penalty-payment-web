@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -28,6 +31,9 @@ public class PenaltyPaidController extends BaseController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     @GetMapping
     public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
                                        @PathVariable String penaltyNumber,
@@ -40,7 +46,7 @@ public class PenaltyPaidController extends BaseController {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());

@@ -119,7 +119,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         try {
@@ -129,7 +129,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

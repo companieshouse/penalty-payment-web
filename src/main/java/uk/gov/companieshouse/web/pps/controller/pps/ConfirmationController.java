@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.thymeleaf.util.StringUtils;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -49,13 +52,17 @@ public class ConfirmationController extends BaseController {
 
     private final SessionService sessionService;
 
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     @Autowired
     public ConfirmationController(CompanyService companyService,
             PayablePenaltyService payablePenaltyService,
-            SessionService sessionService) {
+            SessionService sessionService,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @GetMapping
@@ -109,7 +116,7 @@ public class ConfirmationController extends BaseController {
             return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

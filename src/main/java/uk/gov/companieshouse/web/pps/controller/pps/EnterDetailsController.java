@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -53,6 +55,9 @@ public class EnterDetailsController extends BaseController {
 
     @Autowired
     private FeatureFlagChecker featureFlagChecker;
+
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private static final String NO_PENALTY_FOUND = "/no-penalties-found";
 
@@ -175,7 +180,7 @@ public class EnterDetailsController extends BaseController {
         } catch (ServiceException ex) {
 
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

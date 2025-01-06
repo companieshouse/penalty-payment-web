@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -49,6 +50,9 @@ class ConfirmationControllerTest {
     @Mock
     private CompanyService mockCompanyService;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_REF = "EXAMPLE12345";
     private static final String PAYABLE_REF = "PR_123456";
@@ -73,7 +77,8 @@ class ConfirmationControllerTest {
         ConfirmationController controller = new ConfirmationController(
                 mockCompanyService,
                 mockPayablePenaltyService,
-                sessionService);
+                sessionService,
+                mockPenaltyConfigurationProperties);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
     }
