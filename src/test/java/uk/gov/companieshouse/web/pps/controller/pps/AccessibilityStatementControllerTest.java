@@ -23,7 +23,7 @@ class AccessibilityStatementControllerTest {
     @InjectMocks
     private AccessibilityStatementController controller;
 
-    private static final String ACCESSIBILITY_STATEMENT_REQUIRED_PATH = "/late-filing-penalty/accessibility-statement/";
+    private static final String ACCESSIBILITY_STATEMENT_REQUIRED_PATH = "/late-filing-penalty/accessibility-statement";
 
     private static final String PPS_ACCESSIBILITY_STATEMENT = "pps/accessibilityStatement";
 
