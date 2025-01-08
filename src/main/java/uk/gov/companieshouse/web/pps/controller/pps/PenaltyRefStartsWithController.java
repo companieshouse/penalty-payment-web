@@ -50,6 +50,11 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
+        if (availablePenaltyReference.size() == 1) {
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
+                    + "?ref-starts-with=" + availablePenaltyReference.getFirst().name();
+        }
+
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
