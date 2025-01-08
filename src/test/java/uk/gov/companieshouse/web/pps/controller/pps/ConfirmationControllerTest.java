@@ -19,6 +19,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.COMPANY_NUMBER_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PAYMENT_DATE_ATTR;
@@ -63,6 +65,7 @@ class ConfirmationControllerTest {
     private static final String VIEW_CONFIRMATION_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
 
     private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/view-penalties";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
     private static final String ERROR_VIEW = "error";
@@ -153,13 +156,15 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(false);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
+                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
                         .param("state", STATE)
                         .param("status", PAYMENT_STATUS_PAID))
-                .andExpect(view().name(ERROR_VIEW))
-                .andExpect(status().isOk());
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -169,13 +174,15 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(MISMATCHED_STATE);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
+                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
                         .param("state", STATE)
                         .param("status", PAYMENT_STATUS_PAID))
-                .andExpect(view().name(ERROR_VIEW))
-                .andExpect(status().isOk());
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
+                .andExpect(status().is3xxRedirection());
 
         verify(sessionData).remove(PAYMENT_STATE);
     }
@@ -206,6 +213,8 @@ class ConfirmationControllerTest {
     void getRequestStatusIsCancelledErrorRetrievingPaymentSession() throws Exception {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
+                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
@@ -216,8 +225,8 @@ class ConfirmationControllerTest {
                         .param("ref", REF)
                         .param("state", STATE)
                         .param("status", PAYMENT_STATUS_CANCELLED))
-                .andExpect(view().name(ERROR_VIEW))
-                .andExpect(status().isOk());
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
+                .andExpect(status().is3xxRedirection());
 
         verify(sessionData).remove(PAYMENT_STATE);
     }

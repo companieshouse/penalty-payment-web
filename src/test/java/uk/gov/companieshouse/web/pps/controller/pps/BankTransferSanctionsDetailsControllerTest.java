@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -23,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
@@ -46,12 +48,16 @@ class BankTransferSanctionsDetailsControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private BankTransferSanctionsDetailsController controller;
 
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
     private static final String ERROR_VIEW = "error";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
@@ -79,11 +85,12 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - error path")
     void getRequestError() throws Exception {
+        configureUnscheduledServiceDownPath();
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(FALSE);
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ERROR_VIEW));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
     }
@@ -132,5 +139,10 @@ class BankTransferSanctionsDetailsControllerTest {
 
     private void configureMockEmailNotExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("");
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
+                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }

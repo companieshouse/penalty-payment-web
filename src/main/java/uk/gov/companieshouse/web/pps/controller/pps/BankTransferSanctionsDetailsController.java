@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
@@ -32,6 +34,9 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     @Override protected String getTemplateName() {
         return BANK_TRANSFER_SANCTIONS_DETAILS;
     }
@@ -39,7 +44,7 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     @GetMapping
     public String getBankTransferSanctionsDetails(Model model) {
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         String loginEmail = penaltyUtils.getLoginEmail(sessionService);

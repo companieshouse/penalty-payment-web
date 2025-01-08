@@ -81,7 +81,7 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();

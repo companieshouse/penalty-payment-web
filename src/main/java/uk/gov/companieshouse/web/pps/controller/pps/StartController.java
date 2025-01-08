@@ -73,7 +73,7 @@ public class StartController extends BaseController {
             LOGGER.error("Service is unavailable");
             return PPS_SERVICE_UNAVAILABLE;
         } else {
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

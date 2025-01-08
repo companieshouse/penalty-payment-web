@@ -78,7 +78,7 @@ public class ConfirmationController extends BaseController {
         // Check that the session state is present
         if (!sessionData.containsKey(PAYMENT_STATE)) {
             LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         String sessionPaymentState = (String) sessionData.get(PAYMENT_STATE);
@@ -88,7 +88,7 @@ public class ConfirmationController extends BaseController {
         if (!paymentState.equals(sessionPaymentState)) {
             LOGGER.errorRequest(request, "Payment state value in session is not as expected, possible tampering of session "
                     + "Expected: " + sessionPaymentState + ", Received: " + paymentState);
-            return ERROR_VIEW;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         try {

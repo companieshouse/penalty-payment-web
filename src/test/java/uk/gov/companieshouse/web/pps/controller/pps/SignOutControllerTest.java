@@ -13,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -50,6 +52,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private AllowlistChecker allowlistChecker;
 
     @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
+    @Mock
     final Environment env = mock(Environment.class);
 
     @InjectMocks
@@ -64,6 +69,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private static final String PREVIOUS_PATH = "/late-filing-penalty/enter-details";
     private static final String SIGN_OUT = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
 
     @BeforeEach
@@ -122,9 +128,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @DisplayName("Test sign out page- cannot get sign out page when no session data is present")
     void noSuccessGet() throws Exception {
 
+        configureUnscheduledServiceDownPath();
+
         this.mockMvc.perform(get(SIGN_OUT_PATH))
-                .andExpect(view().name(ERROR_VIEW))
-                .andExpect(status().isOk());
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
+                .andExpect(status().is3xxRedirection());
 
 
     }
@@ -161,5 +169,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         this.mockMvc.perform(post(SIGN_OUT_PATH))
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attribute("errorMessage",true));
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
+                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }
