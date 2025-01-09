@@ -32,6 +32,7 @@ public class PenaltyRefStartsWithController extends BaseController {
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
+    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public PenaltyRefStartsWithController(NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
