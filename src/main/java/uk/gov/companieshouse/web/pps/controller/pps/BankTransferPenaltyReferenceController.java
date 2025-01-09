@@ -19,7 +19,6 @@ import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @PreviousController(StartController.class)
