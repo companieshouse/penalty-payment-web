@@ -32,6 +32,7 @@ public class PenaltyRefStartsWithController extends BaseController {
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
+    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public PenaltyRefStartsWithController(NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
@@ -50,6 +51,11 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
+        if (availablePenaltyReference.size() == 1) {
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
+                    + "?ref-starts-with=" + availablePenaltyReference.getFirst().name();
+        }
+
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
