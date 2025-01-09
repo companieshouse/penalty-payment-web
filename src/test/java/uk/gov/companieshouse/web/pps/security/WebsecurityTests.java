@@ -71,4 +71,11 @@ class WebsecurityTests {
         assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/unscheduled-service-down")
+    void scheduledServiceDownSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
 }

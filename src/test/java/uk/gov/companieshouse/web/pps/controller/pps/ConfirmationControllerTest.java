@@ -68,7 +68,6 @@ class ConfirmationControllerTest {
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String CONFIRMATION_VIEW = "pps/confirmationPage";
-    private static final String ERROR_VIEW = "error";
 
     private static final String REF = "ref";
     private static final String STATE = "state";
@@ -80,6 +79,8 @@ class ConfirmationControllerTest {
 
     @BeforeEach
     void setup() {
+        mockPenaltyConfigurationProperties = new PenaltyConfigurationProperties();
+        mockPenaltyConfigurationProperties.setUnscheduledServiceDownPath(UNSCHEDULED_SERVICE_DOWN_PATH);
         ConfirmationController controller = new ConfirmationController(
                 mockCompanyService,
                 mockPayablePenaltyService,
@@ -156,8 +157,6 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(false);
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -174,8 +173,6 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(MISMATCHED_STATE);
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -213,8 +210,6 @@ class ConfirmationControllerTest {
     void getRequestStatusIsCancelledErrorRetrievingPaymentSession() throws Exception {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
 
