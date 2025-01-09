@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
@@ -36,17 +34,13 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class SignOutControllerTest {
 
-
     private MockMvc mockMvc;
-
 
     @Mock
     private SessionService sessionService;
 
-
     @Mock
     private Map<String, Object> sessionData;
-
 
     @Mock
     private AllowlistChecker allowlistChecker;
@@ -59,8 +53,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
     @InjectMocks
     private SignOutController controller;
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-    private static final String HOME = "/late-filing-penalty/";
     private static final String SIGN_OUT_PATH = "/late-filing-penalty/sign-out";
     private static final String SIGN_OUT_VIEW = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
@@ -69,7 +61,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     private static final String SIGN_OUT = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
-
 
     @BeforeEach
     void setup() {
@@ -82,14 +73,12 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(SIGN_IN_KEY)).thenReturn(true);
 
-
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(view().name(SIGN_OUT_VIEW));
 
     }
-
 
     @Test
     @DisplayName("Check if Referer is populated to return a previous page")
@@ -104,9 +93,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(view().name(SIGN_OUT_VIEW));
 
-
     }
-
 
     @Test
     @DisplayName("Check Sign out set referer then keep alternative path set")
@@ -119,9 +106,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
                 .andExpect(status().isOk())
                 .andExpect(view().name(SIGN_OUT_VIEW));
 
-
     }
-
 
     @Test
     @DisplayName("Test sign out page- cannot get sign out page when no session data is present")
@@ -132,7 +117,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
                 .andExpect(status().is3xxRedirection());
-
 
     }
 
@@ -146,7 +130,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
     }
 
-
     @Test
     @DisplayName("Post Sign Out - no on radio button with previous referer")
     void postRequestRadioNoWithValidReferer() throws Exception {
@@ -159,7 +142,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
 
     }
-
 
       @Test
     @DisplayName("Post Sign Out - error message - a radio button has not been selected")
