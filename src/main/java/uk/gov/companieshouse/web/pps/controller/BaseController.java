@@ -47,13 +47,13 @@ public abstract class BaseController {
         model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
     }
 
-    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
+    protected void addBaseAttributesToModel(Model model) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
         addBackPageAttributeToModel(model);
     }
 
-    protected void addBaseAttributesToModel(Model model) {
+    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
         addBackPageAttributeToModel(model);
