@@ -17,8 +17,8 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -37,16 +37,11 @@ public class BankTransferPenaltyReferenceController extends BaseController {
     public BankTransferPenaltyReferenceController(
             NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker,
-            PenaltyUtils penaltyUtils
-            ) {
+            PenaltyUtils penaltyUtils) {
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.penaltyUtils = penaltyUtils;
-        availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
-                .stream()
-                .filter(featureFlagChecker::isPenaltyRefEnabled)
-                .toList();
+        availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith();
     }
 
     @Override

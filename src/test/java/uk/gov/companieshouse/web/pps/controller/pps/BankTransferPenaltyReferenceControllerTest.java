@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +18,6 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +30,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
-import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,14 +63,9 @@ class BankTransferPenaltyReferenceControllerTest {
         penaltyConfigurationProperties.setBankTransferSanctionsPath(
                 "/late-filing-penalty/bank-transfer/sanctions-details");
 
-        FeatureFlagConfigurationProperties featureFlagConfigurationProperties = new FeatureFlagConfigurationProperties();
-        featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS.name(), FALSE));
-        FeatureFlagChecker featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-
         BankTransferPenaltyReferenceController controller = new BankTransferPenaltyReferenceController(
                 mockNavigatorService,
                 penaltyConfigurationProperties,
-                featureFlagChecker,
                 mockPenaltyUtils);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
@@ -94,7 +85,7 @@ class BankTransferPenaltyReferenceControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals(List.of(LATE_FILING), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
+        assertEquals(List.of(LATE_FILING, SANCTIONS), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
     @Test
@@ -111,7 +102,7 @@ class BankTransferPenaltyReferenceControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals(List.of(LATE_FILING), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
+        assertEquals(List.of(LATE_FILING, SANCTIONS), modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
     @Test
