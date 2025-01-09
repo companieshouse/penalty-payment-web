@@ -54,8 +54,6 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private FeatureFlagChecker featureFlagChecker;
 
-    private static final String NO_PENALTY_FOUND = "/no-penalties-found";
-
     private static final String PENALTY_PAID = "/penalty-paid";
 
     private static final String DCA = "/legal-fees-required";
@@ -120,13 +118,7 @@ public class EnterDetailsController extends BaseController {
             if (payableLateFilingPenalties.isEmpty()) {
                 LOGGER.info("No late filing penalties for company no. "  +  companyNumber
                         + " and penalty: " +   penaltyNumber);
-
-                String penaltyDetailsNotFoundError = switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
-                    case LATE_FILING -> messageSource.getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
-                    case SANCTIONS -> messageSource.getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
-                };
-                bindingResult.reject("globalError", penaltyDetailsNotFoundError);
-
+                bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
                 return getTemplateName();
             }
 
@@ -144,7 +136,8 @@ public class EnterDetailsController extends BaseController {
             } else {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
                         + " does not have the provided penalty number " + penaltyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + NO_PENALTY_FOUND;
+                bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+                return getTemplateName();
             }
 
             // If the payable penalty has DCA payments.
@@ -177,6 +170,13 @@ public class EnterDetailsController extends BaseController {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return ERROR_VIEW;
         }
+    }
+
+    private String getPenaltyDetailsNotFoundError(EnterDetails enterDetails) {
+        return switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
+            case LATE_FILING -> messageSource.getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+            case SANCTIONS -> messageSource.getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
+        };
     }
 
     private String urlGenerator(String companyNumber, String penaltyNumber) {
