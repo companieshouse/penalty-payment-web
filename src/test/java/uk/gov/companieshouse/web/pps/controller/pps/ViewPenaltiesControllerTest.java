@@ -74,7 +74,6 @@ class ViewPenaltiesControllerTest {
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String ENTER_PPS_DETAILS_VIEW = "pps/viewPenalties";
-    private static final String ERROR_VIEW = "error";
 
     private static final String OUTSTANDING_MODEL_ATTR = "outstanding";
     private static final String COMPANY_NAME_MODEL_ATTR = "companyName";

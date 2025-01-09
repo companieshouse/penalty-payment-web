@@ -67,7 +67,6 @@ class StartControllerTest {
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String PPS_START_VIEW = "pps/home";
-    private static final String ERROR_VIEW = "error";
     private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
 
     private static final String DATE_MODEL_ATTR = "date";

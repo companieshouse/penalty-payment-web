@@ -61,7 +61,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     private SignOutController controller;
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
     private static final String HOME = "/late-filing-penalty/";
-    private static final String ERROR_VIEW = "error";
     private static final String SIGN_OUT_PATH = "/late-filing-penalty/sign-out";
     private static final String SIGN_OUT_VIEW = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
