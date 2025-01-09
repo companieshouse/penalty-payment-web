@@ -96,8 +96,6 @@ class EnterDetailsControllerTest {
 
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
-    private static final String ERROR_PAGE = "error";
-
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
     private static final String ENTER_DETAILS_VIEW = "pps/details";
