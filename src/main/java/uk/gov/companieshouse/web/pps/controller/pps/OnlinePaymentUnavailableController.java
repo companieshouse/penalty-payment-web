@@ -24,7 +24,7 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyNumber,
                                               Model model) {
 
-        addBaseAttributesNoSignOutToModel(model);
+        addBaseAttributesToModel(model);
 
         return getTemplateName();
     }

@@ -16,6 +16,7 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -41,6 +42,9 @@ class PenaltyPaidControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
+
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private PenaltyPaidController controller;
@@ -69,6 +73,7 @@ class PenaltyPaidControllerTest {
 
         configurePreviousController();
         configureValidCompanyProfile(COMPANY_NUMBER);
+        configureMockEmailExist();
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().isOk())
@@ -107,5 +112,9 @@ class PenaltyPaidControllerTest {
 
         doThrow(ServiceException.class)
                 .when(mockCompanyService).getCompanyProfile(companyNumber);
+    }
+
+    private void configureMockEmailExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 }

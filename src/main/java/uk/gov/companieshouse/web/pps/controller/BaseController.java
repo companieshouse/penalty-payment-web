@@ -7,11 +7,20 @@ import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 public abstract class BaseController {
 
     @Autowired
     protected NavigatorService navigatorService;
+
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
+    @Autowired
+    private SessionService sessionService;
+
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
@@ -20,6 +29,7 @@ public abstract class BaseController {
 
     public static final String BACK_LINK_ATTR = "backLink";
     public static final String USER_BAR_ATTR = "userBar";
+    public static final String USER_EMAIL_ATTR = "userEmail";
     public static final String USER_SIGN_OUT_URL_ATTR = "userSignOutUrl";
     public static final String HIDE_YOUR_DETAILS_ATTR = "hideYourDetails";
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
@@ -37,23 +47,39 @@ public abstract class BaseController {
         model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
     }
 
+    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
+        addPhaseBannerToModel(model);
+        addUserModel(model, penaltyUtils);
+        addBackPageAttributeToModel(model);
+    }
+
     protected void addBaseAttributesToModel(Model model) {
         addPhaseBannerToModel(model);
-        addUserModel(model);
+        addUserModel(model, penaltyUtils);
         addBackPageAttributeToModel(model);
     }
 
-    protected void addBaseAttributesNoSignOutToModel(Model model) {
+    protected void addBaseAttributesWithoutBackToModel(Model model) {
         addPhaseBannerToModel(model);
-        addBackPageAttributeToModel(model);
+        addUserModel(model, penaltyUtils);
     }
 
-    protected void addUserModel(Model model) {
-        // Set a value for showing user bar part
-        model.addAttribute(USER_BAR_ATTR, "1");
-        model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
-        model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
-        model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
+    protected void addBaseAttributesWithoutBackToModel(Model model, PenaltyUtils penaltyUtils) {
+        addPhaseBannerToModel(model);
+        addUserModel(model, penaltyUtils);
+    }
+
+    protected void addUserModel(Model model, PenaltyUtils penaltyUtils) {
+        String loginEmail = penaltyUtils.getLoginEmail(sessionService);
+        // Set a value for showing user bar part if exist
+        if (loginEmail != null && !loginEmail.isEmpty()) {
+            model.addAttribute(USER_BAR_ATTR, "1");
+            model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
+            model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
+            model.addAttribute(USER_EMAIL_ATTR, loginEmail);
+            model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
+        }
+
     }
 
     protected void addPhaseBannerToModel(Model model) {
