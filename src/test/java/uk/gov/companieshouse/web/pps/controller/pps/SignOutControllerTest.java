@@ -87,7 +87,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
         when(sessionData.containsKey(SIGN_IN_KEY)).thenReturn(true);
         when(allowlistChecker.checkURL(PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
-
         this.mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
@@ -111,7 +110,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     @Test
     @DisplayName("Test sign out page- cannot get sign out page when no session data is present")
     void noSuccessGet() throws Exception {
-
         configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(SIGN_OUT_PATH))
@@ -123,7 +121,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     @Test
     @DisplayName("Post Sign Out - yes radio button selected")
     void postRequestRadioYes() throws Exception {
-
         this.mockMvc.perform(post(SIGN_OUT_PATH)
                 .param(RADIO, "yes"))
                 .andExpect(redirectedUrl(SIGN_OUT+"/signout"));
@@ -146,7 +143,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
       @Test
     @DisplayName("Post Sign Out - error message - a radio button has not been selected")
     void postRequestRadioNull() throws Exception {
-
         this.mockMvc.perform(post(SIGN_OUT_PATH))
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attribute("errorMessage",true));
