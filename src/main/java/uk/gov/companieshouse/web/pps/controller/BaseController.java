@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,7 +21,6 @@ public abstract class BaseController {
 
     @Autowired
     private SessionService sessionService;
-
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
@@ -72,7 +72,7 @@ public abstract class BaseController {
     protected void addUserModel(Model model, PenaltyUtils penaltyUtils) {
         String loginEmail = penaltyUtils.getLoginEmail(sessionService);
         // Set a value for showing user bar part if exist
-        if (loginEmail != null && !loginEmail.isEmpty()) {
+        if (!StringUtils.isEmpty(loginEmail)) {
             model.addAttribute(USER_BAR_ATTR, "1");
             model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
             model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
