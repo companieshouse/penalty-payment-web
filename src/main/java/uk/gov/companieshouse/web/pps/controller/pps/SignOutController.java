@@ -55,9 +55,6 @@ public class SignOutController extends BaseController {
 
     @GetMapping
     public String getSignOut(final HttpServletRequest request, Model model) {
-
-
-
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         if (!sessionData.containsKey(SIGN_IN_KEY)) {
             LOGGER.info("No session data present: " + sessionData);
@@ -80,6 +77,7 @@ public class SignOutController extends BaseController {
             request.getSession().setAttribute("url_prior_signout", allowedUrl);
             model.addAttribute(BACK_LINK, allowedUrl);
         }
+        addPhaseBannerToModel(model);
         return getTemplateName();
     }
 

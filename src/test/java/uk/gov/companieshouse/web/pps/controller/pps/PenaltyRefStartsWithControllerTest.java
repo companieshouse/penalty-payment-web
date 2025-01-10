@@ -36,6 +36,7 @@ import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -48,6 +49,9 @@ class PenaltyRefStartsWithControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
+
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
 
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
     private FeatureFlagConfigurationProperties featureFlagConfigurationProperties;
@@ -71,7 +75,8 @@ class PenaltyRefStartsWithControllerTest {
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
                 penaltyConfigurationProperties,
-                featureFlagChecker);
+                featureFlagChecker,
+                mockPenaltyUtils);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -94,6 +99,7 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWithSanctionsEnabled() throws Exception {
         configurePreviousController();
+        configureMockEmailExist();
 
         featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE));
         setupMockMvc();
@@ -171,6 +177,10 @@ class PenaltyRefStartsWithControllerTest {
     private void configurePreviousController() {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_REDIRECT);
+    }
+
+    private void configureMockEmailExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 
 }

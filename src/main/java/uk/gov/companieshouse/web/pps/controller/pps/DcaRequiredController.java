@@ -24,7 +24,7 @@ public class DcaRequiredController extends BaseController {
                                        @PathVariable String penaltyNumber,
                                        Model model) {
 
-        addBackPageAttributeToModel(model);
+        addBaseAttributesToModel(model);
 
         return getTemplateName();
     }

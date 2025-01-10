@@ -1,11 +1,14 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
+@PreviousController(StartController.class)
 @RequestMapping("/late-filing-penalty/accessibility-statement")
 public class AccessibilityStatementController extends BaseController {
 
@@ -16,8 +19,8 @@ public class AccessibilityStatementController extends BaseController {
     }
 
     @GetMapping
-    public String getPpsAccessibilityStatement() {
-
+    public String getPpsAccessibilityStatement(Model model) {
+        addBaseAttributesToModel(model);
         return getTemplateName();
     }
 }

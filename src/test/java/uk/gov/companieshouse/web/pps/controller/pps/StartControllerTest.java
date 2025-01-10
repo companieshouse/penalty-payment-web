@@ -24,6 +24,7 @@ import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -49,6 +50,9 @@ class StartControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
+
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private StartController controller;
@@ -78,6 +82,7 @@ class StartControllerTest {
     void getRequestSuccess() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
+        configureMockEmailExist();
 
         this.mockMvc.perform(get(START_PATH))
                 .andExpect(status().isOk())
@@ -208,5 +213,9 @@ class StartControllerTest {
         viewResolver.setSuffix(".html");
 
         return viewResolver;
+    }
+
+    private void configureMockEmailExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 }
