@@ -17,27 +17,13 @@ public class BankTransferLateFilingDetailsController extends BaseController {
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
 
-    private static final String USER_EMAIL = "userEmail";
-
-    @Autowired
-    private PenaltyUtils penaltyUtils;
-
-    @Autowired
-    private SessionService sessionService;
-
     @Override protected String getTemplateName() {
         return BANK_TRANSFER_LATE_FILING_DETAILS;
     }
 
     @GetMapping
     public String getBankTransferLateFilingDetails(Model model) {
-        String loginEmail = penaltyUtils.getLoginEmail(sessionService);
-        if (loginEmail != null && !loginEmail.isEmpty()) {
-            model.addAttribute(USER_EMAIL, loginEmail);
-            addBaseAttributesToModel(model);
-        } else {
-            addBaseAttributesNoSignOutToModel(model);
-        }
+        addBaseAttributesToModel(model);
         return getTemplateName();
     }
 
