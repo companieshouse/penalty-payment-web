@@ -19,7 +19,6 @@ import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @PreviousController(StartController.class)
@@ -32,16 +31,13 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
-    private final PenaltyUtils penaltyUtils;
 
     @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public PenaltyRefStartsWithController(NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker,
-            PenaltyUtils penaltyUtils) {
+            FeatureFlagChecker featureFlagChecker) {
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
-        this.penaltyUtils = penaltyUtils;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
                 .filter(featureFlagChecker::isPenaltyRefEnabled)
@@ -63,7 +59,7 @@ public class PenaltyRefStartsWithController extends BaseController {
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addBaseAttributesToModel(model, penaltyUtils);
+        addBaseAttributesNoSignOutToModel(model);
 
         return getTemplateName();
     }

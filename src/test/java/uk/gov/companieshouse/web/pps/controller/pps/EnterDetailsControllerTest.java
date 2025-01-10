@@ -41,7 +41,6 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,9 +66,6 @@ class EnterDetailsControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
-
-    @Mock
-    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private EnterDetailsController controller;
@@ -121,7 +117,6 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureMockEmailExist();
 
         PenaltyReference lateFilingPenaltyRef = LATE_FILING;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
@@ -142,7 +137,6 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureMockEmailExist();
 
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
@@ -541,9 +535,5 @@ class EnterDetailsControllerTest {
 
         doThrow(ServiceException.class)
                 .when(mockPenaltyPaymentService).getLateFilingPenalties(companyNumber, penaltyRef);
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 }

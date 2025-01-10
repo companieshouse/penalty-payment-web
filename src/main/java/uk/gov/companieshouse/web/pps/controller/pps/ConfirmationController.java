@@ -101,7 +101,8 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(PAYMENT_DATE_ATTR, penaltyUtils.getPaymentDateDisplay());
             model.addAttribute(PENALTY_AMOUNT_ATTR, penaltyUtils.getPenaltyAmountDisplay(payablePenalty));
-            addBaseAttributesWithoutBackToModel(model, penaltyUtils);
+            addPhaseBannerToModel(model);
+            addUserModel(model);
 
 
             return getTemplateName();

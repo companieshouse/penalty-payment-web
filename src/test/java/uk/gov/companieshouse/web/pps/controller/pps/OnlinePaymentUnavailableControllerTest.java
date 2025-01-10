@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -29,9 +28,6 @@ class OnlinePaymentUnavailableControllerTest {
 
     @Mock
     private NavigatorService mockNavigatorService;
-
-    @Mock
-    private PenaltyUtils mockPenaltyUtils;
 
     @InjectMocks
     private OnlinePaymentUnavailableController controller;
@@ -56,7 +52,6 @@ class OnlinePaymentUnavailableControllerTest {
     void getRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureMockEmailExist();
 
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(status().isOk())
@@ -67,9 +62,5 @@ class OnlinePaymentUnavailableControllerTest {
     private void configurePreviousController() {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 }
