@@ -52,7 +52,7 @@ class UnscheduledServiceDownControllerTest {
     @DisplayName("Get Unscheduled Service Down - success path")
     void getRequestSuccess() throws Exception {
         configurePreviousController();
-//        configureMockEmailExist();
+        configureMockEmailExist();
 
         this.mockMvc.perform(get(UNSCHEDULED_SERVICE_DOWN_PATH))
                 .andExpect(status().isOk())
@@ -65,7 +65,7 @@ class UnscheduledServiceDownControllerTest {
                 .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
-//    private void configureMockEmailExist() {
-//        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-//    }
+    private void configureMockEmailExist() {
+        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
+    }
 }
