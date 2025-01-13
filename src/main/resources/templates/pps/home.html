@@ -48,8 +48,9 @@
                 <p class="govuk-body">It usually takes around 5 minutes to pay. We'll email you a receipt.</p>
 
                 <div class="form-group">
-                    <input id="next-button" class="govuk-button" data-event-id="lfp - Start now"
-                           onclick="_paq.push(['trackGoal', 3]);" type="submit" role="button" value="Start now"/>
+                    <input id="next-button" class="govuk-button" data-event-id="Pay a penalty - Start now"
+                           th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.start-now-button-goal-id')}]]]);"
+                           type="submit" role="button" value="Start now"/>
                 </div>
 
                 <p class="govuk-body">
