@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +11,10 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +35,7 @@ public class SignOutController extends BaseController {
     private AllowlistChecker allowlistChecker;
 
     @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private PenaltyUtils penaltyUtils;
 
     private static final String PPS_SIGN_OUT = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
@@ -58,7 +56,7 @@ public class SignOutController extends BaseController {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         if (!sessionData.containsKey(SIGN_IN_KEY)) {
             LOGGER.info("No session data present: " + sessionData);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         LOGGER.debug("Processing sign out");

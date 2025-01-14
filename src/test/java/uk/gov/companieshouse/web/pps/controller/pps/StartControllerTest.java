@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.security.WebSecurity;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -56,9 +55,6 @@ class StartControllerTest {
 
     @InjectMocks
     private StartController controller;
-
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @BeforeEach
     void setup() {
@@ -190,8 +186,8 @@ class StartControllerTest {
     }
 
     private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
     private String convertTimeToModelFormat(String inputTime) throws ParseException {

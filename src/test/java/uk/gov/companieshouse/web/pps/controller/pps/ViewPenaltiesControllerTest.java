@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -60,9 +59,6 @@ class ViewPenaltiesControllerTest {
 
     @Mock
     private PenaltyUtils mockPenaltyUtils;
-
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @InjectMocks
     private ViewPenaltiesController controller;
@@ -341,8 +337,8 @@ class ViewPenaltiesControllerTest {
     }
 
     private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
 }

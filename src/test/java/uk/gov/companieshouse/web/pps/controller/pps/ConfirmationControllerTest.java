@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -55,9 +54,6 @@ class ConfirmationControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
-
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_REF = "EXAMPLE12345";
     private static final String PAYABLE_REF = "PR_123456";
@@ -79,14 +75,11 @@ class ConfirmationControllerTest {
 
     @BeforeEach
     void setup() {
-        mockPenaltyConfigurationProperties = new PenaltyConfigurationProperties();
-        mockPenaltyConfigurationProperties.setUnscheduledServiceDownPath(UNSCHEDULED_SERVICE_DOWN_PATH);
         ConfirmationController controller = new ConfirmationController(
                 mockCompanyService,
                 mockPayablePenaltyService,
                 sessionService,
-                mockPenaltyUtils,
-                mockPenaltyConfigurationProperties
+                mockPenaltyUtils
         );
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
@@ -159,6 +152,8 @@ class ConfirmationControllerTest {
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(false);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -175,6 +170,8 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(MISMATCHED_STATE);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH)
                         .param("ref", REF)
@@ -214,6 +211,8 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(PAYMENT_STATE)).thenReturn(true);
         when(sessionData.get(PAYMENT_STATE)).thenReturn(STATE);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         doThrow(ServiceException.class)
                 .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);

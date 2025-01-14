@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +72,7 @@ public class ViewPenaltiesController extends BaseController {
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         // If this screen is accessed directly for an invalid penalty return an error view.
@@ -87,7 +85,7 @@ public class ViewPenaltiesController extends BaseController {
                 || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
                 || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
             LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
@@ -119,7 +117,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         try {
@@ -129,7 +127,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
     }
 

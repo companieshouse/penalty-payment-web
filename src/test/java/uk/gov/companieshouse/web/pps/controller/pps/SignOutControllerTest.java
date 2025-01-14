@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
 import java.util.HashMap;
@@ -44,6 +45,9 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
     @Mock
     private AllowlistChecker allowlistChecker;
+
+    @Mock
+    private PenaltyUtils mockPenaltyUtils;
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
@@ -149,7 +153,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     }
 
     private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,8 @@ import static org.mockito.Mockito.when;
 
 class PenaltyUtilsTest {
 
-    private final PenaltyUtils penaltyUtils = new PenaltyUtils("Late filing of accounts");
+    private final PenaltyUtils penaltyUtils = new PenaltyUtils("Late filing of accounts",
+            new PenaltyConfigurationProperties());
 
     @Test
     void testGetViewPenaltiesLateFilingReason() {

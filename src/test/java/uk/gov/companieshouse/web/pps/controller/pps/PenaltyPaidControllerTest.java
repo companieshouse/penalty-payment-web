@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -47,9 +46,6 @@ class PenaltyPaidControllerTest {
 
     @Mock
     private PenaltyUtils mockPenaltyUtils;
-
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @InjectMocks
     private PenaltyPaidController controller;
@@ -115,8 +111,8 @@ class PenaltyPaidControllerTest {
     }
 
     private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
     private void configureErrorRetrievingCompany(String companyNumber) throws ServiceException {

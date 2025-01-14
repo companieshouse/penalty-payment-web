@@ -32,9 +32,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -72,9 +70,6 @@ class EnterDetailsControllerTest {
 
     @Mock
     private PenaltyUtils mockPenaltyUtils;
-
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @InjectMocks
     private EnterDetailsController controller;
@@ -551,7 +546,7 @@ class EnterDetailsControllerTest {
     }
 
     private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath())
-                .thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }
