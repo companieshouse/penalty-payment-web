@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,6 +11,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Component
@@ -18,8 +21,13 @@ public class PenaltyUtils {
 
     private static final DecimalFormat AMOUNT_FORMATTER = new DecimalFormat("#,###");
 
-    public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason){
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+
+    public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason,
+            PenaltyConfigurationProperties penaltyConfigurationProperties){
         this.viewPenaltiesLateFilingReason = viewPenaltiesLateFilingReason;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+
     }
 
     public String getViewPenaltiesLateFilingReason() {
@@ -49,6 +57,10 @@ public class PenaltyUtils {
 
     public String getPenaltyAmountDisplay(PayableLateFilingPenalty payableLateFilingPenalty) {
         return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
+    }
+
+    public String getUnscheduledServiceDownPath() {
+        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
     }
 }
 

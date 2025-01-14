@@ -19,6 +19,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
@@ -30,6 +31,9 @@ public class StartController extends BaseController {
 
     @Autowired
     private PenaltyPaymentService penaltyPaymentService;
+
+    @Autowired
+    private PenaltyUtils penaltyUtils;
 
     @Autowired
     private Environment environment;
@@ -47,7 +51,7 @@ public class StartController extends BaseController {
             financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
@@ -67,7 +71,7 @@ public class StartController extends BaseController {
             LOGGER.error("Service is unavailable");
             return PPS_SERVICE_UNAVAILABLE;
         } else {
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
     }
 

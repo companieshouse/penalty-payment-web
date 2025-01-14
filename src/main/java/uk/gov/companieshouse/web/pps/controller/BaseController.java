@@ -25,8 +25,6 @@ public abstract class BaseController {
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    protected static final String ERROR_VIEW = "error";
-
     public static final String BACK_LINK_ATTR = "backLink";
     public static final String USER_BAR_ATTR = "userBar";
     public static final String USER_EMAIL_ATTR = "userEmail";

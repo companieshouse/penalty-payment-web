@@ -60,6 +60,14 @@ public class WebSecurity {
 
     @Bean
     @Order(6)
+    public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/unscheduled-service-down")
+        ).build();
+    }
+
+    @Bean
+    @Order(7)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/**")

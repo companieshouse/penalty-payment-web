@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -31,7 +32,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -93,7 +93,7 @@ class EnterDetailsControllerTest {
     private static final String ALREADY_PAID_PATH =
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
 
-    private static final String ERROR_PAGE = "error";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
@@ -109,7 +109,7 @@ class EnterDetailsControllerTest {
 
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
+    private static final String MOCK_CONTROLLER_PATH = REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @BeforeEach
     public void setup() {
@@ -164,13 +164,12 @@ class EnterDetailsControllerTest {
 
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
+        configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeDoesNotExist(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(ERROR_PAGE));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
         verifyNoInteractions(mockEnterDetailsValidator);
@@ -411,15 +410,14 @@ class EnterDetailsControllerTest {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configureErrorRetrievingPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+        configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeErrorCount(ENTER_DETAILS_MODEL_ATTR, 0))
-                .andExpect(view().name(ERROR_PAGE));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -545,5 +543,10 @@ class EnterDetailsControllerTest {
 
     private void configureMockEmailExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }

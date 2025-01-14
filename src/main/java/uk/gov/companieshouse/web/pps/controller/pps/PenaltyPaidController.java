@@ -13,6 +13,7 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @PreviousController(EnterDetailsController.class)
@@ -28,6 +29,9 @@ public class PenaltyPaidController extends BaseController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
     @GetMapping
     public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
                                        @PathVariable String penaltyNumber,
@@ -40,7 +44,7 @@ public class PenaltyPaidController extends BaseController {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());

@@ -29,6 +29,7 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
@@ -54,6 +55,9 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private FeatureFlagChecker featureFlagChecker;
 
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
     private static final String PENALTY_PAID = "/penalty-paid";
 
     private static final String DCA = "/legal-fees-required";
@@ -74,7 +78,7 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
@@ -168,7 +172,7 @@ public class EnterDetailsController extends BaseController {
         } catch (ServiceException ex) {
 
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
     }
 

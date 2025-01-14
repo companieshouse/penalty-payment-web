@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -50,6 +51,9 @@ public class ViewPenaltiesController extends BaseController {
     @Autowired
     private PenaltyUtils penaltyUtils;
 
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     @GetMapping
     public String getViewPenalties(@PathVariable String companyNumber,
                                    @PathVariable String penaltyNumber,
@@ -68,7 +72,7 @@ public class ViewPenaltiesController extends BaseController {
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         // If this screen is accessed directly for an invalid penalty return an error view.
@@ -81,7 +85,7 @@ public class ViewPenaltiesController extends BaseController {
                 || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
                 || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
             LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
@@ -113,7 +117,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
 
         try {
@@ -123,7 +127,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return ERROR_VIEW;
+            return penaltyUtils.getUnscheduledServiceDownPath();
         }
     }
 

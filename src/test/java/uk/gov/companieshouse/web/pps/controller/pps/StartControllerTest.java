@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,9 +64,9 @@ class StartControllerTest {
     private static final String START_PATH = "/late-filing-penalty";
     private static final String START_PATH_PARAM = "/late-filing-penalty?start=0";
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String PPS_START_VIEW = "pps/home";
-    private static final String ERROR_VIEW = "error";
     private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
 
     private static final String DATE_MODEL_ATTR = "date";
@@ -92,10 +93,11 @@ class StartControllerTest {
     void getRequestErrorCheckingFinanceSystem() throws Exception {
 
         configureErrorFinanceHealthcheckResponse();
+        configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(START_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ERROR_VIEW));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
 
@@ -136,10 +138,11 @@ class StartControllerTest {
     void getRequestFinanceSystemInvalidState() throws Exception {
 
         configureInvalidFinanceHealthcheckResponse();
+        configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(START_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ERROR_VIEW));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
 
@@ -180,6 +183,11 @@ class StartControllerTest {
             throws ServiceException {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime())
                 .thenReturn(PPSTestUtility.financeHealthcheckServiceInvalid());
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
     private String convertTimeToModelFormat(String inputTime) throws ParseException {

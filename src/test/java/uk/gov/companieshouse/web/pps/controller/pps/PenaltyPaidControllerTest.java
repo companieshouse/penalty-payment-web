@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,9 +54,9 @@ class PenaltyPaidControllerTest {
     private static final String PENALTY_NUMBER = "44444444";
 
     private static final String PENALTY_PAID_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String PPS_PENALTY_PAID = "pps/penaltyPaid";
-    private static final String ERROR_VIEW = "error";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String COMPANY_NAME_ATTR = "companyName";
     private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
@@ -90,10 +91,11 @@ class PenaltyPaidControllerTest {
     void getRequestErrorRetrievingCompanyDetails() throws Exception {
 
         configureErrorRetrievingCompany(COMPANY_NUMBER);
+        configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ERROR_VIEW));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
     }
@@ -106,6 +108,11 @@ class PenaltyPaidControllerTest {
     private void configureValidCompanyProfile(String companyNumber) throws ServiceException {
         when(mockCompanyService.getCompanyProfile(companyNumber))
                 .thenReturn(PPSTestUtility.validCompanyProfile(companyNumber));
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
     private void configureErrorRetrievingCompany(String companyNumber) throws ServiceException {
