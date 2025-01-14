@@ -77,9 +77,13 @@
                     If you have another penalty to pay
                 </h2>
                 <p class="govuk-body">
-                    You can use this service again to <a id="penalty-ref-starts-with-link"
-                                                         th:href="${@environment.getProperty('penalty.ref-starts-with-url')}"
-                                                         class="govuk-link">pay another penalty</a>.
+                    You can use this service again to
+                    <a id="penalty-ref-starts-with-link"
+                       th:href="${@environment.getProperty('penalty.ref-starts-with-url')}"
+                       class="govuk-link"
+                       data-event-id="Pay another penalty link"
+                       th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.pay-another-penalty-goal-id')}]]]);">
+                    pay another penalty</a>.
                 </p>
                 <br><br>
                 <p class="govuk-body">
