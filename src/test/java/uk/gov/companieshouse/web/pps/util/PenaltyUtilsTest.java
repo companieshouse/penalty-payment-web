@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.util;
 
 import java.util.Collections;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
@@ -11,11 +12,21 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 class PenaltyUtilsTest {
 
-    private final PenaltyUtils penaltyUtils = new PenaltyUtils("Late filing of accounts",
-            new PenaltyConfigurationProperties());
+    private PenaltyUtils penaltyUtils;
+
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+
+    @BeforeEach
+    void setup() {
+        PenaltyConfigurationProperties penaltyConfigurationProperties = new PenaltyConfigurationProperties();
+        penaltyConfigurationProperties.setUnscheduledServiceDownPath(UNSCHEDULED_SERVICE_DOWN_PATH);
+        penaltyUtils = new PenaltyUtils("Late filing of accounts",
+                penaltyConfigurationProperties);
+    }
 
     @Test
     void testGetViewPenaltiesLateFilingReason() {
@@ -73,5 +84,11 @@ class PenaltyUtilsTest {
         when(transaction.getAmount()).thenReturn(10050);
         String result = penaltyUtils.getPenaltyAmountDisplay(payableLateFilingPenalty);
         assertEquals("10,050", result);
+    }
+
+    @Test
+    void testGetUnscheduledServiceDownPath() {
+        String result = penaltyUtils.getUnscheduledServiceDownPath();
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result);
     }
 }
