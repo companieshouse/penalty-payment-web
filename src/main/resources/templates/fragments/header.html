@@ -8,6 +8,7 @@
     <a href="#content" class="govuk-skip-link">Skip to main content</a>
     <header role="banner" id="global-header" class="govuk-header">
         <div class="govuk-header__container govuk-width-container">
+            <div class="header-global">
                 <div class="govuk-header__logo">
                     <a href="/late-filing-penalty" class="govuk-header__link govuk-header__link--homepage">
                         <svg
@@ -25,7 +26,7 @@
                         </svg>
                     </a>
                 </div>
-
+            </div>
             <div class="govuk-header__content"
                  th:if="${headerText != null}">
                 <a id="proposition-name" href="/late-filing-penalty" class="govuk-header__link govuk-header__link--service-name"  th:text='${headerText}'></a>
