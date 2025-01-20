@@ -37,7 +37,7 @@
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Reason for penalty</dt>
-                        <dd class="govuk-summary-list__value" th:text="#{confirmationPage.lfp-penalty-reason}"></dd>
+                        <dd class="govuk-summary-list__value" th:text="${reasonForPenalty}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Paid on</dt>
@@ -63,13 +63,29 @@
                     You do not need to contact us to tell us that you've paid.
                 </p>
                 <div class="govuk-cookie-banner">
-                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6">
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith} == 'A'">
                         <h2 class="govuk-heading-m">
                             Sign up for email reminders
                         </h2>
                         <p class="govuk-body">You can sign up to receive
                             <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminders</a>
-                            to file your company accounts. This will help you file on time in future and avoid penalties.
+                            to file your company accounts. This will help you file on time in future and avoid penalties.</p>
+                    </div>
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith} == 'P'">
+                        <h2 class="govuk-heading-m">
+                            Check if you need to take further action
+                        </h2>
+                        <p class="govuk-body">This penalty was issued because of the following offence:</p>
+                        <p class="govuk-body">Failure to provide an appropriate registered email address</p>
+                        <p class="govuk-body">You've paid the penalty, but there may still be more to do.</p>
+                        <div class="govuk-warning-text">
+                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong class="govuk-warning-text__text">
+                                <span class="govuk-visually-hidden">Warning</span>
+                                You must check if you need to take any further action relating to this offence. If an action is required and you do not comply, you may still be committing an offence and at risk of more penalties or prosecution.
+                            </strong>
+                        </div>
+                        <p class="govuk-body"><a href="https://www.gov.uk/contact-companies-house" class="govuk-link">Contact us </a>if you are unsure of what you need to do.</p>
                     </div>
                 </div>
                 <br>

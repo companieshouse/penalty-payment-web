@@ -19,19 +19,28 @@ class PenaltyUtilsTest {
     private PenaltyUtils penaltyUtils;
 
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String LFP_REASON_FOR_PENALTY = "Late filing of accounts";
+    private static final String CS_REASON_FOR_PENALTY = "Failure to file confirmation statement";
 
     @BeforeEach
     void setup() {
         PenaltyConfigurationProperties penaltyConfigurationProperties = new PenaltyConfigurationProperties();
         penaltyConfigurationProperties.setUnscheduledServiceDownPath(UNSCHEDULED_SERVICE_DOWN_PATH);
-        penaltyUtils = new PenaltyUtils("Late filing of accounts",
+        penaltyUtils = new PenaltyUtils(LFP_REASON_FOR_PENALTY,
+                CS_REASON_FOR_PENALTY,
                 penaltyConfigurationProperties);
     }
 
     @Test
-    void testGetViewPenaltiesLateFilingReason() {
-        String result = penaltyUtils.getViewPenaltiesLateFilingReason();
-        assertEquals("Late filing of accounts", result);
+    void testGetLateFilingPenaltyReason() {
+        String result = penaltyUtils.getReasonForPenalty("AA100030");
+        assertEquals(LFP_REASON_FOR_PENALTY, result);
+    }
+
+    @Test
+    void testGetconfirmationStatementPenaltyReason() {
+        String result = penaltyUtils.getReasonForPenalty("P0000300");
+        assertEquals(CS_REASON_FOR_PENALTY, result);
     }
 
     @Test

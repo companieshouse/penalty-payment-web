@@ -2,36 +2,34 @@ package uk.gov.companieshouse.web.pps.util;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
-
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Component
 public class PenaltyUtils {
 
-    private final String viewPenaltiesLateFilingReason;
-
     private static final DecimalFormat AMOUNT_FORMATTER = new DecimalFormat("#,###");
 
+    private final String lateFilingPenaltyReason;
+    private final String confirmationStatementPenaltyReason;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
-    public PenaltyUtils(@Value("${penalty.view-penalties-late-filing-reason}") String viewPenaltiesLateFilingReason,
+    public PenaltyUtils(@Value("${penalty.reason.lfp}") String lateFilingPenaltyReason,
+            @Value("${penalty.reason.cs}") String confirmationStatementPenaltyReason,
             PenaltyConfigurationProperties penaltyConfigurationProperties){
-        this.viewPenaltiesLateFilingReason = viewPenaltiesLateFilingReason;
+        this.lateFilingPenaltyReason = lateFilingPenaltyReason;
+        this.confirmationStatementPenaltyReason = confirmationStatementPenaltyReason;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
 
-    }
-
-    public String getViewPenaltiesLateFilingReason() {
-        return viewPenaltiesLateFilingReason;
     }
 
     public String getFormattedAmount(final Integer amount) {
@@ -59,8 +57,22 @@ public class PenaltyUtils {
         return getFormattedAmount(payableLateFilingPenalty.getTransactions().getFirst().getAmount());
     }
 
+    public String getReasonForPenalty(@NotNull String penaltyRef) {
+
+        return switch (getPenaltyReferenceType(penaltyRef)) {
+            case SANCTIONS -> confirmationStatementPenaltyReason;
+            case LATE_FILING -> lateFilingPenaltyReason;
+        };
+    }
+
     public String getUnscheduledServiceDownPath() {
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+    }
+
+    public PenaltyReference getPenaltyReferenceType(String penaltyRef) {
+        // Get the first character of the penalty reference
+        String refStartsWith = penaltyRef.toUpperCase().substring(0, 1);
+        return PenaltyReference.fromStartsWith(refStartsWith);
     }
 }
 
