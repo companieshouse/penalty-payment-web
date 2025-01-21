@@ -56,8 +56,8 @@ class BankTransferPenaltyReferenceControllerTest {
         penaltyConfigurationProperties = new PenaltyConfigurationProperties();
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
                 LATE_FILING, SANCTIONS));
-        penaltyConfigurationProperties.setBankTransferWhichPenaltyPath(
-                "/late-filing-penalty/bank-transfer/which-penalty-service");
+        penaltyConfigurationProperties.setBankTransferPath(
+                "/late-filing-penalty/bank-transfer");
         penaltyConfigurationProperties.setBankTransferLateFilingDetailsPath(
                 "/late-filing-penalty/bank-transfer/late-filing-details");
         penaltyConfigurationProperties.setBankTransferSanctionsPath(
@@ -76,7 +76,7 @@ class BankTransferPenaltyReferenceControllerTest {
 
         configurePreviousController();
 
-        MvcResult mvcResult = this.mockMvc.perform(get(penaltyConfigurationProperties.getBankTransferWhichPenaltyPath()))
+        MvcResult mvcResult = this.mockMvc.perform(get(penaltyConfigurationProperties.getBankTransferPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_BANK_TRANSFER_PENALTY_REFERENCE))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
@@ -92,7 +92,7 @@ class BankTransferPenaltyReferenceControllerTest {
     @DisplayName("Post PPS Bank Transfer Which Penalty Reference - empty selection")
     void postRequestBankTransferPenaltyReferenceEmptySelected() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferWhichPenaltyPath()))
+        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferPath()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_BANK_TRANSFER_PENALTY_REFERENCE))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
@@ -108,7 +108,7 @@ class BankTransferPenaltyReferenceControllerTest {
     @Test
     @DisplayName("Post PPS Bank Transfer Which Penalty Reference - late filing selection")
     void postRequestBankTransferPenaltyReferenceLateFilingSelected() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferWhichPenaltyPath())
+        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferPath())
                         .param(SELECTED_PENALTY_REF_ATTR, LATE_FILING.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
@@ -124,7 +124,7 @@ class BankTransferPenaltyReferenceControllerTest {
     @Test
     @DisplayName("Post PPS Bank Transfer Which Penalty Reference - sanctions selection")
     void postRequestBankTransferPenaltyReferenceSanctionSelected() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferWhichPenaltyPath())
+        MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferPath())
                         .param(SELECTED_PENALTY_REF_ATTR, SANCTIONS.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
