@@ -49,15 +49,17 @@ public abstract class BaseController {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
         addBackPageAttributeToModel(model);
+        addServiceBannerToModel(model);
     }
 
     protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
         addBackPageAttributeToModel(model);
+        addServiceBannerToModel(model);
     }
 
-    protected void addBaseAttributesWithoutBackToModel(Model model) {
+    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
     }
@@ -65,6 +67,7 @@ public abstract class BaseController {
     protected void addBaseAttributesWithoutBackToModel(Model model, PenaltyUtils penaltyUtils) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
+        addServiceBannerToModel(model);
     }
 
     protected void addUserModel(Model model, PenaltyUtils penaltyUtils) {
@@ -83,5 +86,9 @@ public abstract class BaseController {
     protected void addPhaseBannerToModel(Model model) {
         model.addAttribute(PHASE_BANNER_ATTR, "beta");
         model.addAttribute(PHASE_BANNER_LINK_ATTR, "https://www.smartsurvey.co.uk/s/pay-lfp-feedback/");
+    }
+
+    protected void addServiceBannerToModel(Model model) {
+        model.addAttribute("serviceBanner", "1");
     }
 }

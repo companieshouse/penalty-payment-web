@@ -23,6 +23,17 @@
 
         </div>
     </header>
+    <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Pay a penalty to Companies House" th:if="${serviceBanner != null}">
+        <div class="govuk-cookie-banner govuk-width-container">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <a href="/late-filing-penalty" class="govuk-header__link--service-name govuk-heading-s">
+                        Pay a penalty to Companies House
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </th:block>
 </body>
 </html>
