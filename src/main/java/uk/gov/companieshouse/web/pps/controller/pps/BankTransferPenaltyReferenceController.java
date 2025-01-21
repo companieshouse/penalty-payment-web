@@ -22,7 +22,7 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @PreviousController(StartController.class)
-@RequestMapping("/late-filing-penalty/bank-transfer/which-penalty-service")
+@RequestMapping("/late-filing-penalty/bank-transfer")
 public class BankTransferPenaltyReferenceController extends BaseController {
 
     static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
