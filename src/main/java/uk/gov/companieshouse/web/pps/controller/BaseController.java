@@ -85,7 +85,7 @@ public abstract class BaseController {
 
     protected void addPhaseBannerToModel(Model model) {
         model.addAttribute(PHASE_BANNER_ATTR, "beta");
-        model.addAttribute(PHASE_BANNER_LINK_ATTR, "https://www.smartsurvey.co.uk/s/pay-lfp-feedback/");
+        model.addAttribute(PHASE_BANNER_LINK_ATTR, "https://www.smartsurvey.co.uk/s/pay-a-penalty-feedback");
     }
 
     protected void addServiceBannerToModel(Model model) {

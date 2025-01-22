@@ -13,7 +13,7 @@ public class PenaltyConfigurationProperties {
     private List<PenaltyReference> allowedRefStartsWith = new ArrayList<>();
     private String refStartsWithPath;
     private String enterDetailsPath;
-    private String bankTransferWhichPenaltyPath;
+    private String bankTransferPath;
     private String bankTransferLateFilingDetailsPath;
     private String bankTransferSanctionsPath;
     private String unscheduledServiceDownPath;
@@ -43,12 +43,12 @@ public class PenaltyConfigurationProperties {
         this.enterDetailsPath = enterDetailsPath;
     }
 
-    public String getBankTransferWhichPenaltyPath() {
-        return bankTransferWhichPenaltyPath;
+    public String getBankTransferPath() {
+        return bankTransferPath;
     }
 
-    public void setBankTransferWhichPenaltyPath(String bankTransferWhichPenaltyPath) {
-        this.bankTransferWhichPenaltyPath = bankTransferWhichPenaltyPath;
+    public void setBankTransferPath(String bankTransferPath) {
+        this.bankTransferPath = bankTransferPath;
     }
 
     public String getBankTransferLateFilingDetailsPath() {
