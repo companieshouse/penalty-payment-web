@@ -60,7 +60,7 @@ public class StartController extends BaseController {
                 return navigatorService.getNextControllerRedirect(this.getClass());
             }
 
-            addBaseAttributesWithoutBackToModel(model);
+            addBaseAttributesWithoutServiceAndBackToModel(model);
             return getTemplateName();
         } else if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());
