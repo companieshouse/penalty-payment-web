@@ -10,9 +10,11 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
 class PenaltyUtilsTest {
 
@@ -38,7 +40,7 @@ class PenaltyUtilsTest {
     }
 
     @Test
-    void testGetconfirmationStatementPenaltyReason() {
+    void testGetConfirmationStatementPenaltyReason() {
         String result = penaltyUtils.getReasonForPenalty("P0000300");
         assertEquals(CS_REASON_FOR_PENALTY, result);
     }
@@ -47,6 +49,44 @@ class PenaltyUtilsTest {
     void testGetFormattedAmount(){
         String result = penaltyUtils.getFormattedAmount(1000);
         assertEquals("1,000", result);
+    }
+
+    @Test
+    void testGetReasonForPenaltyWithNullPenaltyRef() {
+
+        IllegalArgumentException expectedException = assertThrowsExactly(
+                IllegalArgumentException.class, () -> penaltyUtils.getReasonForPenalty(null));
+        assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
+    }
+
+    @Test
+    void testGetReasonForPenaltyWithEmptyPenaltyRef() {
+
+        IllegalArgumentException expectedException = assertThrowsExactly(
+                IllegalArgumentException.class, () -> penaltyUtils.getReasonForPenalty(""));
+        assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
+    }
+
+    @Test
+    void testGetPenaltyReferenceType() {
+        PenaltyReference result = penaltyUtils.getPenaltyReferenceType("AA100030");
+        assertEquals(LATE_FILING, result);
+    }
+
+    @Test
+    void testGetPenaltyReferenceTypeWithNullRef() {
+
+        IllegalArgumentException expectedException = assertThrowsExactly(
+                IllegalArgumentException.class, () -> penaltyUtils.getPenaltyReferenceType(null));
+        assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
+    }
+
+    @Test
+    void testGetPenaltyReferenceTypeWithEmptyRef() {
+
+        IllegalArgumentException expectedException = assertThrowsExactly(
+                IllegalArgumentException.class, () -> penaltyUtils.getPenaltyReferenceType(""));
+        assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
     }
 
     @Test
