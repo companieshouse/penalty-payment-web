@@ -33,17 +33,29 @@
                     <li>
                         <span class="govuk-!-font-weight-bold">Account name</span>:
                         <span id="late-filing-account-name"
+                              th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-name')}"></span>
+                        <span id="sanctions-account-name"
+                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-name')}"></span>
                     </li>
                     <li>
                         <span class="govuk-!-font-weight-bold">Sort code</span>:
                         <span id="late-filing-sort-code"
+                              th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.sort-code')}"></span>
+                        <span id="sanctions-sort-code"
+                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.sort-code')}"></span>
                     </li>
                     <li>
                         <span class="govuk-!-font-weight-bold">Account number</span>:
                         <span id="late-filing-account-number"
+                              th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-number')}"></span>
+                        <span id="sanctions-account-number"
+                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-number')}"></span>
                     </li>
                     <li>
                         <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
@@ -57,12 +69,20 @@
                     <li>
                         <span class="govuk-!-font-weight-bold">IBAN</span>:
                         <span id="late-filing-iban"
+                              th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.iban')}"></span>
+                        <span id="sanctions-iban"
+                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.iban')}"></span>
                     </li>
                     <li>
                         <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
                         <span id="late-filing-swift-code"
+                              th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.swift-code')}"></span>
+                        <span id="sanctions-swift-code"
+                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.swift-code')}"></span>
                     </li>
                     <li>
                         <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
