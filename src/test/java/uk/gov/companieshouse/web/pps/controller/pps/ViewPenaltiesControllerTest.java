@@ -64,9 +64,10 @@ class ViewPenaltiesControllerTest {
     private ViewPenaltiesController controller;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "44444444";
+    private static final String LFP_PENALTY_NUMBER = "A4444444";
 
-    private static final String VIEW_PENALTIES_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/view-penalties";
+    private static final String VIEW_PENALTIES_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_NUMBER
+            + "/view-penalties";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String ENTER_PPS_DETAILS_VIEW = "pps/viewPenalties";
@@ -91,11 +92,11 @@ class ViewPenaltiesControllerTest {
     void getRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureValidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+        configureValidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
 
         when(mockPenaltyUtils.getFormattedAmount(any())).thenReturn("Mocked Outstanding Value");
-        when(mockPenaltyUtils.getViewPenaltiesLateFilingReason()).thenReturn("Mocked Reason for Penalty");
+        when(mockPenaltyUtils.getReasonForPenalty(LFP_PENALTY_NUMBER)).thenReturn("Mocked Reason for Penalty");
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
@@ -106,9 +107,10 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_MODEL_ATTR));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
         verify(mockPenaltyUtils, times(1)).getFormattedAmount(any());
-        verify(mockPenaltyUtils, times(1)).getViewPenaltiesLateFilingReason();
+        verify(mockPenaltyUtils, times(1)).getReasonForPenalty(LFP_PENALTY_NUMBER);
     }
 
     @Test
@@ -116,14 +118,15 @@ class ViewPenaltiesControllerTest {
     void getRequestErrorRetrievingLateFilingPenalty() throws Exception {
 
         configurePreviousController();
-        configureErrorRetrievingPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+        configureErrorRetrievingPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
 
     }
 
@@ -148,7 +151,7 @@ class ViewPenaltiesControllerTest {
     void getRequestLateFilingPenaltyIsNull() throws Exception {
 
         configurePreviousController();
-        configureNullPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+        configureNullPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
         configureUnscheduledServiceDownPath();
 
@@ -157,7 +160,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
 
     }
 
@@ -166,7 +170,7 @@ class ViewPenaltiesControllerTest {
     void getRequestLateFilingPenaltyIsPaid() throws Exception {
 
         configurePreviousController();
-        configurePaidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+        configurePaidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
         configureUnscheduledServiceDownPath();
 
@@ -175,7 +179,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
 
     }
 
@@ -184,8 +189,8 @@ class ViewPenaltiesControllerTest {
     void postRequestSuccess() throws Exception {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession = PPSTestUtility.payableLateFilingPenaltySession(COMPANY_NUMBER);
-        configureValidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
-        configureValidPenaltyCreation(COMPANY_NUMBER, PENALTY_NUMBER,
+        configureValidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        configureValidPenaltyCreation(COMPANY_NUMBER, LFP_PENALTY_NUMBER,
                 PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER),
                 payableLateFilingPenaltySession);
         configureCreatingPaymentSession(payableLateFilingPenaltySession);
@@ -194,11 +199,14 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER));
 
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
         verify(mockPayablePenaltyService, times(1))
-                .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
+                .createLateFilingPenaltySession(COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER);
 
     }
 
@@ -206,14 +214,15 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View PPS - error returning Late Filing Penalty")
     void postRequestErrorRetrievingLateFilingPenalty() throws Exception {
 
-        configureErrorRetrievingPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
+        configureErrorRetrievingPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(post(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
 
     }
 
@@ -221,17 +230,19 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View PPS - error creating Late Filing Penalty")
     void postRequestErrorCreatingLateFilingPenalty() throws Exception {
 
-        configureValidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
-        configureErrorCreatingLateFilingPenalty(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER));
+        configureValidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        configureErrorCreatingLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER));
         configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(post(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
         verify(mockPayablePenaltyService, times(1))
-                .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
+                .createLateFilingPenaltySession(COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
 
     }
 
@@ -240,8 +251,8 @@ class ViewPenaltiesControllerTest {
     void postRequestErrorCreatingPaymentSession() throws Exception {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession = PPSTestUtility.payableLateFilingPenaltySession(COMPANY_NUMBER);
-        configureValidPenalty(COMPANY_NUMBER, PENALTY_NUMBER);
-        configureValidPenaltyCreation(COMPANY_NUMBER, PENALTY_NUMBER,
+        configureValidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        configureValidPenaltyCreation(COMPANY_NUMBER, LFP_PENALTY_NUMBER,
                 PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER),
                 payableLateFilingPenaltySession);
         configureErrorCreatingPaymentSession(payableLateFilingPenaltySession);
@@ -251,11 +262,14 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
         verify(mockPayablePenaltyService, times(1))
-                .createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
+                .createLateFilingPenaltySession(COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER).getOutstanding());
         verify(mockPaymentService, times(1))
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER);
     }
 
 
@@ -325,7 +339,8 @@ class ViewPenaltiesControllerTest {
     private void configureCreatingPaymentSession(PayableLateFilingPenaltySession payableLateFilingPenaltySession)
             throws ServiceException {
 
-        when(mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER))
+        when(mockPaymentService.createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER))
                 .thenReturn(MOCK_PAYMENTS_URL);
     }
 
@@ -333,7 +348,8 @@ class ViewPenaltiesControllerTest {
             throws ServiceException {
 
         doThrow(ServiceException.class).when(mockPaymentService)
-                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_NUMBER);
+                .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
+                        LFP_PENALTY_NUMBER);
     }
 
     private void configureUnscheduledServiceDownPath() {

@@ -90,7 +90,7 @@ public class ViewPenaltiesController extends BaseController {
 
         model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
         model.addAttribute("penaltyReference", penaltyNumber);
-        model.addAttribute("reasonForPenalty", penaltyUtils.getViewPenaltiesLateFilingReason());
+        model.addAttribute("reasonForPenalty", penaltyUtils.getReasonForPenalty(penaltyNumber));
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 
