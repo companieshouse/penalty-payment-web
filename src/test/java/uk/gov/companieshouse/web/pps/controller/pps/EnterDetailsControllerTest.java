@@ -318,7 +318,7 @@ class EnterDetailsControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
                 .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(DCA_PAYMENTS_PATH));
+                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);

@@ -16,7 +16,8 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
-    private final PenaltyUtils penaltyUtils;
+    @Autowired
+    private PenaltyUtils penaltyUtils;
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
 
@@ -24,11 +25,6 @@ public class OnlinePaymentUnavailableController extends BaseController {
 
     @Override protected String getTemplateName() {
         return ONLINE_PAYMENT_UNAVAILABLE;
-    }
-
-    @Autowired
-    public OnlinePaymentUnavailableController(PenaltyUtils penaltyUtils){
-        this.penaltyUtils = penaltyUtils;
     }
 
     @GetMapping

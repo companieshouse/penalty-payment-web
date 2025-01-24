@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -33,13 +36,19 @@ class OnlinePaymentUnavailableControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private OnlinePaymentUnavailableController controller;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "44444444";
+    private static final String PENALTY_NUMBER = "A4444444";
+    private static final String INVALID_PENALTY_NUMBER = "44444444";
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/online-payment-unavailable";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE_ERROR_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + INVALID_PENALTY_NUMBER + "/online-payment-unavailable";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
@@ -64,6 +73,17 @@ class OnlinePaymentUnavailableControllerTest {
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
     }
 
+    @Test
+    @DisplayName("Get Online Payment Unavailable - exception path")
+    void getRequestError() throws Exception {
+
+        configureUnscheduledServiceDownPath();
+
+        this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_ERROR_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+    }
+
     private void configurePreviousController() {
         when(mockNavigatorService.getPreviousControllerPath(any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
@@ -71,5 +91,10 @@ class OnlinePaymentUnavailableControllerTest {
 
     private void configureMockEmailExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
+    }
+
+    private void configureUnscheduledServiceDownPath() {
+        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
+                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 }
