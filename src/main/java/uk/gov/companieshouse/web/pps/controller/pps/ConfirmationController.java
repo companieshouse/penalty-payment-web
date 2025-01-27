@@ -33,6 +33,8 @@ public class ConfirmationController extends BaseController {
     static final String PAYMENT_DATE_ATTR = "paymentDate";
     static final String PENALTY_REF_ATTR = "penaltyRef";
     static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
+    static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
+    static final String PENALTY_REF_STARTS_WITH = "penaltyRefStartsWith";
 
     @Override protected String getTemplateName() {
         return CONFIRMATION_PAGE;
@@ -101,6 +103,8 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(PAYMENT_DATE_ATTR, penaltyUtils.getPaymentDateDisplay());
             model.addAttribute(PENALTY_AMOUNT_ATTR, penaltyUtils.getPenaltyAmountDisplay(payablePenalty));
+            model.addAttribute(REASON_FOR_PENALTY_ATTR, penaltyUtils.getReasonForPenalty(penaltyRef));
+            model.addAttribute(PENALTY_REF_STARTS_WITH, penaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith());
             addBaseAttributesWithoutBackToModel(model, penaltyUtils);
 
 

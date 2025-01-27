@@ -6,7 +6,7 @@
 <body class="govuk-template__body">
 <th:block th:fragment="header">
     <a href="#content" class="govuk-skip-link">Skip to main content</a>
-    <header role="banner" id="global-header" class="govuk-header">
+    <header role="banner" id="global-header" class="govuk-header govuk-header--full-width-border" data-module="govuk-header">
         <div class="govuk-header__container govuk-width-container">
             <div class="header-global">
                 <div class="govuk-header__logo">
@@ -27,25 +27,32 @@
                     </a>
                 </div>
             </div>
-
             <div class="govuk-header__content"
                  th:if="${headerText != null}">
                 <a id="proposition-name" href="/late-filing-penalty" class="govuk-header__link govuk-header__link--service-name"  th:text='${headerText}'></a>
             </div>
-
         </div>
     </header>
-    <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Pay a penalty to Companies House" th:if="${serviceBanner != null}">
-        <div class="govuk-cookie-banner govuk-width-container">
+    <div style="background-color:#1d70b8; margin-top: -10px; padding: 0.305em"></div>
+    <div style="border-bottom: 1px solid #b1b4b6; background-color: #f3f2f1;" class="govuk-service-navigation" data-nosnippet role="region" aria-label="Pay a penalty to Companies House" th:if="${serviceBanner != null}">
+        <div style="width:100%" class="govuk-cookie-banner govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <a href="/late-filing-penalty" class="govuk-header__link--service-name govuk-heading-s">
-                        Pay a penalty to Companies House
-                    </a>
+                    <a href="/late-filing-penalty" style="color:black" class="govuk-header__link--service-name">Pay a penalty to Companies House</a>
                 </div>
             </div>
         </div>
     </div>
+    <style>
+        .govuk-header__link--service-name {
+            text-decoration: none;
+            font-size: 1.1875rem;
+        }
+
+        .govuk-header__link--service-name:hover {
+            text-decoration: underline;
+        }
+    </style>
 </th:block>
 </body>
 </html>
