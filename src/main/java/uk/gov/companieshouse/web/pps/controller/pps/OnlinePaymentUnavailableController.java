@@ -30,16 +30,11 @@ public class OnlinePaymentUnavailableController extends BaseController {
     public String getOnlinePaymentUnavailable(@PathVariable String companyNumber,
                                               @PathVariable String penaltyRef,
                                               Model model) {
-        try {
+
             var penaltyReference = penaltyUtils.getPenaltyReferenceType(penaltyRef);
             model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
             addBaseAttributesToModel(model);
-
             return getTemplateName();
-        } catch (IllegalArgumentException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
-        }
     }
 
 }
