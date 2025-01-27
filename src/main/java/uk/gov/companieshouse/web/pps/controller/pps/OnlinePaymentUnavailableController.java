@@ -32,9 +32,9 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyNumber,
                                               Model model) {
 
-        String penaltyReferenceStart = penaltyNumber.substring(0, 1);
+        var penaltyReferenceStart = penaltyNumber.substring(0, 1);
         try {
-            PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStart);
+            var penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStart);
 
             model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.toString());
             addBaseAttributesToModel(model);
