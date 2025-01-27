@@ -74,7 +74,7 @@ public class PenaltyUtils {
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
     }
 
-    public PenaltyReference getPenaltyReferenceType( String penaltyRef) {
+    public PenaltyReference getPenaltyReferenceType(String penaltyRef) {
         if (StringUtils.isBlank(penaltyRef)) {
             throw new IllegalArgumentException("Penalty Reference is null or empty");
         }

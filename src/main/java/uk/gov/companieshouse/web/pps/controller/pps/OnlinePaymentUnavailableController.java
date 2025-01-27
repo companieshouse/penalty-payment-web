@@ -8,12 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @PreviousController(EnterDetailsController.class)
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/online-payment-unavailable")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
     @Autowired
@@ -29,14 +28,11 @@ public class OnlinePaymentUnavailableController extends BaseController {
 
     @GetMapping
     public String getOnlinePaymentUnavailable(@PathVariable String companyNumber,
-                                              @PathVariable String penaltyNumber,
+                                              @PathVariable String penaltyRef,
                                               Model model) {
-
-        var penaltyReferenceStart = penaltyNumber.substring(0, 1);
         try {
-            var penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStart);
-
-            model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.toString());
+            var penaltyReference = penaltyUtils.getPenaltyReferenceType(penaltyRef);
+            model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
             addBaseAttributesToModel(model);
 
             return getTemplateName();

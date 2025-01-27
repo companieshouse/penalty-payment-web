@@ -13,16 +13,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,6 +67,7 @@ class OnlinePaymentUnavailableControllerTest {
 
         configurePreviousController();
         configureMockEmailExist();
+        configurePenaltyReferenceTypeSuccess();
 
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(status().isOk())
@@ -77,6 +79,7 @@ class OnlinePaymentUnavailableControllerTest {
     @DisplayName("Get Online Payment Unavailable - exception path")
     void getRequestError() throws Exception {
 
+        configurePenaltyReferenceTypeException();
         configureUnscheduledServiceDownPath();
 
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_ERROR_PATH))
@@ -96,5 +99,15 @@ class OnlinePaymentUnavailableControllerTest {
     private void configureUnscheduledServiceDownPath() {
         when(mockPenaltyUtils.getUnscheduledServiceDownPath())
                 .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+    }
+
+    private void configurePenaltyReferenceTypeSuccess() {
+        when(mockPenaltyUtils.getPenaltyReferenceType(any()))
+                .thenReturn(LATE_FILING);
+    }
+
+    private void configurePenaltyReferenceTypeException() {
+        doThrow(IllegalArgumentException.class)
+                .when(mockPenaltyUtils).getPenaltyReferenceType(any());
     }
 }
