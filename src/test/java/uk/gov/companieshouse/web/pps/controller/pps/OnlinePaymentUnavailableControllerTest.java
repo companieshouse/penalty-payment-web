@@ -41,10 +41,10 @@ class OnlinePaymentUnavailableControllerTest {
     @InjectMocks
     private OnlinePaymentUnavailableController controller;
 
-    private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "A4444444";
+    private static final String VALID_COMPANY_NUMBER = "12345678";
+    private static final String VALID_PENALTY_REF = "A4444444";
 
-    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/online-payment-unavailable";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
 
     private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
