@@ -87,9 +87,6 @@ class EnterDetailsControllerTest {
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH =
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
 
-    private static final String DCA_PAYMENTS_PATH =
-            "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/legal-fees-required";
-
     private static final String ALREADY_PAID_PATH =
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
 
