@@ -87,9 +87,6 @@ class EnterDetailsControllerTest {
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH =
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
 
-    private static final String DCA_PAYMENTS_PATH =
-            "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/legal-fees-required";
-
     private static final String ALREADY_PAID_PATH =
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
 
@@ -318,7 +315,7 @@ class EnterDetailsControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
                 .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(DCA_PAYMENTS_PATH));
+                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
