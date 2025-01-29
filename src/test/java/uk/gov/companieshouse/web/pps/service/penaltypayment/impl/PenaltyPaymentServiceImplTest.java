@@ -67,9 +67,9 @@ class PenaltyPaymentServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_NUMBER = "98765432";
+    private static final String PENALTY_NUMBER = "A9876543";
 
-    private static final String GET_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing";
+    private static final String GET_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PENALTY_NUMBER;
 
     private static final String GET_FINANCE_HEALTHCHECK_URI = "/healthcheck/finance-system";
 
@@ -102,7 +102,7 @@ class PenaltyPaymentServiceImplTest {
                 mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER);
 
         assertEquals(1, payableLateFilingPenalties.size());
-        assertEquals(validLateFilingPenalty, payableLateFilingPenalties.get(0));
+        assertEquals(validLateFilingPenalty, payableLateFilingPenalties.getFirst());
     }
 
     @Test
@@ -151,9 +151,11 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesPaidPenalty() throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
 
+        String penaltyNum = "A4738483";
+        String uri = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + penaltyNum;
         LateFilingPenalty paidLateFilingPenalty = PPSTestUtility.paidLateFilingPenalty(PENALTY_NUMBER);
 
-        when(lateFilingPenaltyResourceHandler.get(GET_LFP_URI)).thenReturn(lateFilingPenaltyGet);
+        when(lateFilingPenaltyResourceHandler.get(uri)).thenReturn(lateFilingPenaltyGet);
         when(lateFilingPenaltyGet.execute()).thenReturn(responseWithData);
 
         when(responseWithData.getData()).thenReturn(
@@ -161,7 +163,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, "84738483");
+                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, penaltyNum);
 
         assertEquals(0, payableLateFilingPenalties.size());
     }
