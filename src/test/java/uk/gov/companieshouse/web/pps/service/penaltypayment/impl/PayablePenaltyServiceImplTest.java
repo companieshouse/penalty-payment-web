@@ -59,13 +59,13 @@ class PayablePenaltyServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_NUMBER = "98765432";
+    private static final String PENALTY_NUMBER = "A9876543";
 
     private static final String PAYABLE_REF = "EXAMPLE1234";
 
     private static final Integer AMOUNT = 750;
 
-    private static final String POST_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable";
+    private static final String POST_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PENALTY_NUMBER + "/payable";
 
     private static final String GET_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable/" + PAYABLE_REF;
 

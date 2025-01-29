@@ -24,7 +24,7 @@ import java.util.List;
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
     private static final UriTemplate GET_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing");
+            new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penaltyNumber}");
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/healthcheck/finance-system");
@@ -45,7 +45,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
         LateFilingPenalties lateFilingPenalties;
 
         try {
-            String uri = GET_LFP_URI.expand(companyNumber).toString();
+            String uri = GET_LFP_URI.expand(companyNumber, penaltyNumber).toString();
             LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
                     + companyNumber + " and penalty " + penaltyNumber);
             lateFilingPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();

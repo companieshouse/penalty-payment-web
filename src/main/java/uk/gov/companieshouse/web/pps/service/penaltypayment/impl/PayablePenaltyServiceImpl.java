@@ -24,7 +24,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{payableRef}");
 
     private static final UriTemplate POST_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
+            new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penalty_number}/payable");
 
     @Autowired
     private ApiClientService apiClientService;
@@ -53,7 +53,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
         ApiResponse<PayableLateFilingPenaltySession> apiResponse;
 
         try {
-            String uri = POST_LFP_URI.expand(companyNumber).toString();
+            String uri = POST_LFP_URI.expand(companyNumber, penaltyNumber).toString();
             LateFilingPenaltySession lateFilingPenaltySession = generateLateFilingPenaltySessionData(penaltyNumber, amount);
             apiResponse = apiClient.payableLateFilingPenalty().create(uri, lateFilingPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
