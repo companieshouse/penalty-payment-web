@@ -24,7 +24,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{payableRef}");
 
     private static final UriTemplate POST_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penalty_number}/payable");
+            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
 
     @Autowired
     private ApiClientService apiClientService;
