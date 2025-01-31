@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -71,6 +72,9 @@ class EnterDetailsControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private EnterDetailsController controller;
 
@@ -94,6 +98,8 @@ class EnterDetailsControllerTest {
             "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
 
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+
+    private static final String START_PATH = "/late-filing-penalty";
 
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
@@ -120,7 +126,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details - Late Filing view success path")
     void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
 
-        configurePreviousController();
+        configureStartPathProperty();
         configureMockEmailExist();
 
         PenaltyReference lateFilingPenaltyRef = LATE_FILING;
@@ -141,7 +147,6 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details - Sanction view success path")
     void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
 
-        configurePreviousController();
         configureMockEmailExist();
 
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
@@ -154,7 +159,6 @@ class EnterDetailsControllerTest {
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
-        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 
@@ -179,6 +183,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - Blank company number, correct penalty ref")
     void postRequestCompanyNumberBlank() throws Exception {
 
+        configureStartPathProperty();
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
@@ -235,6 +240,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - no payable late filing penalties found")
     void postRequestNoPayableLateFilingPenaltyFound() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
@@ -253,6 +259,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - no payable sanction penalties found")
     void postRequestNoPayableSanctionPenaltyFound() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
@@ -291,6 +298,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - payable penalty does not match provided penalty ref")
     void postRequestPenaltyNumbersDoNotMatch() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configurePenaltyWrongID(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
 
@@ -443,11 +451,6 @@ class EnterDetailsControllerTest {
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
     private void configureNextController() {
         when(mockNavigatorService.getNextControllerRedirect(any(),any(),any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
@@ -548,5 +551,10 @@ class EnterDetailsControllerTest {
     private void configureUnscheduledServiceDownPath() {
         when(mockPenaltyUtils.getUnscheduledServiceDownPath())
                 .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+    }
+
+    private void configureStartPathProperty() {
+        when(mockPenaltyConfigurationProperties.getStartPath())
+                .thenReturn(START_PATH);
     }
 }

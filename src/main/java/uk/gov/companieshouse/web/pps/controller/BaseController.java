@@ -26,6 +26,7 @@ public abstract class BaseController {
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     public static final String BACK_LINK_ATTR = "backLink";
+    public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
     public static final String USER_BAR_ATTR = "userBar";
     public static final String USER_EMAIL_ATTR = "userEmail";
     public static final String USER_SIGN_OUT_URL_ATTR = "userSignOutUrl";
@@ -40,22 +41,25 @@ public abstract class BaseController {
     @ModelAttribute("templateName")
     protected abstract String getTemplateName();
 
-    protected void addBackPageAttributeToModel(Model model, String... pathVars) {
-        // Set a value for showing back link
-        model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
+    protected void addBackPageAttributeToModel(Model model, String url) {
+        // Set to show the back button
+        model.addAttribute(BACK_LINK_ATTR, "1");
+        if (!StringUtils.isEmpty(url)) {
+            model.addAttribute(BACK_LINK_URL_ATTR, url);
+        }
     }
 
-    protected void addBaseAttributesToModel(Model model) {
+    protected void addBaseAttributesToModel(Model model, String url) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
-        addBackPageAttributeToModel(model);
+        addBackPageAttributeToModel(model, url);
         addServiceBannerToModel(model);
     }
 
-    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
+    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils, String url) {
         addPhaseBannerToModel(model);
         addUserModel(model, penaltyUtils);
-        addBackPageAttributeToModel(model);
+        addBackPageAttributeToModel(model, url);
         addServiceBannerToModel(model);
     }
 

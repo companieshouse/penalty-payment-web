@@ -1,7 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -58,6 +61,9 @@ public class EnterDetailsController extends BaseController {
     @Autowired
     private PenaltyUtils penaltyUtils;
 
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+
     private static final String PENALTY_PAID = "/penalty-paid";
 
     private static final String DCA = "/legal-fees-required";
@@ -85,7 +91,7 @@ public class EnterDetailsController extends BaseController {
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model, setBackLink());
 
         return getTemplateName();
     }
@@ -104,6 +110,8 @@ public class EnterDetailsController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
+
+            addBaseAttributesToModel(model, setBackLink());
             return getTemplateName();
         }
 
@@ -123,6 +131,7 @@ public class EnterDetailsController extends BaseController {
                 LOGGER.info("No late filing penalties for company no. "  +  companyNumber
                         + " and penalty: " +   penaltyNumber);
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+                addBaseAttributesToModel(model, setBackLink());
                 return getTemplateName();
             }
 
@@ -141,17 +150,18 @@ public class EnterDetailsController extends BaseController {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
                         + " does not have the provided penalty number " + penaltyNumber);
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+                addBaseAttributesToModel(model, setBackLink());
                 return getTemplateName();
             }
 
             // If the payable penalty has DCA payments.
-            if (Boolean.TRUE.equals(lateFilingPenalty.getDca())) {
+            if (TRUE.equals(lateFilingPenalty.getDca())) {
                 LOGGER.info("Penalty has DCA payments");
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + DCA;
             }
 
             // If the penalty is already paid.
-            if (Boolean.TRUE.equals(lateFilingPenalty.getPaid())) {
+            if (TRUE.equals(lateFilingPenalty.getPaid())) {
                 LOGGER.info("Penalty has already been paid");
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PENALTY_PAID;
             }
@@ -187,4 +197,10 @@ public class EnterDetailsController extends BaseController {
         return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyNumber;
     }
 
+    private String setBackLink() {
+        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(SANCTIONS.name())))) {
+            return penaltyConfigurationProperties.getRefStartsWithPath();
+        }
+        return penaltyConfigurationProperties.getStartPath();
+    }
 }

@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
@@ -44,8 +43,6 @@ class DcaRequiredControllerTest {
     private static final String PPS_DCA_REQUIRED = "pps/legalFeesDCA";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -55,18 +52,11 @@ class DcaRequiredControllerTest {
     @DisplayName("Get DCA Required - success path")
     void getRequestSuccess() throws Exception {
 
-        configurePreviousController();
-
         this.mockMvc.perform(get(DCA_REQUIRED_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_DCA_REQUIRED))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureMockEmailExist() {

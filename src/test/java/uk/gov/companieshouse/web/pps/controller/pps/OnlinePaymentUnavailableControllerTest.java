@@ -10,8 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -33,18 +34,19 @@ class OnlinePaymentUnavailableControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private OnlinePaymentUnavailableController controller;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "44444444";
+    private static final String PENALTY_NUMBER = "A4444444";
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/online-payment-unavailable";
 
     private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @BeforeEach
     public void setup() {
@@ -55,8 +57,8 @@ class OnlinePaymentUnavailableControllerTest {
     @DisplayName("Get Online Payment Unavailable - success path")
     void getRequestSuccess() throws Exception {
 
-        configurePreviousController();
         configureMockEmailExist();
+        configureMockPenaltyReferenceTypeExist();
 
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(status().isOk())
@@ -64,12 +66,11 @@ class OnlinePaymentUnavailableControllerTest {
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
     private void configureMockEmailExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
+    }
+
+    private void configureMockPenaltyReferenceTypeExist() {
+        when(mockPenaltyUtils.getPenaltyReferenceType(any())).thenReturn(PenaltyReference.LATE_FILING);
     }
 }

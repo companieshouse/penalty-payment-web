@@ -55,11 +55,6 @@ class AccessibilityStatementControllerTest {
                 .andExpect(view().name(PPS_ACCESSIBILITY_STATEMENT));
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
     private void configureMockEmailExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
