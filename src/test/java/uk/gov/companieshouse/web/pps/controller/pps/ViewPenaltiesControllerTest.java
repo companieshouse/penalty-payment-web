@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -22,6 +22,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyServic
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -60,6 +61,9 @@ class ViewPenaltiesControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private ViewPenaltiesController controller;
 
@@ -77,7 +81,6 @@ class ViewPenaltiesControllerTest {
     private static final String PENALTY_REFERENCE_ATTR = "penaltyReference";
     private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
     private static final String REDIRECT_PATH = "redirect:";
     private static final String MOCK_PAYMENTS_URL = "pay.companieshouse/payments/987654321987654321/pay";
     private static final String SUMMARY_FALSE_PARAMETER = "?summary=false";
@@ -90,11 +93,10 @@ class ViewPenaltiesControllerTest {
     @Test
     @DisplayName("Get View PPS - success path")
     void getRequestSuccess() throws Exception {
-
-        configurePreviousController();
         configureValidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
 
+        when(mockPenaltyUtils.getPenaltyReferenceType(any())).thenReturn(PenaltyReference.LATE_FILING);
         when(mockPenaltyUtils.getFormattedAmount(any())).thenReturn("Mocked Outstanding Value");
         when(mockPenaltyUtils.getReasonForPenalty(LFP_PENALTY_NUMBER)).thenReturn("Mocked Reason for Penalty");
 
@@ -117,7 +119,6 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View PPS - error returning Late Filing Penalty")
     void getRequestErrorRetrievingLateFilingPenalty() throws Exception {
 
-        configurePreviousController();
         configureErrorRetrievingPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureUnscheduledServiceDownPath();
 
@@ -134,7 +135,6 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View PPS - error returning Company Profile")
     void getRequestErrorRetrievingCompanyProfile() throws Exception {
 
-        configurePreviousController();
         configureErrorRetrievingCompany(COMPANY_NUMBER);
         configureUnscheduledServiceDownPath();
 
@@ -150,7 +150,6 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View PPS - late filing penalty is null")
     void getRequestLateFilingPenaltyIsNull() throws Exception {
 
-        configurePreviousController();
         configureNullPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
         configureUnscheduledServiceDownPath();
@@ -169,7 +168,6 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View PPS - late filing penalty is already paid")
     void getRequestLateFilingPenaltyIsPaid() throws Exception {
 
-        configurePreviousController();
         configurePaidPenalty(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
         configureValidCompanyProfile(COMPANY_NUMBER);
         configureUnscheduledServiceDownPath();
@@ -270,12 +268,6 @@ class ViewPenaltiesControllerTest {
         verify(mockPaymentService, times(1))
                 .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
                         LFP_PENALTY_NUMBER);
-    }
-
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureValidPenalty(String companyNumber, String penaltyNumber) throws ServiceException {

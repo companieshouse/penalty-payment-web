@@ -43,7 +43,6 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 class PenaltyRefStartsWithControllerTest {
 
     private static final String SELECTED_PENALTY_REFERENCE = "selectedPenaltyReference";
-    private static final String MOCK_REDIRECT = "redirect:mockControllerPath";
 
     private MockMvc mockMvc;
 
@@ -98,7 +97,6 @@ class PenaltyRefStartsWithControllerTest {
     @Test
     @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWithSanctionsEnabled() throws Exception {
-        configurePreviousController();
         configureMockEmailExist();
 
         featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE));
@@ -172,11 +170,6 @@ class PenaltyRefStartsWithControllerTest {
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
         assertTrue(modelAndView.getModel().isEmpty());
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_REDIRECT);
     }
 
     private void configureMockEmailExist() {

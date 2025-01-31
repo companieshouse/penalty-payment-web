@@ -10,7 +10,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import uk.gov.companieshouse.web.pps.annotation.NextController;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
@@ -24,7 +23,6 @@ import java.util.Map;
 
 @Controller
 @NextController(StartController.class)
-@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/sign-out")
 public class SignOutController extends BaseController {
 

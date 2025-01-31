@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
@@ -31,8 +30,6 @@ class UnscheduledServiceDownControllerTest {
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
     private static final String UNSCHEDULED_SERVICE_DOWN = "pps/unscheduledServiceDown";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @Mock
     private PenaltyUtils mockPenaltyUtils;
@@ -51,18 +48,12 @@ class UnscheduledServiceDownControllerTest {
     @Test
     @DisplayName("Get Unscheduled Service Down - success path")
     void getRequestSuccess() throws Exception {
-        configurePreviousController();
         configureMockEmailExist();
 
         this.mockMvc.perform(get(UNSCHEDULED_SERVICE_DOWN_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(UNSCHEDULED_SERVICE_DOWN))
                 .andExpect(model().attributeExists(USER_BAR_ATTR));
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureMockEmailExist() {

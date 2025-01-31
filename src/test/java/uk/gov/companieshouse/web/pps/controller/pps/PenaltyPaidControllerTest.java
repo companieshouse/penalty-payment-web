@@ -10,12 +10,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,11 +48,14 @@ class PenaltyPaidControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private PenaltyPaidController controller;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "44444444";
+    private static final String PENALTY_NUMBER = "A4444444";
 
     private static final String PENALTY_PAID_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
@@ -60,8 +64,6 @@ class PenaltyPaidControllerTest {
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String COMPANY_NAME_ATTR = "companyName";
     private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @BeforeEach
     void setup() {
@@ -72,9 +74,9 @@ class PenaltyPaidControllerTest {
     @DisplayName("Get Penalty Paid - success path")
     void getRequestSuccess() throws Exception {
 
-        configurePreviousController();
         configureValidCompanyProfile(COMPANY_NUMBER);
         configureMockEmailExist();
+        configureMockPenaltyReferenceTypeExist();
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().isOk())
@@ -100,11 +102,6 @@ class PenaltyPaidControllerTest {
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
     private void configureValidCompanyProfile(String companyNumber) throws ServiceException {
         when(mockCompanyService.getCompanyProfile(companyNumber))
                 .thenReturn(PPSTestUtility.validCompanyProfile(companyNumber));
@@ -123,5 +120,9 @@ class PenaltyPaidControllerTest {
 
     private void configureMockEmailExist() {
         when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
+    }
+
+    private void configureMockPenaltyReferenceTypeExist() {
+        when(mockPenaltyUtils.getPenaltyReferenceType(any())).thenReturn(PenaltyReference.LATE_FILING);
     }
 }

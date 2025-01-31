@@ -13,7 +13,6 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -24,7 +23,6 @@ import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
@@ -60,8 +58,6 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
-        addBaseAttributesToModel(model);
-
         List<LateFilingPenalty> lateFilingPenalties;
         LateFilingPenalty lateFilingPenalty;
         CompanyProfileApi companyProfileApi;
@@ -93,6 +89,9 @@ public class ViewPenaltiesController extends BaseController {
         model.addAttribute("reasonForPenalty", penaltyUtils.getReasonForPenalty(penaltyNumber));
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
+
+        addBaseAttributesToModel(model,penaltyConfigurationProperties.getEnterDetailsPath()
+                + "?ref-starts-with=" + penaltyUtils.getPenaltyReferenceType(penaltyNumber).name());
 
         return getTemplateName();
     }
