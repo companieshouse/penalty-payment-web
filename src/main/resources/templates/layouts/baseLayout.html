@@ -52,7 +52,9 @@
     <div class="govuk-width-container app-width-container">
         <div th:replace="~{fragments/phaseBanner :: phaseBanner}"></div>
         <div th:replace="~{fragments/userBar :: userBar}"></div>
-        <div th:replace="~{fragments/back-button :: backLink}"></div>
+        <div th:if="${backLink}">
+            <div th:replace="~{fragments/back-button :: backLink}"></div>
+        </div>
         <div th:if="${@environment.getProperty('welshLanguage.enabled')} or ${onWelshJourney}">
             <div th:replace="~{fragments/localesBanner :: localesBanner}"></div>
         </div>

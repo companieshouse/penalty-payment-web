@@ -63,7 +63,7 @@ public class PenaltyRefStartsWithController extends BaseController {
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addBaseAttributesToModel(model, penaltyUtils);
+        addBaseAttributesToModel(model, penaltyUtils, penaltyConfigurationProperties.getStartPath());
 
         return getTemplateName();
     }
@@ -79,6 +79,7 @@ public class PenaltyRefStartsWithController extends BaseController {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
             model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
+            addBaseAttributesToModel(model, penaltyUtils, penaltyConfigurationProperties.getStartPath());
             return getTemplateName();
         }
 

@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
@@ -34,14 +34,15 @@ class BankTransferLateFilingDetailsControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private BankTransferLateFilingDetailsController controller;
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS_PATH = "/late-filing-penalty/bank-transfer/late-filing-details";
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @BeforeEach
     void setup() {
@@ -52,7 +53,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success")
     void getBankTransferLateFilingDetailsSuccess() throws Exception {
 
-        configurePreviousController();
         configureMockEmailExist();
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
@@ -65,7 +65,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success without login")
     void getBankTransferLateFilingDetailsSuccessWithoutLogin() throws Exception {
 
-        configurePreviousController();
         configureMockEmailNotExist();
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
@@ -78,18 +77,12 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success null email")
     void getBankTransferLateFilingDetailsSuccessNullEmail() throws Exception {
 
-        configurePreviousController();
         configureMockEmailNull();
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureMockEmailExist() {

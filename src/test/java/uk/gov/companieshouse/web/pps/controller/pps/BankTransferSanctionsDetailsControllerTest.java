@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
@@ -38,13 +38,14 @@ class BankTransferSanctionsDetailsControllerTest {
     @Mock
     private PenaltyUtils mockPenaltyUtils;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @InjectMocks
     private BankTransferSanctionsDetailsController controller;
 
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
 
     @BeforeEach
     void setup() {
@@ -54,7 +55,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path")
     void getRequestSuccess() throws Exception {
-        configurePreviousController();
         configureMockEmailExist();
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
@@ -66,7 +66,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path without login")
     void getRequestSuccessWithoutLogin() throws Exception {
-        configurePreviousController();
         configureMockEmailNotExist();
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
@@ -78,18 +77,12 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path null email")
     void getRequestSuccessNullEmail() throws Exception {
-        configurePreviousController();
         configureMockEmailNull();
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureMockEmailExist() {
