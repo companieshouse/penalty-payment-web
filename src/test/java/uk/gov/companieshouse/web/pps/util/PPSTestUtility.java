@@ -21,7 +21,7 @@ public class PPSTestUtility {
     public static final String PENALTY_TYPE = "penalty";
     public static final String LEGAL_FEES_TYPE = "legal-fees";
     public static final String DATE = "2018-12-12";
-    public static final String PENALTY_ID = "EXAMPLE1234";
+    public static final String PENALTY_ID = "A1234567";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
 
     private PPSTestUtility() {
@@ -140,7 +140,7 @@ public class PPSTestUtility {
 
     public static LateFilingPenalties oneLateFilingPenalties(LateFilingPenalty lateFilingPenalty) {
         LateFilingPenalties lateFilingPenalties = new LateFilingPenalties();
-        List<LateFilingPenalty> items = new ArrayList<LateFilingPenalty>() {{
+        List<LateFilingPenalty> items = new ArrayList<>() {{
             add(lateFilingPenalty);
         }};
 
@@ -153,7 +153,7 @@ public class PPSTestUtility {
     public static LateFilingPenalties twoLateFilingPenalties(LateFilingPenalty lateFilingPenalty1,
                                                              LateFilingPenalty lateFilingPenalty2) {
         LateFilingPenalties lateFilingPenalties = new LateFilingPenalties();
-        List<LateFilingPenalty> items = new ArrayList<LateFilingPenalty>() {{
+        List<LateFilingPenalty> items = new ArrayList<>() {{
             add(lateFilingPenalty1);
             add(lateFilingPenalty2);
         }};
