@@ -48,13 +48,13 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     }
 
     @Override
-    public PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyNumber, Integer amount) throws ServiceException {
+    public PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyRef, Integer amount) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         ApiResponse<PayableLateFilingPenaltySession> apiResponse;
 
         try {
-            String uri = POST_LFP_URI.expand(companyNumber, penaltyNumber).toString();
-            LateFilingPenaltySession lateFilingPenaltySession = generateLateFilingPenaltySessionData(penaltyNumber, amount);
+            String uri = POST_LFP_URI.expand(companyNumber, penaltyRef).toString();
+            LateFilingPenaltySession lateFilingPenaltySession = generateLateFilingPenaltySessionData(penaltyRef, amount);
             apiResponse = apiClient.payableLateFilingPenalty().create(uri, lateFilingPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
@@ -66,9 +66,9 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     }
 
-    private LateFilingPenaltySession generateLateFilingPenaltySessionData(String penaltyNumber, Integer amount) {
+    private LateFilingPenaltySession generateLateFilingPenaltySessionData(String penaltyRef, Integer amount) {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(penaltyNumber);
+        transaction.setTransactionId(penaltyRef);
         transaction.setAmount(amount);
 
         LateFilingPenaltySession lateFilingPenaltySession = new LateFilingPenaltySession();

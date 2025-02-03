@@ -1,7 +1,13 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponseException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,15 +31,9 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,12 +63,16 @@ class PenaltyPaymentServiceImplTest {
     @Mock
     private ApiResponse<FinanceHealthcheck> healthcheckApiResponse;
 
+    @Mock
+    private PenaltyUtils penaltyUtils;
+
     @InjectMocks
     private PenaltyPaymentService mockPenaltyPaymentService = new PenaltyPaymentServiceImpl();
 
     private static final String COMPANY_NUMBER = "12345678";
 
     private static final String PENALTY_NUMBER = "A9876543";
+    private static final String PENALTY_NUMBER_TWO = "A0000001";
 
     private static final String GET_LFP_URI =
             "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PenaltyReference.LATE_FILING;
@@ -79,7 +83,6 @@ class PenaltyPaymentServiceImplTest {
 
     @BeforeEach
     void init() {
-
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
     }
 
@@ -91,6 +94,7 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesSuccess()
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER)).thenReturn(PenaltyReference.LATE_FILING);
 
         LateFilingPenalty validLateFilingPenalty = PPSTestUtility.validLateFilingPenalty(
                 PENALTY_NUMBER);
@@ -114,11 +118,12 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesTwoUnpaid()
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER)).thenReturn(PenaltyReference.LATE_FILING);
 
         LateFilingPenalty validLateFilingPenalty1 = PPSTestUtility.validLateFilingPenalty(
                 PENALTY_NUMBER);
         LateFilingPenalty validLateFilingPenalty2 = PPSTestUtility.validLateFilingPenalty(
-                PENALTY_NUMBER);
+                PENALTY_NUMBER_TWO);
 
         when(lateFilingPenaltyResourceHandler.get(GET_LFP_URI)).thenReturn(lateFilingPenaltyGet);
         when(lateFilingPenaltyGet.execute()).thenReturn(responseWithData);
@@ -141,6 +146,7 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesNoPenalties()
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER)).thenReturn(PenaltyReference.LATE_FILING);
 
         when(lateFilingPenaltyResourceHandler.get(GET_LFP_URI)).thenReturn(lateFilingPenaltyGet);
         when(lateFilingPenaltyGet.execute()).thenReturn(responseWithData);
@@ -160,6 +166,7 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesPaidPenalty()
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER_TWO)).thenReturn(PenaltyReference.LATE_FILING);
 
         String uri = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/"
                 + PenaltyReference.LATE_FILING;
@@ -174,7 +181,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, "A4738483");
+                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER_TWO);
 
         assertEquals(0, payableLateFilingPenalties.size());
     }
@@ -184,6 +191,7 @@ class PenaltyPaymentServiceImplTest {
     void getPayableLateFilingPenaltiesThrowsApiErrorResponseException()
             throws ApiErrorResponseException, URIValidationException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER)).thenReturn(PenaltyReference.LATE_FILING);
 
         when(lateFilingPenaltyResourceHandler.get(GET_LFP_URI)).thenReturn(lateFilingPenaltyGet);
         when(lateFilingPenaltyGet.execute()).thenThrow(ApiErrorResponseException.class);
@@ -195,14 +203,24 @@ class PenaltyPaymentServiceImplTest {
     @Test
     @DisplayName("Get Payable Late Filing Penalties - Throws URIValidationException")
     void getPayableLateFilingPenaltiesThrowsURIValidationException()
-            throws ApiErrorResponseException, URIValidationException {
+            throws ApiErrorResponseException, URIValidationException, IllegalArgumentException {
         when(apiClient.lateFilingPenalty()).thenReturn(lateFilingPenaltyResourceHandler);
+        when(penaltyUtils.getPenaltyReferenceType(PENALTY_NUMBER)).thenReturn(PenaltyReference.LATE_FILING);
 
         when(lateFilingPenaltyResourceHandler.get(GET_LFP_URI)).thenReturn(lateFilingPenaltyGet);
         when(lateFilingPenaltyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
                 mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_NUMBER));
+    }
+
+    @Test
+    @DisplayName("Get Payable Late Filing Penalties - Throws IllegalArgumentException when penalty reference is invalid")
+    void getPayableLateFilingPenaltiesThrowsIllegalArgumentExceptionWhenPenaltyReferenceIsInvalid() {
+        when(penaltyUtils.getPenaltyReferenceType("")).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(ServiceException.class, () ->
+                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, ""));
     }
 
     @Test

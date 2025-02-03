@@ -19,7 +19,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
@@ -40,20 +40,23 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Autowired
     private ApiClientService apiClientService;
 
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
     @Override
     public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyReference) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         LateFilingPenalties lateFilingPenalties;
 
         try {
-            String penaltyReferenceType = PenaltyReference.fromStartsWith(penaltyReference.substring(0, 1)).name();
+            String penaltyReferenceType = penaltyUtils.getPenaltyReferenceType(penaltyReference).name();
             String uri = GET_LFP_URI.expand(companyNumber, penaltyReferenceType).toString();
             LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
                     + companyNumber + " and penalty " + penaltyReference);
             lateFilingPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
-        } catch (IndexOutOfBoundsException|URIValidationException ex) {
+        } catch (IllegalArgumentException|URIValidationException ex) {
             throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
         }
 
