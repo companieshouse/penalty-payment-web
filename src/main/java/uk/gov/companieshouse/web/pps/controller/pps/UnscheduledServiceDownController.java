@@ -19,7 +19,7 @@ public class UnscheduledServiceDownController extends BaseController {
 
     @GetMapping
     public String getUnscheduledServiceDown(Model model) {
-        addBaseAttributesToModel(model, "");
+        addBaseAttributesWithoutBackUrlToModel(model);
         return getTemplateName();
     }
 }

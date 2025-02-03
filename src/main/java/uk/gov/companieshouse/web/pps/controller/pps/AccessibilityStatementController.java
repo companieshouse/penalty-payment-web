@@ -18,7 +18,7 @@ public class AccessibilityStatementController extends BaseController {
 
     @GetMapping
     public String getPpsAccessibilityStatement(Model model) {
-        addBaseAttributesToModel(model, "");
+        addBaseAttributesWithoutBackUrlToModel(model);
         return getTemplateName();
     }
 }

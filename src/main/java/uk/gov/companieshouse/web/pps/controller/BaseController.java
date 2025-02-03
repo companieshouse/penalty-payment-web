@@ -74,6 +74,10 @@ public abstract class BaseController {
         addServiceBannerToModel(model);
     }
 
+    protected void addBaseAttributesWithoutBackUrlToModel(Model model) {
+        addBaseAttributesToModel(model, "");
+    }
+
     protected void addUserModel(Model model, PenaltyUtils penaltyUtils) {
         String loginEmail = penaltyUtils.getLoginEmail(sessionService);
         // Set a value for showing user bar part if exist

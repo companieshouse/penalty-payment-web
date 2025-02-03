@@ -22,7 +22,7 @@ public class DcaRequiredController extends BaseController {
                                        @PathVariable String penaltyNumber,
                                        Model model) {
 
-        addBaseAttributesToModel(model, "");
+        addBaseAttributesWithoutBackUrlToModel(model);
 
         return getTemplateName();
     }
