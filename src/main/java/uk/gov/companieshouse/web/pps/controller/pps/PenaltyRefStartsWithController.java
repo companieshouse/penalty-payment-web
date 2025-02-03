@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
@@ -22,7 +21,6 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(StartController.class)
 @RequestMapping("/late-filing-penalty/ref-starts-with")
 public class PenaltyRefStartsWithController extends BaseController {
 

@@ -23,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -36,7 +35,6 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
-@PreviousController(PenaltyRefStartsWithController.class)
 @NextController(ViewPenaltiesController.class)
 @RequestMapping("/late-filing-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
