@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface PenaltyPaymentService {
 
-    List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyNumber) throws ServiceException;
+    List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException;
     FinanceHealthcheck checkFinanceSystemAvailableTime() throws ServiceException;
 }
