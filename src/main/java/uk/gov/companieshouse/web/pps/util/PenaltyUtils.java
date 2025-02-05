@@ -1,14 +1,12 @@
 package uk.gov.companieshouse.web.pps.util;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -74,7 +72,7 @@ public class PenaltyUtils {
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
     }
 
-    public PenaltyReference getPenaltyReferenceType( String penaltyRef) {
+    public PenaltyReference getPenaltyReferenceType(String penaltyRef) {
         if (StringUtils.isBlank(penaltyRef)) {
             throw new IllegalArgumentException("Penalty Reference is null or empty");
         }
