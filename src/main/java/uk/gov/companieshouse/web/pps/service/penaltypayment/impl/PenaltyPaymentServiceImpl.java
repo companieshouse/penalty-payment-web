@@ -19,12 +19,13 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 
 import java.util.ArrayList;
 import java.util.List;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
     private static final UriTemplate GET_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing");
+            new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penaltyReferenceType}");
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/healthcheck/finance-system");
@@ -39,19 +40,23 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Autowired
     private ApiClientService apiClientService;
 
+    @Autowired
+    private PenaltyUtils penaltyUtils;
+
     @Override
-    public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyNumber) throws ServiceException {
+    public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         LateFilingPenalties lateFilingPenalties;
 
         try {
-            String uri = GET_LFP_URI.expand(companyNumber).toString();
+            String penaltyReferenceType = penaltyUtils.getPenaltyReferenceType(penaltyRef).name();
+            String uri = GET_LFP_URI.expand(companyNumber, penaltyReferenceType).toString();
             LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
-                    + companyNumber + " and penalty " + penaltyNumber);
+                    + companyNumber + " and penalty " + penaltyRef);
             lateFilingPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
-        } catch (URIValidationException ex) {
+        } catch (IllegalArgumentException|URIValidationException ex) {
             throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
         }
 
@@ -59,7 +64,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
         // If no Late Filing Penalties for company return an empty list.
         if (lateFilingPenalties.getTotalResults() == 0) {
-            LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyNumber);
+            LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
             return payableLateFilingPenalties;
         }
 
@@ -67,11 +72,11 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
         // Always include penalty with the ID provided so the correct error page can be displayed.
         for (LateFilingPenalty lateFilingPenalty : lateFilingPenalties.getItems()) {
             if ((!lateFilingPenalty.getPaid() && lateFilingPenalty.getType().equals(PENALTY_TYPE))
-                    || lateFilingPenalty.getId().equals(penaltyNumber)) {
+                    || lateFilingPenalty.getId().equals(penaltyRef)) {
                 payableLateFilingPenalties.add(lateFilingPenalty);
             }
         }
-        LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyNumber);
+        LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
         return payableLateFilingPenalties;
     }
 
