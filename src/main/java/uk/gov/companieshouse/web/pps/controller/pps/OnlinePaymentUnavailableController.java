@@ -22,6 +22,8 @@ public class OnlinePaymentUnavailableController extends BaseController {
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
 
+    private static final String PENALTY_REFERENCE_MODEL_ATTR = "penaltyReference";
+
     @Override protected String getTemplateName() {
         return ONLINE_PAYMENT_UNAVAILABLE;
     }
@@ -31,9 +33,10 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyRef,
                                               Model model) {
 
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getEnterDetailsPath()
+            var penaltyReference = penaltyUtils.getPenaltyReferenceType(penaltyRef);
+            model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
+            addBaseAttributesToModel(model, penaltyConfigurationProperties.getEnterDetailsPath()
                 + "?ref-starts-with=" + penaltyUtils.getPenaltyReferenceType(penaltyRef).name());
-
         return getTemplateName();
     }
 

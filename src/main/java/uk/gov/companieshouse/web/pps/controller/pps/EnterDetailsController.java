@@ -64,8 +64,6 @@ public class EnterDetailsController extends BaseController {
 
     private static final String PENALTY_PAID = "/penalty-paid";
 
-    private static final String DCA = "/legal-fees-required";
-
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
 
     private static final String PENALTY_TYPE = "penalty";
@@ -155,7 +153,7 @@ public class EnterDetailsController extends BaseController {
             // If the payable penalty has DCA payments.
             if (TRUE.equals(lateFilingPenalty.getDca())) {
                 LOGGER.info("Penalty has DCA payments");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + DCA;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
             // If the penalty is already paid.
