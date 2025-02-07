@@ -1,7 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller;
 
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -64,7 +64,7 @@ public abstract class BaseController {
     protected void addUserModel(Model model) {
         String loginEmail = PenaltyUtils.getLoginEmail(sessionService.getSessionDataFromContext());
         // Set a value for showing user bar part if exist
-        if (!StringUtils.isEmpty(loginEmail)) {
+        if (StringUtils.isNotEmpty(loginEmail)) {
             model.addAttribute(USER_BAR_ATTR, "1");
             model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
             model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
@@ -77,7 +77,7 @@ public abstract class BaseController {
     protected void addUserModel(Model model, Map<String, Object> sessionData) {
         String loginEmail = PenaltyUtils.getLoginEmail(sessionData);
         // Set a value for showing user bar part if exist
-        if (!StringUtils.isEmpty(loginEmail)) {
+        if (StringUtils.isNotEmpty(loginEmail)) {
             model.addAttribute(USER_BAR_ATTR, "1");
             model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
             model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
