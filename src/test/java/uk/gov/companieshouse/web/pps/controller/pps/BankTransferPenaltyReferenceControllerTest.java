@@ -26,13 +26,14 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -44,7 +45,7 @@ class BankTransferPenaltyReferenceControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private SessionService mockSessionService;
 
     private static final String SELECTED_PENALTY_REF_ATTR = "selectedPenaltyReference";
     private static final String MOCK_CONTROLLER_PATH = REDIRECT_URL_PREFIX + "mockControllerPath";
@@ -65,8 +66,9 @@ class BankTransferPenaltyReferenceControllerTest {
 
         BankTransferPenaltyReferenceController controller = new BankTransferPenaltyReferenceController(
                 mockNavigatorService,
-                penaltyConfigurationProperties,
-                mockPenaltyUtils);
+                penaltyConfigurationProperties);
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

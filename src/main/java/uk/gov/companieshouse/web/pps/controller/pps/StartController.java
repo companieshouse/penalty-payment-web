@@ -1,5 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
@@ -11,15 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheckStatus;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Optional;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
@@ -33,10 +32,10 @@ public class StartController extends BaseController {
     private PenaltyPaymentService penaltyPaymentService;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
+    private Environment environment;
 
     @Autowired
-    private Environment environment;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Override
     protected String getTemplateName() {
@@ -51,7 +50,7 @@ public class StartController extends BaseController {
             financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
 
         if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
@@ -71,7 +70,7 @@ public class StartController extends BaseController {
             LOGGER.error("Service is unavailable");
             return PPS_SERVICE_UNAVAILABLE;
         } else {
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
     }
 

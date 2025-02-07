@@ -5,8 +5,6 @@ import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -28,6 +26,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -35,15 +34,14 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 class PenaltyRefStartsWithControllerTest {
 
     private static final String SELECTED_PENALTY_REFERENCE = "selectedPenaltyReference";
-    private static final String MOCK_REDIRECT = "redirect:mockControllerPath";
 
     private MockMvc mockMvc;
 
@@ -51,7 +49,7 @@ class PenaltyRefStartsWithControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private SessionService mockSessionService;
 
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
     private FeatureFlagConfigurationProperties featureFlagConfigurationProperties;
@@ -75,8 +73,9 @@ class PenaltyRefStartsWithControllerTest {
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
                 penaltyConfigurationProperties,
-                featureFlagChecker,
-                mockPenaltyUtils);
+                featureFlagChecker);
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -98,9 +97,6 @@ class PenaltyRefStartsWithControllerTest {
     @Test
     @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWithSanctionsEnabled() throws Exception {
-        configurePreviousController();
-        configureMockEmailExist();
-
         featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE));
         setupMockMvc();
         MvcResult mvcResult = mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
@@ -172,15 +168,6 @@ class PenaltyRefStartsWithControllerTest {
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
         assertTrue(modelAndView.getModel().isEmpty());
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_REDIRECT);
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
     }
 
 }

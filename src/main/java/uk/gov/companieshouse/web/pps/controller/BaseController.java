@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller;
 
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -15,9 +16,6 @@ public abstract class BaseController {
 
     @Autowired
     protected NavigatorService navigatorService;
-
-    @Autowired
-    private PenaltyUtils penaltyUtils;
 
     @Autowired
     private SessionService sessionService;
@@ -47,31 +45,37 @@ public abstract class BaseController {
 
     protected void addBaseAttributesToModel(Model model) {
         addPhaseBannerToModel(model);
-        addUserModel(model, penaltyUtils);
-        addBackPageAttributeToModel(model);
-        addServiceBannerToModel(model);
-    }
-
-    protected void addBaseAttributesToModel(Model model, PenaltyUtils penaltyUtils) {
-        addPhaseBannerToModel(model);
-        addUserModel(model, penaltyUtils);
+        addUserModel(model);
         addBackPageAttributeToModel(model);
         addServiceBannerToModel(model);
     }
 
     protected void addBaseAttributesWithoutServiceAndBackToModel(Model model) {
         addPhaseBannerToModel(model);
-        addUserModel(model, penaltyUtils);
+        addUserModel(model);
     }
 
-    protected void addBaseAttributesWithoutBackToModel(Model model, PenaltyUtils penaltyUtils) {
+    protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData) {
         addPhaseBannerToModel(model);
-        addUserModel(model, penaltyUtils);
+        addUserModel(model, sessionData);
         addServiceBannerToModel(model);
     }
 
-    protected void addUserModel(Model model, PenaltyUtils penaltyUtils) {
-        String loginEmail = penaltyUtils.getLoginEmail(sessionService);
+    protected void addUserModel(Model model) {
+        String loginEmail = PenaltyUtils.getLoginEmail(sessionService.getSessionDataFromContext());
+        // Set a value for showing user bar part if exist
+        if (!StringUtils.isEmpty(loginEmail)) {
+            model.addAttribute(USER_BAR_ATTR, "1");
+            model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
+            model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
+            model.addAttribute(USER_EMAIL_ATTR, loginEmail);
+            model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
+        }
+
+    }
+
+    protected void addUserModel(Model model, Map<String, Object> sessionData) {
+        String loginEmail = PenaltyUtils.getLoginEmail(sessionData);
         // Set a value for showing user bar part if exist
         if (!StringUtils.isEmpty(loginEmail)) {
             model.addAttribute(USER_BAR_ATTR, "1");

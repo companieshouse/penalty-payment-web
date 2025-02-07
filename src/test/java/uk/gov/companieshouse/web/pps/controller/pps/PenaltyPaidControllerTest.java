@@ -1,23 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -28,6 +10,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -45,13 +47,16 @@ class PenaltyPaidControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
+    @Mock
+    private SessionService mockSessionService;
 
     @InjectMocks
     private PenaltyPaidController controller;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "44444444";
+    private static final String PENALTY_NUMBER = "A4444444";
 
     private static final String PENALTY_PAID_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
@@ -65,6 +70,8 @@ class PenaltyPaidControllerTest {
 
     @BeforeEach
     void setup() {
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -74,7 +81,6 @@ class PenaltyPaidControllerTest {
 
         configurePreviousController();
         configureValidCompanyProfile(COMPANY_NUMBER);
-        configureMockEmailExist();
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().isOk())
@@ -91,7 +97,9 @@ class PenaltyPaidControllerTest {
     void getRequestErrorRetrievingCompanyDetails() throws Exception {
 
         configureErrorRetrievingCompany(COMPANY_NUMBER);
-        configureUnscheduledServiceDownPath();
+
+        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
+                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -110,18 +118,10 @@ class PenaltyPaidControllerTest {
                 .thenReturn(PPSTestUtility.validCompanyProfile(companyNumber));
     }
 
-    private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
-                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
-    }
-
     private void configureErrorRetrievingCompany(String companyNumber) throws ServiceException {
 
         doThrow(ServiceException.class)
                 .when(mockCompanyService).getCompanyProfile(companyNumber);
     }
 
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-    }
 }

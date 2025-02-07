@@ -22,6 +22,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -29,7 +30,6 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
@@ -56,7 +56,7 @@ public class EnterDetailsController extends BaseController {
     private FeatureFlagChecker featureFlagChecker;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private static final String PENALTY_PAID = "/penalty-paid";
 
@@ -76,7 +76,7 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
@@ -170,7 +170,7 @@ public class EnterDetailsController extends BaseController {
         } catch (ServiceException ex) {
 
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
     }
 

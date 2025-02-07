@@ -18,9 +18,9 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -49,9 +49,6 @@ public class ViewPenaltiesController extends BaseController {
     private PaymentService paymentService;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
-
-    @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
@@ -72,7 +69,7 @@ public class ViewPenaltiesController extends BaseController {
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
 
         // If this screen is accessed directly for an invalid penalty return an error view.
@@ -85,12 +82,12 @@ public class ViewPenaltiesController extends BaseController {
                 || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
                 || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
             LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
 
-        model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
+        model.addAttribute("outstanding", PenaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
         model.addAttribute("penaltyReference", penaltyNumber);
-        model.addAttribute("reasonForPenalty", penaltyUtils.getReasonForPenalty(penaltyNumber));
+        model.addAttribute("reasonForPenalty", PenaltyUtils.getReasonForPenalty(penaltyNumber));
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 
@@ -117,7 +114,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
 
         try {
@@ -127,7 +124,7 @@ public class ViewPenaltiesController extends BaseController {
         } catch (ServiceException e) {
 
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
         }
     }
 
