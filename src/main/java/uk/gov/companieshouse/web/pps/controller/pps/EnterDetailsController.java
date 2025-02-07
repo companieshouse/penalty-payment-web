@@ -207,4 +207,5 @@ public class EnterDetailsController extends BaseController {
         }
         return penaltyConfigurationProperties.getStartPath();
     }
+
 }

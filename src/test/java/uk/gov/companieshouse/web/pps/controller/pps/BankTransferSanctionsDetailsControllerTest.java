@@ -94,4 +94,5 @@ class BankTransferSanctionsDetailsControllerTest {
                 .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
+
 }

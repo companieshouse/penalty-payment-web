@@ -62,4 +62,5 @@ class OnlinePaymentUnavailableControllerTest {
                 .andExpect(view().name(PPS_ONLINE_PAYMENT_UNAVAILABLE))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
     }
+
 }

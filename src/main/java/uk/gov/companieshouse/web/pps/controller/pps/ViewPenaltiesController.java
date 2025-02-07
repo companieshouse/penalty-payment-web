@@ -59,7 +59,7 @@ public class ViewPenaltiesController extends BaseController {
 
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + penaltyUtils.getPenaltyReferenceType(penaltyNumber).name(),
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyNumber).name(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 

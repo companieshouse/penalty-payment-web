@@ -96,4 +96,5 @@ public class SignOutController extends BaseController {
         }
         return new RedirectView(HOME);
     }
+
 }

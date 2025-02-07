@@ -29,4 +29,5 @@ public class BankTransferSanctionsDetailsController extends BaseController {
                 penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
+
 }

@@ -92,4 +92,5 @@ class BankTransferLateFilingDetailsControllerTest {
                 .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
+
 }

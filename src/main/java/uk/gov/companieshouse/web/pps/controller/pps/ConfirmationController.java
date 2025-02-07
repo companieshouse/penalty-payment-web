@@ -117,4 +117,5 @@ public class ConfirmationController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
+
 }

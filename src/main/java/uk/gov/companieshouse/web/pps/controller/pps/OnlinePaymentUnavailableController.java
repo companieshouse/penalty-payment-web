@@ -38,4 +38,5 @@ public class OnlinePaymentUnavailableController extends BaseController {
                 penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
+
 }

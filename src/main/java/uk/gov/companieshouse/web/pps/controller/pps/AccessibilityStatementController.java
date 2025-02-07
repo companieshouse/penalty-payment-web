@@ -27,4 +27,5 @@ public class AccessibilityStatementController extends BaseController {
                 penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
+
 }

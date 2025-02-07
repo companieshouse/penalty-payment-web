@@ -100,4 +100,5 @@ public abstract class BaseController {
     protected void addServiceBannerToModel(Model model) {
         model.addAttribute("serviceBanner", "1");
     }
+
 }

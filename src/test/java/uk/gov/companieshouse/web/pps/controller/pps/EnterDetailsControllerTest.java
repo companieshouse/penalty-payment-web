@@ -547,4 +547,5 @@ class EnterDetailsControllerTest {
         when(mockPenaltyConfigurationProperties.getStartPath())
                 .thenReturn(START_PATH);
     }
+
 }

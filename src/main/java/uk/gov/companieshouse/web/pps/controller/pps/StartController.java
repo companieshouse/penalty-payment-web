@@ -79,10 +79,10 @@ public class StartController extends BaseController {
         }
     }
 
-
     @PostMapping
     public String postEnterDetails() {
 
         return navigatorService.getNextControllerRedirect(this.getClass());
     }
+
 }
