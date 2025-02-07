@@ -29,8 +29,8 @@ public final class PenaltyUtils {
         if (signInInfo != null) {
             Map<?, ?> userProfile = (Map<?, ?>) signInInfo.get("user_profile");
             if (userProfile != null && userProfile.get("email") != null) {
-                    return userProfile.get("email").toString();
-                }
+                return userProfile.get("email").toString();
+            }
         }
         return "";
     }
