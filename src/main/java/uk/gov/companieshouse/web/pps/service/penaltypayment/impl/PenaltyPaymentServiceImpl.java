@@ -27,7 +27,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penaltyReferenceType}");
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
-            new UriTemplate("/healthcheck/finance-system");
+            new UriTemplate("/penalty-payment-api/healthcheck/finance-system");
 
     private static final String PENALTY_TYPE = "penalty";
 
