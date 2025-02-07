@@ -29,19 +29,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,7 +71,10 @@ class EnterDetailsControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private SessionService mockSessionService;
+
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @InjectMocks
     private EnterDetailsController controller;
@@ -110,6 +115,8 @@ class EnterDetailsControllerTest {
 
     @BeforeEach
     public void setup() {
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -118,7 +125,6 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureMockEmailExist();
 
         PenaltyReference lateFilingPenaltyRef = LATE_FILING;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
@@ -139,7 +145,6 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
 
         configurePreviousController();
-        configureMockEmailExist();
 
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
@@ -160,8 +165,9 @@ class EnterDetailsControllerTest {
     void getEnterDetailsErrorWhenSanctionRefStartsWithRequestDisabled() throws Exception {
 
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
+
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
-        configureUnscheduledServiceDownPath();
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
@@ -407,7 +413,8 @@ class EnterDetailsControllerTest {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configureErrorRetrievingPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-        configureUnscheduledServiceDownPath();
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -470,8 +477,8 @@ class EnterDetailsControllerTest {
 
     private void configureMultiplePenalties(String companyNumber, String penaltyRef) throws ServiceException {
         List<LateFilingPenalty> multipleValidLFPs = new ArrayList<>();
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("12345678"));
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("23456789"));
+        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A2345678"));
+        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A3456789"));
 
         when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
                 .thenReturn(multipleValidLFPs);
@@ -538,12 +545,4 @@ class EnterDetailsControllerTest {
                 .when(mockPenaltyPaymentService).getLateFilingPenalties(companyNumber, penaltyRef);
     }
 
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-    }
-
-    private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
-                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
-    }
 }

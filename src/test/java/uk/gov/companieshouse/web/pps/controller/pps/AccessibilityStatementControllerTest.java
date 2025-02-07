@@ -1,5 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,17 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,19 +29,21 @@ class AccessibilityStatementControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private SessionService mockSessionService;
+
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @InjectMocks
     private AccessibilityStatementController controller;
 
     private static final String ACCESSIBILITY_STATEMENT_REQUIRED_PATH = "/late-filing-penalty/accessibility-statement";
-
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     private static final String PPS_ACCESSIBILITY_STATEMENT = "pps/accessibilityStatement";
 
     @BeforeEach
     void setup() {
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -55,12 +56,4 @@ class AccessibilityStatementControllerTest {
                 .andExpect(view().name(PPS_ACCESSIBILITY_STATEMENT));
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-    }
 }

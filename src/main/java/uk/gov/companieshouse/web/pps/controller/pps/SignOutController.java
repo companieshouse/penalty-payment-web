@@ -1,5 +1,10 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,18 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
-
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Map;
 
 
 @Controller
@@ -35,7 +34,7 @@ public class SignOutController extends BaseController {
     private AllowlistChecker allowlistChecker;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private static final String PPS_SIGN_OUT = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
@@ -56,7 +55,7 @@ public class SignOutController extends BaseController {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         if (!sessionData.containsKey(SIGN_IN_KEY)) {
             LOGGER.info("No session data present: " + sessionData);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         LOGGER.debug("Processing sign out");
@@ -75,18 +74,18 @@ public class SignOutController extends BaseController {
             request.getSession().setAttribute("url_prior_signout", allowedUrl);
             model.addAttribute(BACK_LINK, allowedUrl);
         }
-        addPhaseBannerToModel(model);
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
 
 
     @PostMapping
-    public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+    public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         LOGGER.debug("Processing sign out POST");
         String valueGet = request.getParameter("radio");
         String url =  (String) request.getSession().getAttribute("url_prior_signout");
 
-        if (valueGet == null || valueGet.equals("")) {
+        if (StringUtils.isEmpty(valueGet)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);
             redirectAttributes.addFlashAttribute(BACK_LINK, url);
             return new RedirectView(SIGN_OUT_URL, true, false);

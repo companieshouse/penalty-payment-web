@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -29,7 +31,6 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
@@ -56,7 +57,7 @@ public class EnterDetailsController extends BaseController {
     private FeatureFlagChecker featureFlagChecker;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private static final String PENALTY_PAID = "/penalty-paid";
 
@@ -76,14 +77,15 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
     }
@@ -168,9 +170,8 @@ public class EnterDetailsController extends BaseController {
             return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyNumber);
 
         } catch (ServiceException ex) {
-
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

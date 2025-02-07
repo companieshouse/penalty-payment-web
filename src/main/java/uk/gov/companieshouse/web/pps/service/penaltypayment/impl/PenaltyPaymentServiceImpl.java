@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,6 @@ import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-
-import java.util.ArrayList;
-import java.util.List;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Service
@@ -40,16 +39,13 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Autowired
     private ApiClientService apiClientService;
 
-    @Autowired
-    private PenaltyUtils penaltyUtils;
-
     @Override
     public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         LateFilingPenalties lateFilingPenalties;
 
         try {
-            String penaltyReferenceType = penaltyUtils.getPenaltyReferenceType(penaltyRef).name();
+            String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
             String uri = GET_LFP_URI.expand(companyNumber, penaltyReferenceType).toString();
             LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
                     + companyNumber + " and penalty " + penaltyRef);

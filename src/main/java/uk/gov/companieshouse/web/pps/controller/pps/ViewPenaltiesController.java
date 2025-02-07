@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,9 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -49,9 +51,6 @@ public class ViewPenaltiesController extends BaseController {
     private PaymentService paymentService;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
-
-    @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
@@ -60,7 +59,8 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         List<LateFilingPenalty> lateFilingPenalties;
         LateFilingPenalty lateFilingPenalty;
@@ -72,7 +72,7 @@ public class ViewPenaltiesController extends BaseController {
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         // If this screen is accessed directly for an invalid penalty return an error view.
@@ -85,12 +85,12 @@ public class ViewPenaltiesController extends BaseController {
                 || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
                 || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
             LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        model.addAttribute("outstanding", penaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
+        model.addAttribute("outstanding", PenaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
         model.addAttribute("penaltyReference", penaltyNumber);
-        model.addAttribute("reasonForPenalty", penaltyUtils.getReasonForPenalty(penaltyNumber));
+        model.addAttribute("reasonForPenalty", PenaltyUtils.getReasonForPenalty(penaltyNumber));
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
 
@@ -103,6 +103,8 @@ public class ViewPenaltiesController extends BaseController {
                                     HttpServletRequest request) {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession;
+        String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
+                penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         try {
             // Call penalty details for create request
@@ -115,9 +117,8 @@ public class ViewPenaltiesController extends BaseController {
                     lateFilingPenalty.getOutstanding());
 
         } catch (ServiceException e) {
-
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return redirectPathUnscheduledServiceDown;
         }
 
         try {
@@ -125,9 +126,8 @@ public class ViewPenaltiesController extends BaseController {
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
                     payableLateFilingPenaltySession, companyNumber, penaltyNumber) + "?summary=false";
         } catch (ServiceException e) {
-
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return redirectPathUnscheduledServiceDown;
         }
     }
 
