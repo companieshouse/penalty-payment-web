@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -8,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -32,10 +34,10 @@ class BankTransferLateFilingDetailsControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+    private SessionService mockSessionService;
 
     @InjectMocks
     private BankTransferLateFilingDetailsController controller;
@@ -46,6 +48,8 @@ class BankTransferLateFilingDetailsControllerTest {
 
     @BeforeEach
     void setup() {
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -53,7 +57,8 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success")
     void getBankTransferLateFilingDetailsSuccess() throws Exception {
 
-        configureMockEmailExist();
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(
+                Map.of("signin_info", Map.of("user_profile", Map.of("email", "test@gmail.com"))));
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
@@ -65,8 +70,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success without login")
     void getBankTransferLateFilingDetailsSuccessWithoutLogin() throws Exception {
 
-        configureMockEmailNotExist();
-
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
@@ -77,23 +80,16 @@ class BankTransferLateFilingDetailsControllerTest {
     @DisplayName("Get Bank Transfer Late Filing Details - success null email")
     void getBankTransferLateFilingDetailsSuccessNullEmail() throws Exception {
 
-        configureMockEmailNull();
+        Map<String, Object> sessionData = new HashMap<>(
+                Map.of("signin_info",
+                        Map.of("user_profile",
+                                Map.of("", ""))));
+
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-    }
-
-    private void configureMockEmailNull() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn(null);
-    }
-
-    private void configureMockEmailNotExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("");
     }
 }

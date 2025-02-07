@@ -17,6 +17,8 @@ public class PenaltyConfigurationProperties {
     private String bankTransferLateFilingDetailsPath;
     private String bankTransferSanctionsPath;
     private String unscheduledServiceDownPath;
+    private String signOutPath;
+    private String surveyLink;
     private String startPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
@@ -74,6 +76,22 @@ public class PenaltyConfigurationProperties {
 
     public void setUnscheduledServiceDownPath(String unscheduledServiceDownPath) {
         this.unscheduledServiceDownPath = unscheduledServiceDownPath;
+    }
+
+    public String getSignOutPath() {
+        return signOutPath;
+    }
+
+    public void setSignOutPath(String signOutPath) {
+        this.signOutPath = signOutPath;
+    }
+
+    public String getSurveyLink() {
+        return surveyLink;
+    }
+
+    public void setSurveyLink(String surveyLink) {
+        this.surveyLink = surveyLink;
     }
 
     public String getStartPath() {

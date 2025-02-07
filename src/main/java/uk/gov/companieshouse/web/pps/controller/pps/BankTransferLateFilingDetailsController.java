@@ -12,10 +12,10 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 @RequestMapping("/late-filing-penalty/bank-transfer/late-filing-details")
 public class BankTransferLateFilingDetailsController extends BaseController {
 
+    private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
+
     @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
-
-    private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
 
     @Override protected String getTemplateName() {
         return BANK_TRANSFER_LATE_FILING_DETAILS;
@@ -23,7 +23,10 @@ public class BankTransferLateFilingDetailsController extends BaseController {
 
     @GetMapping
     public String getBankTransferLateFilingDetails(Model model) {
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getBankTransferPath());
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getBankTransferPath()
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
 

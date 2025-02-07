@@ -17,7 +17,6 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @RequestMapping("/late-filing-penalty/bank-transfer")
@@ -29,15 +28,12 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
-    private final PenaltyUtils penaltyUtils;
 
     public BankTransferPenaltyReferenceController(
             NavigatorService navigatorService,
-            PenaltyConfigurationProperties penaltyConfigurationProperties,
-            PenaltyUtils penaltyUtils) {
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
-        this.penaltyUtils = penaltyUtils;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith();
     }
 
@@ -51,7 +47,10 @@ public class BankTransferPenaltyReferenceController extends BaseController {
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addBaseAttributesToModel(model, penaltyUtils, penaltyConfigurationProperties.getStartPath());
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getStartPath(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
     }
@@ -68,7 +67,10 @@ public class BankTransferPenaltyReferenceController extends BaseController {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
             model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-            addBaseAttributesToModel(model, penaltyUtils, penaltyConfigurationProperties.getStartPath());
+            addBaseAttributesToModel(model,
+                    penaltyConfigurationProperties.getStartPath(),
+                    penaltyConfigurationProperties.getSignOutPath(),
+                    penaltyConfigurationProperties.getSurveyLink());
             return getTemplateName();
         }
 

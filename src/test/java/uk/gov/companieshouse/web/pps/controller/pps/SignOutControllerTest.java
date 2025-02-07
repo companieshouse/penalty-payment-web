@@ -1,5 +1,18 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,23 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.Mockito.mock;
-
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -45,9 +42,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
     @Mock
     private AllowlistChecker allowlistChecker;
-
-    @Mock
-    private PenaltyUtils mockPenaltyUtils;
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
@@ -114,7 +108,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     @Test
     @DisplayName("Test sign out page- cannot get sign out page when no session data is present")
     void noSuccessGet() throws Exception {
-        configureUnscheduledServiceDownPath();
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
@@ -134,11 +128,11 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
     @Test
     @DisplayName("Post Sign Out - no on radio button with previous referer")
     void postRequestRadioNoWithValidReferer() throws Exception {
-        HashMap<String, Object> sessionattr = new HashMap<String, Object>();
-        sessionattr.put("url_prior_signout", PREVIOUS_PATH);
+        HashMap<String, Object> sessionAttr = new HashMap<>();
+        sessionAttr.put("url_prior_signout", PREVIOUS_PATH);
 
         this.mockMvc.perform(post(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH)
-                .sessionAttrs(sessionattr).param("url_prior_signout", PREVIOUS_PATH)
+                .sessionAttrs(sessionAttr).param("url_prior_signout", PREVIOUS_PATH)
                 .param(RADIO, "no"))
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
 
@@ -152,8 +146,4 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
                 .andExpect(flash().attribute("errorMessage",true));
     }
 
-    private void configureUnscheduledServiceDownPath() {
-        when(mockPenaltyUtils.getUnscheduledServiceDownPath())
-                .thenReturn(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
-    }
 }

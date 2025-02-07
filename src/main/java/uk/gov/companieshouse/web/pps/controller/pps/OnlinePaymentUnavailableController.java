@@ -14,15 +14,11 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
-    @Autowired
-    private PenaltyUtils penaltyUtils;
+    private static final String ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
+    private static final String PENALTY_REFERENCE_MODEL_ATTR = "penaltyReference";
 
     @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
-
-    private static final String ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
-
-    private static final String PENALTY_REFERENCE_MODEL_ATTR = "penaltyReference";
 
     @Override protected String getTemplateName() {
         return ONLINE_PAYMENT_UNAVAILABLE;
@@ -33,11 +29,13 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyRef,
                                               Model model) {
 
-            var penaltyReference = penaltyUtils.getPenaltyReferenceType(penaltyRef);
-            model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
-            addBaseAttributesToModel(model, penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + penaltyUtils.getPenaltyReferenceType(penaltyRef).name());
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+        model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + penaltyReference.name(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
-
 }

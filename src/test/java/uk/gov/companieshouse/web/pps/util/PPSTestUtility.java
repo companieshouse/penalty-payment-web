@@ -1,5 +1,10 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheckStatus;
@@ -7,12 +12,8 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalties;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import uk.gov.companieshouse.api.model.latefilingpenalty.Payment;
+import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
 
 public class PPSTestUtility {
 
@@ -23,6 +24,8 @@ public class PPSTestUtility {
     public static final String DATE = "2018-12-12";
     public static final String PAYABLE_ID = "DD72961607";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
+    public static final String VALID_COMPANY_NUMBER = "N1234567";
+    public static final String VALID_PENALTY_NUMBER = "A0000007";
 
     private PPSTestUtility() {
         throw new IllegalAccessError("Utility class");
@@ -54,6 +57,10 @@ public class PPSTestUtility {
 
         payableLateFilingPenalty.setLinks(new HashMap<>(){{put("resume_journey_uri", resumeURI);}});
         payableLateFilingPenalty.setPayment(payment);
+
+        TransactionPayableLateFilingPenalty payablePenalty = new TransactionPayableLateFilingPenalty();
+        payablePenalty.setAmount(VALID_AMOUNT);
+        payableLateFilingPenalty.setTransactions(Collections.singletonList(payablePenalty));
 
         return payableLateFilingPenalty;
     }

@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +14,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-
-import jakarta.servlet.http.HttpServletRequest;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -29,9 +30,6 @@ public class PenaltyPaidController extends BaseController {
     private CompanyService companyService;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
-
-    @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
@@ -46,14 +44,17 @@ public class PenaltyPaidController extends BaseController {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
         model.addAttribute("penaltyNumber", penaltyRef);
 
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + penaltyUtils.getPenaltyReferenceType(penaltyRef).name());
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
     }
