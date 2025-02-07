@@ -98,8 +98,7 @@ class PenaltyPaidControllerTest {
 
         configureErrorRetrievingCompany(COMPANY_NUMBER);
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().is3xxRedirection())

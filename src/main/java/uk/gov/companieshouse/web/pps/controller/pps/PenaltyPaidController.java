@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,7 +45,7 @@ public class PenaltyPaidController extends BaseController {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());

@@ -167,8 +167,7 @@ class EnterDetailsControllerTest {
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
 
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
@@ -415,8 +414,7 @@ class EnterDetailsControllerTest {
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configureErrorRetrievingPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())

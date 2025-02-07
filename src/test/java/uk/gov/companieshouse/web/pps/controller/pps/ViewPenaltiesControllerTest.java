@@ -122,8 +122,8 @@ class ViewPenaltiesControllerTest {
         configurePreviousController();
         configureErrorRetrievingPenalty(LFP_PENALTY_NUMBER);
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
+                UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -141,8 +141,7 @@ class ViewPenaltiesControllerTest {
         configurePreviousController();
         configureErrorRetrievingCompany();
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -160,8 +159,7 @@ class ViewPenaltiesControllerTest {
         configureNullPenalty(LFP_PENALTY_NUMBER);
         configureValidCompanyProfile();
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -181,8 +179,7 @@ class ViewPenaltiesControllerTest {
         configurePaidPenalty(LFP_PENALTY_NUMBER);
         configureValidCompanyProfile();
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -226,8 +223,7 @@ class ViewPenaltiesControllerTest {
 
         configureErrorRetrievingPenalty(LFP_PENALTY_NUMBER);
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -245,8 +241,7 @@ class ViewPenaltiesControllerTest {
         configureValidPenalty(LFP_PENALTY_NUMBER);
         configureErrorCreatingLateFilingPenalty(LFP_PENALTY_NUMBER, PPSTestUtility.validLateFilingPenalty(COMPANY_NUMBER));
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
@@ -271,8 +266,7 @@ class ViewPenaltiesControllerTest {
                 payableLateFilingPenaltySession);
         configureErrorCreatingPaymentSession(payableLateFilingPenaltySession);
 
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())

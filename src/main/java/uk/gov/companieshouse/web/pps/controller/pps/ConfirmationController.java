@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +75,7 @@ public class ConfirmationController extends BaseController {
         // Check that the session state is present
         if (!sessionData.containsKey(PAYMENT_STATE)) {
             LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         String sessionPaymentState = (String) sessionData.get(PAYMENT_STATE);
@@ -83,7 +85,7 @@ public class ConfirmationController extends BaseController {
         if (!paymentState.equals(sessionPaymentState)) {
             LOGGER.errorRequest(request, "Payment state value in session is not as expected, possible tampering of session "
                     + "Expected: " + sessionPaymentState + ", Received: " + paymentState);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         try {
@@ -111,7 +113,7 @@ public class ConfirmationController extends BaseController {
             return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 }

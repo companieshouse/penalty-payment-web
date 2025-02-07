@@ -177,8 +177,7 @@ class ConfirmationControllerTest {
     @DisplayName("Get Confirmation Screen - missing payment state from session")
     void getRequestMissingPaymentState() throws Exception {
         when(sessionService.getSessionDataFromContext()).thenReturn(Collections.emptyMap());
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
                         .param("ref", REF)
@@ -194,8 +193,8 @@ class ConfirmationControllerTest {
         Map<String, Object> sessionData = new HashMap<>(Map.of(PAYMENT_STATE, STATE));
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
+                UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
                         .param("ref", REF)
@@ -229,8 +228,7 @@ class ConfirmationControllerTest {
         Map<String, Object> sessionData = new HashMap<>(Map.of(PAYMENT_STATE, STATE));
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         doThrow(ServiceException.class)
                 .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);

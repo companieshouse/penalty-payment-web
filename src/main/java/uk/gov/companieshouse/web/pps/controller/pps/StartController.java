@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,13 +46,15 @@ public class StartController extends BaseController {
 
     @GetMapping
     public String getPpsHome(@RequestParam("start") Optional<Integer> startId, Model model) throws ParseException {
+        String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
+                penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         FinanceHealthcheck financeHealthcheck;
         try {
             financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return redirectPathUnscheduledServiceDown;
         }
 
         if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
@@ -70,7 +74,7 @@ public class StartController extends BaseController {
             LOGGER.error("Service is unavailable");
             return PPS_SERVICE_UNAVAILABLE;
         } else {
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return redirectPathUnscheduledServiceDown;
         }
     }
 

@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +55,7 @@ public class SignOutController extends BaseController {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         if (!sessionData.containsKey(SIGN_IN_KEY)) {
             LOGGER.info("No session data present: " + sessionData);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         LOGGER.debug("Processing sign out");

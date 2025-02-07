@@ -108,8 +108,7 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
     @Test
     @DisplayName("Test sign out page- cannot get sign out page when no session data is present")
     void noSuccessGet() throws Exception {
-        when(mockPenaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath()).thenReturn(
-                REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))

@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -76,7 +77,7 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
@@ -168,9 +169,8 @@ public class EnterDetailsController extends BaseController {
             return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyNumber);
 
         } catch (ServiceException ex) {
-
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyConfigurationProperties.getRedirectedUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

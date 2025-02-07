@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.config;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -75,9 +73,5 @@ public class PenaltyConfigurationProperties {
 
     public void setUnscheduledServiceDownPath(String unscheduledServiceDownPath) {
         this.unscheduledServiceDownPath = unscheduledServiceDownPath;
-    }
-
-    public String getRedirectedUnscheduledServiceDownPath() {
-        return REDIRECT_URL_PREFIX + unscheduledServiceDownPath;
     }
 }
