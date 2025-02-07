@@ -59,7 +59,8 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         List<LateFilingPenalty> lateFilingPenalties;
         LateFilingPenalty lateFilingPenalty;

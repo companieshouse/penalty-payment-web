@@ -107,7 +107,8 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getPenaltyAmountDisplay(payablePenalty));
             model.addAttribute(REASON_FOR_PENALTY_ATTR, PenaltyUtils.getReasonForPenalty(penaltyRef));
             model.addAttribute(PENALTY_REF_STARTS_WITH, PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith());
-            addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext());
+            addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
+                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink());
 
 
             return getTemplateName();

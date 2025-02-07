@@ -43,53 +43,50 @@ public abstract class BaseController {
         model.addAttribute(BACK_LINK_ATTR, navigatorService.getPreviousControllerPath(this.getClass(), pathVars));
     }
 
-    protected void addBaseAttributesToModel(Model model) {
-        addPhaseBannerToModel(model);
-        addUserModel(model);
+    protected void addBaseAttributesToModel(Model model, String signOutUrl, String surveyLink) {
+        addPhaseBannerToModel(model, surveyLink);
+        addUserModel(model, signOutUrl);
         addBackPageAttributeToModel(model);
         addServiceBannerToModel(model);
     }
 
-    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model) {
-        addPhaseBannerToModel(model);
-        addUserModel(model);
+    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl,
+            String surveyLink) {
+        addPhaseBannerToModel(model, surveyLink);
+        addUserModel(model, signOutUrl);
     }
 
-    protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData) {
-        addPhaseBannerToModel(model);
-        addUserModel(model, sessionData);
+    protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData,
+            String signOutUrl, String surveyLink) {
+        addPhaseBannerToModel(model, surveyLink);
+        addUserModel(model, signOutUrl, sessionData);
         addServiceBannerToModel(model);
     }
 
-    protected void addUserModel(Model model) {
+    protected void addUserModel(Model model, String signOutUrl) {
         String loginEmail = PenaltyUtils.getLoginEmail(sessionService.getSessionDataFromContext());
-        // Set a value for showing user bar part if exist
-        if (StringUtils.isNotEmpty(loginEmail)) {
-            model.addAttribute(USER_BAR_ATTR, "1");
-            model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
-            model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
-            model.addAttribute(USER_EMAIL_ATTR, loginEmail);
-            model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
-        }
-
+        addEmailAttributes(model, signOutUrl, loginEmail);
     }
 
-    protected void addUserModel(Model model, Map<String, Object> sessionData) {
+    protected void addUserModel(Model model, String signOutUrl, Map<String, Object> sessionData) {
         String loginEmail = PenaltyUtils.getLoginEmail(sessionData);
+        addEmailAttributes(model, signOutUrl, loginEmail);
+    }
+
+    private static void addEmailAttributes(Model model, String signOutUrl, String loginEmail) {
         // Set a value for showing user bar part if exist
         if (StringUtils.isNotEmpty(loginEmail)) {
             model.addAttribute(USER_BAR_ATTR, "1");
             model.addAttribute(HIDE_YOUR_DETAILS_ATTR, "1");
             model.addAttribute(HIDE_RECENT_FILINGS_ATTR, "1");
             model.addAttribute(USER_EMAIL_ATTR, loginEmail);
-            model.addAttribute(USER_SIGN_OUT_URL_ATTR, "/late-filing-penalty/sign-out");
+            model.addAttribute(USER_SIGN_OUT_URL_ATTR, signOutUrl);
         }
-
     }
 
-    protected void addPhaseBannerToModel(Model model) {
+    protected void addPhaseBannerToModel(Model model, String surveyLink) {
         model.addAttribute(PHASE_BANNER_ATTR, "beta");
-        model.addAttribute(PHASE_BANNER_LINK_ATTR, "https://www.smartsurvey.co.uk/s/pay-a-penalty-feedback");
+        model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
 
     protected void addServiceBannerToModel(Model model) {

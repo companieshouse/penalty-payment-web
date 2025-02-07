@@ -74,7 +74,7 @@ public class SignOutController extends BaseController {
             request.getSession().setAttribute("url_prior_signout", allowedUrl);
             model.addAttribute(BACK_LINK, allowedUrl);
         }
-        addPhaseBannerToModel(model);
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
 
