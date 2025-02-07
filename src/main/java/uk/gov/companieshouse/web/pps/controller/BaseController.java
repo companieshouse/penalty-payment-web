@@ -42,7 +42,7 @@ public abstract class BaseController {
     protected void addBackPageAttributeToModel(Model model, String url) {
         // Set to show the back button
         model.addAttribute(BACK_LINK_ATTR, "1");
-        if (!StringUtils.isEmpty(url)) {
+        if (StringUtils.isNotEmpty(url)) {
             model.addAttribute(BACK_LINK_URL_ATTR, url);
         }
     }
