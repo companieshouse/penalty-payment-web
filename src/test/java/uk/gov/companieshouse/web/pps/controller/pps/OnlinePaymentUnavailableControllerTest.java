@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -49,8 +46,6 @@ class OnlinePaymentUnavailableControllerTest {
     private static final String PPS_ONLINE_PAYMENT_UNAVAILABLE = "pps/onlinePaymentUnavailable";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     public void setup() {
         // As this bean is autowired in the base class, we need to use reflection to set it
@@ -62,17 +57,10 @@ class OnlinePaymentUnavailableControllerTest {
     @DisplayName("Get Online Payment Unavailable - success path")
     void getRequestSuccess() throws Exception {
 
-        configurePreviousController();
-
         this.mockMvc.perform(get(ONLINE_PAYMENT_UNAVAILABLE_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PPS_ONLINE_PAYMENT_UNAVAILABLE))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
@@ -20,7 +19,6 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
-@PreviousController(StartController.class)
 @RequestMapping("/late-filing-penalty/bank-transfer")
 public class BankTransferPenaltyReferenceController extends BaseController {
 
@@ -49,7 +47,9 @@ public class BankTransferPenaltyReferenceController extends BaseController {
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
 
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getStartPath(),
+                penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
@@ -67,6 +67,10 @@ public class BankTransferPenaltyReferenceController extends BaseController {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
             model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
+            addBaseAttributesToModel(model,
+                    penaltyConfigurationProperties.getStartPath(),
+                    penaltyConfigurationProperties.getSignOutPath(),
+                    penaltyConfigurationProperties.getSurveyLink());
             return getTemplateName();
         }
 

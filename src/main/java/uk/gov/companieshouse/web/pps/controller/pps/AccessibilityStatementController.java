@@ -5,12 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
-@PreviousController(StartController.class)
 @RequestMapping("/late-filing-penalty/accessibility-statement")
 public class AccessibilityStatementController extends BaseController {
 
@@ -25,8 +23,9 @@ public class AccessibilityStatementController extends BaseController {
 
     @GetMapping
     public String getPpsAccessibilityStatement(Model model) {
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+        addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
+
 }

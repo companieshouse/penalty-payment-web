@@ -15,7 +15,6 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -26,7 +25,6 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
@@ -59,7 +57,10 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyNumber).name(),
+                penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
         List<LateFilingPenalty> lateFilingPenalties;

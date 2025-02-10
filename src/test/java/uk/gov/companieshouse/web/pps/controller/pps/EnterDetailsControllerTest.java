@@ -97,6 +97,8 @@ class EnterDetailsControllerTest {
 
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
+    private static final String START_PATH = "/late-filing-penalty";
+
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
     private static final String ENTER_DETAILS_VIEW = "pps/details";
@@ -124,7 +126,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details - Late Filing view success path")
     void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
 
-        configurePreviousController();
+        configureStartPathProperty();
 
         PenaltyReference lateFilingPenaltyRef = LATE_FILING;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
@@ -144,8 +146,6 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details - Sanction view success path")
     void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
 
-        configurePreviousController();
-
         PenaltyReference sanctionPenaltyRef = SANCTIONS;
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
 
@@ -156,7 +156,6 @@ class EnterDetailsControllerTest {
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
-        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 
@@ -182,6 +181,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - Blank company number, correct penalty ref")
     void postRequestCompanyNumberBlank() throws Exception {
 
+        configureStartPathProperty();
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
@@ -238,6 +238,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - no payable late filing penalties found")
     void postRequestNoPayableLateFilingPenaltyFound() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
@@ -256,6 +257,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - no payable sanction penalties found")
     void postRequestNoPayableSanctionPenaltyFound() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
@@ -294,6 +296,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - payable penalty does not match provided penalty ref")
     void postRequestPenaltyNumbersDoNotMatch() throws Exception {
 
+        configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configurePenaltyWrongID(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
 
@@ -447,11 +450,6 @@ class EnterDetailsControllerTest {
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
     private void configureNextController() {
         when(mockNavigatorService.getNextControllerRedirect(any(),any(),any()))
                 .thenReturn(MOCK_CONTROLLER_PATH);
@@ -543,6 +541,11 @@ class EnterDetailsControllerTest {
 
         doThrow(ServiceException.class)
                 .when(mockPenaltyPaymentService).getLateFilingPenalties(companyNumber, penaltyRef);
+    }
+
+    private void configureStartPathProperty() {
+        when(mockPenaltyConfigurationProperties.getStartPath())
+                .thenReturn(START_PATH);
     }
 
 }

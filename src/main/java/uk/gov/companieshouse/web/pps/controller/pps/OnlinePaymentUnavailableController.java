@@ -6,13 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
@@ -31,11 +29,14 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyRef,
                                               Model model) {
 
-            var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
-            model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
-            addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
-            return getTemplateName();
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+        model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + penaltyReference.name(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
+        return getTemplateName();
     }
 
 }

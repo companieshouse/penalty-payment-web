@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -66,8 +64,6 @@ class PenaltyPaidControllerTest {
     private static final String COMPANY_NAME_ATTR = "companyName";
     private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     void setup() {
         // As this bean is autowired in the base class, we need to use reflection to set it
@@ -79,7 +75,6 @@ class PenaltyPaidControllerTest {
     @DisplayName("Get Penalty Paid - success path")
     void getRequestSuccess() throws Exception {
 
-        configurePreviousController();
         configureValidCompanyProfile(COMPANY_NUMBER);
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
@@ -105,11 +100,6 @@ class PenaltyPaidControllerTest {
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
     private void configureValidCompanyProfile(String companyNumber) throws ServiceException {

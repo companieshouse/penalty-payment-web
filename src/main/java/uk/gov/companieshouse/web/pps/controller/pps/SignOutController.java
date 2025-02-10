@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -23,7 +22,6 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
 @Controller
 @NextController(StartController.class)
-@PreviousController(EnterDetailsController.class)
 @RequestMapping("/late-filing-penalty/sign-out")
 public class SignOutController extends BaseController {
 
@@ -98,4 +96,5 @@ public class SignOutController extends BaseController {
         }
         return new RedirectView(HOME);
     }
+
 }

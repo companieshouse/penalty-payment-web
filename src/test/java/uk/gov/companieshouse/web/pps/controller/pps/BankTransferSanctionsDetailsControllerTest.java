@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -47,8 +46,6 @@ class BankTransferSanctionsDetailsControllerTest {
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     void setup() {
         // As this bean is autowired in the base class, we need to use reflection to set it
@@ -59,8 +56,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path")
     void getRequestSuccess() throws Exception {
-        configurePreviousController();
-
         Map<String, Object> sessionData = new HashMap<>(
                 Map.of("signin_info",
                         Map.of("user_profile",
@@ -77,8 +72,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path without login")
     void getRequestSuccessWithoutLogin() throws Exception {
-        configurePreviousController();
-
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
@@ -88,8 +81,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path null email")
     void getRequestSuccessNullEmail() throws Exception {
-        configurePreviousController();
-
         Map<String, Object> sessionDataNoEmail = new HashMap<>(
                 Map.of("signin_info",
                         Map.of("user_profile",
@@ -104,8 +95,4 @@ class BankTransferSanctionsDetailsControllerTest {
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
 }

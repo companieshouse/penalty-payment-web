@@ -240,4 +240,5 @@ class ConfirmationControllerTest {
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH))
                 .andExpect(status().is3xxRedirection());
     }
+
 }

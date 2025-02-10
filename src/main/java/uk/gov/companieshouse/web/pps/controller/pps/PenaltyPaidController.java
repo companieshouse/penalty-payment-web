@@ -10,15 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(EnterDetailsController.class)
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/penalty-paid")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
 public class PenaltyPaidController extends BaseController {
 
     private static final String PPS_PENALTY_PAID = "pps/penaltyPaid";
@@ -35,7 +34,7 @@ public class PenaltyPaidController extends BaseController {
 
     @GetMapping
     public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
-                                       @PathVariable String penaltyNumber,
+                                       @PathVariable String penaltyRef,
                                        Model model,
                                        HttpServletRequest request) {
 
@@ -49,9 +48,12 @@ public class PenaltyPaidController extends BaseController {
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
-        model.addAttribute("penaltyNumber", penaltyNumber);
+        model.addAttribute("penaltyNumber", penaltyRef);
 
-        addBaseAttributesToModel(model, penaltyConfigurationProperties.getSignOutPath(),
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
+                penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();

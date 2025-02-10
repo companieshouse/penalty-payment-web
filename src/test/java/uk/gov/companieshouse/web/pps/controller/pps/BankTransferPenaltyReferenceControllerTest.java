@@ -3,14 +3,11 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PPS_BANK_TRANSFER_PENALTY_REFERENCE;
@@ -48,7 +45,6 @@ class BankTransferPenaltyReferenceControllerTest {
     private SessionService mockSessionService;
 
     private static final String SELECTED_PENALTY_REF_ATTR = "selectedPenaltyReference";
-    private static final String MOCK_CONTROLLER_PATH = REDIRECT_URL_PREFIX + "mockControllerPath";
 
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
@@ -75,8 +71,6 @@ class BankTransferPenaltyReferenceControllerTest {
     @Test
     @DisplayName("Get PPS Bank Transfer Which Penalty Reference success path")
     void getRequestSuccess() throws Exception {
-
-        configurePreviousController();
 
         MvcResult mvcResult = this.mockMvc.perform(get(penaltyConfigurationProperties.getBankTransferPath()))
                 .andExpect(status().isOk())
@@ -137,11 +131,6 @@ class BankTransferPenaltyReferenceControllerTest {
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
         assertTrue(modelAndView.getModel().isEmpty());
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
     }
 
 }

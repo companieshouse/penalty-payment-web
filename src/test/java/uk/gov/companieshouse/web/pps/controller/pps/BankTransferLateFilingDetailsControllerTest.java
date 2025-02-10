@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -21,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -48,8 +46,6 @@ class BankTransferLateFilingDetailsControllerTest {
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     void setup() {
         // As this bean is autowired in the base class, we need to use reflection to set it
@@ -60,7 +56,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Late Filing Details - success")
     void getBankTransferLateFilingDetailsSuccess() throws Exception {
-        configurePreviousController();
 
         when(mockSessionService.getSessionDataFromContext()).thenReturn(
                 Map.of("signin_info", Map.of("user_profile", Map.of("email", "test@gmail.com"))));
@@ -74,7 +69,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Late Filing Details - success without login")
     void getBankTransferLateFilingDetailsSuccessWithoutLogin() throws Exception {
-        configurePreviousController();
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
@@ -85,7 +79,6 @@ class BankTransferLateFilingDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Late Filing Details - success null email")
     void getBankTransferLateFilingDetailsSuccessNullEmail() throws Exception {
-        configurePreviousController();
 
         Map<String, Object> sessionData = new HashMap<>(
                 Map.of("signin_info",
@@ -100,8 +93,4 @@ class BankTransferLateFilingDetailsControllerTest {
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
 }
