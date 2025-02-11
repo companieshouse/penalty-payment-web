@@ -73,7 +73,7 @@ class PenaltyPaymentServiceImplTest {
     private static final String GET_LFP_URI =
             "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PenaltyReference.LATE_FILING;
 
-    private static final String GET_FINANCE_HEALTHCHECK_URI = "/healthcheck/finance-system";
+    private static final String GET_FINANCE_HEALTHCHECK_URI = "/penalty-payment-api/healthcheck/finance-system";
 
     private static final String MAINTENANCE_END_TIME = "2019-11-08T23:00:12Z";
 
