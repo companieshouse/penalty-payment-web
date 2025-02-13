@@ -12,8 +12,8 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 @Component
 public class EnterDetailsValidator {
 
-    private static final String LATE_FILING_PENALTY_REF_REGEX = "^A\\d{7}$";
-    private static final String SANCTIONS_PENALTY_REF_REGEX = "^P\\d{7}$";
+    private static final String LATE_FILING_PENALTY_REF_REGEX = "^[Aa]\\d{7}$";
+    private static final String SANCTIONS_PENALTY_REF_REGEX = "^[Pp]\\d{7}$";
 
     private final ResourceBundle bundle;
 
