@@ -115,7 +115,7 @@ public class EnterDetailsController extends BaseController {
         }
 
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterDetails.getPenaltyRef();
+        String penaltyNumber = enterDetails.getPenaltyRef().toUpperCase();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
