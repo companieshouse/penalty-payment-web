@@ -114,12 +114,14 @@ public class EnterDetailsController extends BaseController {
             return getTemplateName();
         }
 
-        String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
+        String companyNumber = enterDetails.getCompanyNumber();
         String penaltyNumber = enterDetails.getPenaltyRef();
+        String companyNumberSearch = companyService.appendToCompanyNumber(companyNumber.toUpperCase());
+        String penaltyNumberSearch = penaltyNumber.toUpperCase();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
-                    .getLateFilingPenalties(companyNumber, penaltyNumber);
+                    .getLateFilingPenalties(companyNumberSearch, penaltyNumberSearch);
 
             redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
             redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
@@ -146,7 +148,7 @@ public class EnterDetailsController extends BaseController {
 
             LateFilingPenalty lateFilingPenalty;
             // If the only penalty in the List does not have the provided penalty number return Penalty Not Found.
-            if (payableLateFilingPenalties.getFirst().getId().equals(penaltyNumber)) {
+            if (payableLateFilingPenalties.getFirst().getId().equals(penaltyNumberSearch)) {
                 lateFilingPenalty = payableLateFilingPenalties.getFirst();
             } else {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber

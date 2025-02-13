@@ -41,7 +41,8 @@ public class PenaltyPaidController extends BaseController {
         CompanyProfileApi companyProfileApi;
 
         try {
-            companyProfileApi = companyService.getCompanyProfile(companyNumber);
+            String companyNumberSearch = companyNumber.toUpperCase();
+            companyProfileApi = companyService.getCompanyProfile(companyNumberSearch);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();

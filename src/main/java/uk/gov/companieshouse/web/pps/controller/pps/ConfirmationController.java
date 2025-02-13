@@ -89,8 +89,9 @@ public class ConfirmationController extends BaseController {
         }
 
         try {
+            String companyNumberSearch = companyNumber.toUpperCase();
             PayableLateFilingPenalty payablePenalty = payablePenaltyService
-                    .getPayableLateFilingPenalty(companyNumber, payableRef);
+                    .getPayableLateFilingPenalty(companyNumberSearch, payableRef);
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
@@ -98,7 +99,7 @@ public class ConfirmationController extends BaseController {
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payablePenalty.getLinks().get("resume_journey_uri");
             }
 
-            CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
+            CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumberSearch);
 
             model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
             model.addAttribute(PENALTY_REF_ATTR, penaltyRef);

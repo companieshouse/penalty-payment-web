@@ -57,9 +57,11 @@ public class ViewPenaltiesController extends BaseController {
                                    Model model,
                                    HttpServletRequest request) {
 
+        String companyNumberSearch = companyNumber.toUpperCase();
+        String penaltyNumberSearch = penaltyNumber.toUpperCase();
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyNumber).name(),
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyNumberSearch).name(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
@@ -68,8 +70,8 @@ public class ViewPenaltiesController extends BaseController {
         CompanyProfileApi companyProfileApi;
 
         try {
-            companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber);
+            companyProfileApi = companyService.getCompanyProfile(companyNumberSearch);
+            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumberSearch, penaltyNumberSearch);
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
@@ -79,7 +81,7 @@ public class ViewPenaltiesController extends BaseController {
         // If this screen is accessed directly for an invalid penalty return an error view.
         if (lateFilingPenalty == null
                 || lateFilingPenalties.size() != 1
-                || !lateFilingPenalty.getId().equals(penaltyNumber)
+                || !lateFilingPenalty.getId().equals(penaltyNumberSearch)
                 || Boolean.TRUE.equals(lateFilingPenalty.getDca())
                 || Boolean.TRUE.equals(lateFilingPenalty.getPaid())
                 || lateFilingPenalty.getOutstanding() <= 0
@@ -103,18 +105,20 @@ public class ViewPenaltiesController extends BaseController {
                                     @PathVariable String penaltyNumber,
                                     HttpServletRequest request) {
 
+        String companyNumberSearch = companyNumber.toUpperCase();
+        String penaltyNumberSearch = penaltyNumber.toUpperCase();
         PayableLateFilingPenaltySession payableLateFilingPenaltySession;
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         try {
             // Call penalty details for create request
-            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber).getFirst();
+            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumberSearch, penaltyNumberSearch).getFirst();
 
             // Create payable session
             payableLateFilingPenaltySession = payablePenaltyService.createLateFilingPenaltySession(
-                    companyNumber,
-                    penaltyNumber,
+                    companyNumberSearch,
+                    penaltyNumberSearch,
                     lateFilingPenalty.getOutstanding());
 
         } catch (ServiceException e) {

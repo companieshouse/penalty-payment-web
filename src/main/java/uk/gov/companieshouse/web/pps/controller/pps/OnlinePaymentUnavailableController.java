@@ -29,7 +29,8 @@ public class OnlinePaymentUnavailableController extends BaseController {
                                               @PathVariable String penaltyRef,
                                               Model model) {
 
-        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+        String penaltyRefSearch = penaltyRef.toUpperCase();
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRefSearch);
         model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
