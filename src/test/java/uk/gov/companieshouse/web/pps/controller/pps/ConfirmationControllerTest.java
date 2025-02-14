@@ -12,8 +12,10 @@ import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationControlle
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PAYMENT_DATE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_STARTS_WITH_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.REASON_FOR_PENALTY_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -39,7 +41,6 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -97,7 +98,7 @@ class ConfirmationControllerTest {
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF));
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
@@ -110,8 +111,8 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
-                .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, PenaltyUtils.LATE_FILING_REASON))
-                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH, LATE_FILING.getStartsWith()))
+                .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, VALID_LATE_FILING_REASON))
+                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH_ATTR, LATE_FILING.getStartsWith()))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
     }
 
@@ -123,7 +124,7 @@ class ConfirmationControllerTest {
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, CS_PENALTY_REF));
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, CS_PENALTY_REF, VALID_CS_REASON));
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_CS)
@@ -136,8 +137,8 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
-                .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, PenaltyUtils.SANCTIONS_REASON))
-                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH, SANCTIONS.getStartsWith()))
+                .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, VALID_CS_REASON))
+                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH_ATTR, SANCTIONS.getStartsWith()))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
     }
 
@@ -151,7 +152,7 @@ class ConfirmationControllerTest {
                         Map.of("email", "test@gmail.com"))));
         sessionData.put(PAYMENT_STATE, STATE);
 
-        PayableLateFilingPenalty penalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF);
+        PayableLateFilingPenalty penalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON);
         penalty.setPayment(null);
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
@@ -212,7 +213,7 @@ class ConfirmationControllerTest {
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF));
+                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
                         .param("ref", REF)

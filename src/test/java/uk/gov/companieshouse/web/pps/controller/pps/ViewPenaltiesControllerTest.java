@@ -10,6 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.REASON_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,13 +78,6 @@ class ViewPenaltiesControllerTest {
             + "/view-penalties";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
-    private static final String ENTER_PPS_DETAILS_VIEW = "pps/viewPenalties";
-
-    private static final String OUTSTANDING_MODEL_ATTR = "outstanding";
-    private static final String COMPANY_NAME_MODEL_ATTR = "companyName";
-    private static final String PENALTY_REFERENCE_ATTR = "penaltyReference";
-    private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
-
     private static final String REDIRECT_PATH = "redirect:";
     private static final String MOCK_PAYMENTS_URL = "pay.companieshouse/payments/987654321987654321/pay";
     private static final String SUMMARY_FALSE_PARAMETER = "?summary=false";
@@ -100,11 +98,11 @@ class ViewPenaltiesControllerTest {
 
         this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_PPS_DETAILS_VIEW))
-                .andExpect(model().attributeExists(OUTSTANDING_MODEL_ATTR))
-                .andExpect(model().attributeExists(PENALTY_REFERENCE_ATTR))
-                .andExpect(model().attributeExists(REASON_FOR_PENALTY_ATTR))
-                .andExpect(model().attributeExists(COMPANY_NAME_MODEL_ATTR));
+                .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
+                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
+                .andExpect(model().attributeExists(PENALTY_REF_ATTR))
+                .andExpect(model().attributeExists(REASON_ATTR))
+                .andExpect(model().attributeExists(AMOUNT_ATTR));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
         verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,

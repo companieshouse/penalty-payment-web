@@ -25,15 +25,19 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyNumber}/view-penalties")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
-    private static final String PPS_VIEW_PENALTIES = "pps/viewPenalties";
+    static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";
+    static final String COMPANY_NAME_ATTR = "companyName";
+    static final String PENALTY_REF_ATTR = "penaltyRef";
+    static final String REASON_ATTR = "reasonForPenalty";
+    static final String AMOUNT_ATTR = "outstanding";
 
     private static final String PENALTY_TYPE = "penalty";
 
     @Override protected String getTemplateName() {
-        return PPS_VIEW_PENALTIES;
+        return VIEW_PENALTIES_TEMPLATE_NAME;
     }
 
     @Autowired
@@ -53,13 +57,13 @@ public class ViewPenaltiesController extends BaseController {
 
     @GetMapping
     public String getViewPenalties(@PathVariable String companyNumber,
-                                   @PathVariable String penaltyNumber,
-                                   Model model,
-                                   HttpServletRequest request) {
+            @PathVariable String penaltyRef,
+            Model model,
+            HttpServletRequest request) {
 
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyNumber).name(),
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
@@ -69,7 +73,7 @@ public class ViewPenaltiesController extends BaseController {
 
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber);
+            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
             lateFilingPenalty = lateFilingPenalties.getFirst();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
@@ -79,7 +83,7 @@ public class ViewPenaltiesController extends BaseController {
         // If this screen is accessed directly for an invalid penalty return an error view.
         if (lateFilingPenalty == null
                 || lateFilingPenalties.size() != 1
-                || !lateFilingPenalty.getId().equals(penaltyNumber)
+                || !lateFilingPenalty.getId().equals(penaltyRef)
                 || Boolean.TRUE.equals(lateFilingPenalty.getDca())
                 || Boolean.TRUE.equals(lateFilingPenalty.getPaid())
                 || lateFilingPenalty.getOutstanding() <= 0
@@ -89,18 +93,17 @@ public class ViewPenaltiesController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        model.addAttribute("outstanding", PenaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
-        model.addAttribute("penaltyReference", penaltyNumber);
-        model.addAttribute("reasonForPenalty", PenaltyUtils.getReasonForPenalty(penaltyNumber));
-
-        model.addAttribute("companyName", companyProfileApi.getCompanyName());
+        model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
+        model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
+        model.addAttribute(REASON_ATTR, lateFilingPenalty.getReason());
+        model.addAttribute(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
 
         return getTemplateName();
     }
 
     @PostMapping
     public String postViewPenalties(@PathVariable String companyNumber,
-                                    @PathVariable String penaltyNumber,
+            @PathVariable String penaltyRef,
                                     HttpServletRequest request) {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession;
@@ -109,12 +112,12 @@ public class ViewPenaltiesController extends BaseController {
 
         try {
             // Call penalty details for create request
-            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyNumber).getFirst();
+            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef).getFirst();
 
             // Create payable session
             payableLateFilingPenaltySession = payablePenaltyService.createLateFilingPenaltySession(
                     companyNumber,
-                    penaltyNumber,
+                    penaltyRef,
                     lateFilingPenalty.getOutstanding());
 
         } catch (ServiceException e) {
@@ -125,7 +128,7 @@ public class ViewPenaltiesController extends BaseController {
         try {
             // Return the payment session URL and add query parameter to indicate Review Payments screen isn't wanted
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
-                    payableLateFilingPenaltySession, companyNumber, penaltyNumber) + "?summary=false";
+                    payableLateFilingPenaltySession, companyNumber, penaltyRef) + "?summary=false";
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return redirectPathUnscheduledServiceDown;
