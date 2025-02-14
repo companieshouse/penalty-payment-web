@@ -26,6 +26,8 @@ public class PPSTestUtility {
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
     public static final String VALID_COMPANY_NUMBER = "N1234567";
     public static final String VALID_PENALTY_NUMBER = "A0000007";
+    public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
+    public static final String VALID_CS_REASON = "Failure to file a confirmation statement";
 
     private PPSTestUtility() {
         throw new IllegalAccessError("Utility class");
@@ -42,11 +44,12 @@ public class PPSTestUtility {
         lateFilingPenalty.setType(PENALTY_TYPE);
         lateFilingPenalty.setMadeUpDate(DATE);
         lateFilingPenalty.setDueDate(DATE);
+        lateFilingPenalty.setReason(VALID_LATE_FILING_REASON);
 
         return lateFilingPenalty;
     }
 
-    public static PayableLateFilingPenalty validPayableLateFilingPenalty(String companyNumber, String id) {
+    public static PayableLateFilingPenalty validPayableLateFilingPenalty(String companyNumber, String id, String reason) {
         PayableLateFilingPenalty payableLateFilingPenalty = new PayableLateFilingPenalty();
         payableLateFilingPenalty.setCompanyNumber(companyNumber);
 
@@ -59,7 +62,11 @@ public class PPSTestUtility {
         payableLateFilingPenalty.setPayment(payment);
 
         TransactionPayableLateFilingPenalty payablePenalty = new TransactionPayableLateFilingPenalty();
+        payablePenalty.setTransactionId(VALID_PENALTY_NUMBER);
         payablePenalty.setAmount(VALID_AMOUNT);
+        payablePenalty.setType(PENALTY_TYPE);
+        payablePenalty.setMadeUpDate(DATE);
+        payablePenalty.setReason(reason);
         payableLateFilingPenalty.setTransactions(Collections.singletonList(payablePenalty));
 
         return payableLateFilingPenalty;

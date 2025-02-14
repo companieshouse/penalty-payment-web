@@ -8,6 +8,6 @@ public interface PayablePenaltyService {
 
     PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String payableRef) throws ServiceException;
 
-    PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyNumber, Integer amount)
+    PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyRef, Integer amount)
             throws ServiceException;
 }
