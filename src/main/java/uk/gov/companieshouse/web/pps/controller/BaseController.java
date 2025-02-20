@@ -93,7 +93,7 @@ public abstract class BaseController {
     }
 
     protected void addPhaseBannerToModel(Model model, String surveyLink) {
-        model.addAttribute(PHASE_BANNER_ATTR, "beta");
+        model.addAttribute(PHASE_BANNER_ATTR, "Beta");
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
 

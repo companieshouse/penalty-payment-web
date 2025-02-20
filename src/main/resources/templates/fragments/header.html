@@ -29,7 +29,7 @@
             </div>
             <div class="govuk-header__content"
                  th:if="${headerText != null}">
-                <a id="proposition-name" href="/late-filing-penalty" class="govuk-header__link govuk-header__link--service-name"  th:text='${headerText}'></a>
+                <a id="proposition-name" href="/late-filing-penalty" class="govuk-header__link"  th:text='${headerText}'></a>
             </div>
         </div>
     </header>
@@ -38,21 +38,11 @@
         <div style="width:100%" class="govuk-cookie-banner govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <a href="/late-filing-penalty" style="color:black" class="govuk-header__link--service-name">Pay a penalty to Companies House</a>
+                    <a href="/late-filing-penalty" style="color:black" class="govuk-header__link">Pay a penalty to Companies House</a>
                 </div>
             </div>
         </div>
     </div>
-    <style>
-        .govuk-header__link--service-name {
-            text-decoration: none;
-            font-size: 1.1875rem;
-        }
-
-        .govuk-header__link--service-name:hover {
-            text-decoration: underline;
-        }
-    </style>
 </th:block>
 </body>
 </html>
