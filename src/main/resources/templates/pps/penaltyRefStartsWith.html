@@ -6,25 +6,15 @@
 <head>
     <title>What does the penalty reference start with?</title>
     <script>
-
-        function trackMatomoEvent(eventId) {
-            if (typeof _paq !== 'undefined') {
-                _paq.push(['trackEvent', 'Penalty Reference', eventId]);
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('penalty-ref-starts-with-form').addEventListener('submit', function (e) {
-                var selectedOption = document.querySelector('input[name="available-penalty-reference"]:checked');
-
-                if (!selectedOption) {
-                    trackMatomoEvent('Error: No option selected');
-                } else {
-                    var option = selectedOption.value;
-                    if (option === 'A') {
-                        _paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-id')}]]]);
-                    } else if (option === 'P') {
-                        _paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-ref-starts-with-sanction-id')}]]]);
+                var selectedPenaltyReference = document.querySelector('input[name=selectedPenaltyReference]:checked');
+                if (selectedPenaltyReference != null) {
+                    var selectedPenaltyReferenceValue = selectedPenaltyReference.value;
+                    if (selectedPenaltyReferenceValue === 'LATE_FILING') {
+                        _paq.push(['trackGoal', document.querySelector("#lfp-goal-id").value]);
+                    } else if (selectedPenaltyReferenceValue === 'SANCTIONS') {
+                        _paq.push(['trackGoal', document.querySelector("#sanctions-goal-id").value]);
                     }
                 }
             });
@@ -61,7 +51,7 @@
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input"
                                        th:id="${penaltyReference.name}"
-                                       name="available-penalty-reference"
+                                       name="selectedPenaltyReference"
                                        type="radio"
                                        th:value="${penaltyReference.name}"
                                        th:field="*{selectedPenaltyReference}"
@@ -71,6 +61,8 @@
                                        th:text="${penaltyReference.startsWith}">PenaltyReference.startsWith</label>
                             </div>
                         </div>
+                        <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-goal-id')}" id="lfp-goal-id">
+                        <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-sanctions-goal-id')}" id="sanctions-goal-id">
                     </fieldset>
                 </div>
 
@@ -79,7 +71,7 @@
                              data-module="govuk-details" aria-labelledby="penalty-reference">
                         <summary class="govuk-details__summary" id="penalty-reference">
                             <span class="govuk-details__summary-text piwik-event"
-                                  data-event-id="Penalty Ref Starts with - Help with Penalty Reference clicked">
+                                  data-event-id="Help with the penalty reference clicked">
                                 Help with the penalty reference
                             </span>
                         </summary>
