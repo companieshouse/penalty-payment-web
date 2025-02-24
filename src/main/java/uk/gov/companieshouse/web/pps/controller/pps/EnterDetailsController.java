@@ -1,7 +1,10 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,7 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -29,11 +32,9 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @Controller
-@PreviousController(PenaltyRefStartsWithController.class)
 @NextController(ViewPenaltiesController.class)
 @RequestMapping("/late-filing-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
@@ -56,11 +57,9 @@ public class EnterDetailsController extends BaseController {
     private FeatureFlagChecker featureFlagChecker;
 
     @Autowired
-    private PenaltyUtils penaltyUtils;
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private static final String PENALTY_PAID = "/penalty-paid";
-
-    private static final String DCA = "/legal-fees-required";
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
 
@@ -78,14 +77,17 @@ public class EnterDetailsController extends BaseController {
             Model model) {
 
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model,
+                setBackLink(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
     }
@@ -104,11 +106,16 @@ public class EnterDetailsController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
+
+            addBaseAttributesToModel(model,
+                    setBackLink(),
+                    penaltyConfigurationProperties.getSignOutPath(),
+                    penaltyConfigurationProperties.getSurveyLink());
             return getTemplateName();
         }
 
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterDetails.getPenaltyRef();
+        String penaltyNumber = enterDetails.getPenaltyRef().toUpperCase();
 
         try {
             List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
@@ -123,6 +130,10 @@ public class EnterDetailsController extends BaseController {
                 LOGGER.info("No late filing penalties for company no. "  +  companyNumber
                         + " and penalty: " +   penaltyNumber);
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+                addBaseAttributesToModel(model,
+                        setBackLink(),
+                        penaltyConfigurationProperties.getSignOutPath(),
+                        penaltyConfigurationProperties.getSurveyLink());
                 return getTemplateName();
             }
 
@@ -141,17 +152,21 @@ public class EnterDetailsController extends BaseController {
                 LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
                         + " does not have the provided penalty number " + penaltyNumber);
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+                addBaseAttributesToModel(model,
+                        setBackLink(),
+                        penaltyConfigurationProperties.getSignOutPath(),
+                        penaltyConfigurationProperties.getSurveyLink());
                 return getTemplateName();
             }
 
             // If the payable penalty has DCA payments.
-            if (Boolean.TRUE.equals(lateFilingPenalty.getDca())) {
+            if (TRUE.equals(lateFilingPenalty.getDca())) {
                 LOGGER.info("Penalty has DCA payments");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + DCA;
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
             // If the penalty is already paid.
-            if (Boolean.TRUE.equals(lateFilingPenalty.getPaid())) {
+            if (TRUE.equals(lateFilingPenalty.getPaid())) {
                 LOGGER.info("Penalty has already been paid");
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PENALTY_PAID;
             }
@@ -170,9 +185,8 @@ public class EnterDetailsController extends BaseController {
             return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyNumber);
 
         } catch (ServiceException ex) {
-
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 
@@ -185,6 +199,13 @@ public class EnterDetailsController extends BaseController {
 
     private String urlGenerator(String companyNumber, String penaltyNumber) {
         return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyNumber;
+    }
+
+    private String setBackLink() {
+        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(SANCTIONS.name())))) {
+            return penaltyConfigurationProperties.getRefStartsWithPath();
+        }
+        return penaltyConfigurationProperties.getStartPath();
     }
 
 }

@@ -1,7 +1,8 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import jakarta.servlet.http.HttpServletRequest;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
+import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -28,13 +31,13 @@ public class ConfirmationController extends BaseController {
 
     private static final String PAYMENT_STATE = "payment_state";
 
+    static final String PENALTY_REF_ATTR = "penaltyRef";
+    static final String PENALTY_REF_STARTS_WITH_ATTR = "penaltyRefStartsWith";
     static final String COMPANY_NAME_ATTR = "companyName";
     static final String COMPANY_NUMBER_ATTR = "companyNumber";
-    static final String PAYMENT_DATE_ATTR = "paymentDate";
-    static final String PENALTY_REF_ATTR = "penaltyRef";
-    static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
     static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
-    static final String PENALTY_REF_STARTS_WITH = "penaltyRefStartsWith";
+    static final String PAYMENT_DATE_ATTR = "paymentDate";
+    static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
     @Override protected String getTemplateName() {
         return CONFIRMATION_PAGE;
@@ -46,17 +49,17 @@ public class ConfirmationController extends BaseController {
 
     private final SessionService sessionService;
 
-    private final PenaltyUtils penaltyUtils;
+    private final PenaltyConfigurationProperties  penaltyConfigurationProperties;
 
     @Autowired
     public ConfirmationController(CompanyService companyService,
             PayablePenaltyService payablePenaltyService,
             SessionService sessionService,
-            PenaltyUtils penaltyUtils) {
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.sessionService = sessionService;
-        this.penaltyUtils = penaltyUtils;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @GetMapping
@@ -73,7 +76,7 @@ public class ConfirmationController extends BaseController {
         // Check that the session state is present
         if (!sessionData.containsKey(PAYMENT_STATE)) {
             LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         String sessionPaymentState = (String) sessionData.get(PAYMENT_STATE);
@@ -83,35 +86,37 @@ public class ConfirmationController extends BaseController {
         if (!paymentState.equals(sessionPaymentState)) {
             LOGGER.errorRequest(request, "Payment state value in session is not as expected, possible tampering of session "
                     + "Expected: " + sessionPaymentState + ", Received: " + paymentState);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         try {
-            PayableLateFilingPenalty payablePenalty = payablePenaltyService
-                    .getPayableLateFilingPenalty(companyNumber, payableRef);
+            PayableLateFilingPenalty payableResource = payablePenaltyService.getPayableLateFilingPenalty(companyNumber, payableRef);
+            TransactionPayableLateFilingPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
                 LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payablePenalty.getLinks().get("resume_journey_uri");
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payableResource.getLinks().get("resume_journey_uri");
             }
 
             CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
 
-            model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
             model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
+            model.addAttribute(PENALTY_REF_STARTS_WITH_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith());
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
-            model.addAttribute(PAYMENT_DATE_ATTR, penaltyUtils.getPaymentDateDisplay());
-            model.addAttribute(PENALTY_AMOUNT_ATTR, penaltyUtils.getPenaltyAmountDisplay(payablePenalty));
-            model.addAttribute(REASON_FOR_PENALTY_ATTR, penaltyUtils.getReasonForPenalty(penaltyRef));
-            model.addAttribute(PENALTY_REF_STARTS_WITH, penaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith());
-            addBaseAttributesWithoutBackToModel(model, penaltyUtils);
+            model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
+            model.addAttribute(REASON_FOR_PENALTY_ATTR, payableResourceTransaction.getReason());
+            model.addAttribute(PAYMENT_DATE_ATTR, PenaltyUtils.getPaymentDateDisplay());
+            model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payableResourceTransaction.getAmount()));
 
+            addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
+                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink());
 
             return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return penaltyUtils.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
+
 }

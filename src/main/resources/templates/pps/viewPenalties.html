@@ -5,8 +5,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title>
-        View your penalty
+    <title th:text="#{viewPenalties.page-title}">
     </title>
 </head>
 
@@ -16,32 +15,32 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 id="page-title " class="govuk-heading-xl">
-                    <span id="page-title-heading">Penalty summary</span>
+                    <span id="page-title-heading" th:text="#{viewPenalties.penalty-summary-title}"></span>
                 </h1>
 
                 <table class="govuk-table" style="width: 800px">
                     <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__header" style="width:40%">Issued to</td>
+                        <td class="govuk-table__header" style="width:40%" th:text="#{viewPenalties.issued-to-label}"></td>
                         <td class="govuk-table__cell" th:text="${companyName}"></td>
                     </tr>
                     </thead>
 
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__header">Company number</td>
+                        <td class="govuk-table__header" th:text="#{viewPenalties.company-number-label}"></td>
                         <td class="govuk-table__cell" th:text="${companyNumber}"></td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__header" th:text="#{viewPenalties.penalty-ref-title}"></td>
-                        <td class="govuk-table__cell" th:text="${penaltyReference}"></td>
+                        <td class="govuk-table__header" th:text="#{viewPenalties.penalty-ref-label}"></td>
+                        <td class="govuk-table__cell" th:text="${penaltyRef}"></td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__header">Reason for penalty</td>
+                        <td class="govuk-table__header" th:text="#{viewPenalties.reason-for-penalty-label}"></td>
                         <td class="govuk-table__cell" th:text="${reasonForPenalty}"></td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__header">Amount</td>
+                        <td class="govuk-table__header" th:text="#{viewPenalties.amount-label}"></td>
                         <td class="govuk-table__cell" th:text="'£' + ${outstanding} + ' (no VAT is charged)'"></td>
                     </tr>
                     </tbody>

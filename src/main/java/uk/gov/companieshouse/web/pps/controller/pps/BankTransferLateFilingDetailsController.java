@@ -5,17 +5,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
-import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@PreviousController(BankTransferPenaltyReferenceController.class)
 @RequestMapping("/late-filing-penalty/bank-transfer/late-filing-details")
 public class BankTransferLateFilingDetailsController extends BaseController {
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
+
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Override protected String getTemplateName() {
         return BANK_TRANSFER_LATE_FILING_DETAILS;
@@ -23,7 +23,10 @@ public class BankTransferLateFilingDetailsController extends BaseController {
 
     @GetMapping
     public String getBankTransferLateFilingDetails(Model model) {
-        addBaseAttributesToModel(model);
+        addBaseAttributesToModel(model,
+                penaltyConfigurationProperties.getBankTransferPath(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
 

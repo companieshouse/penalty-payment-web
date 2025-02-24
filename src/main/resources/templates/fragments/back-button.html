@@ -8,9 +8,17 @@
    data-th-text="#{button.back}"
    data-event-id="back-button-link"
    th:fragment="backLink"
-   th:if="${backLink != null}"
+   th:if="${backLinkUrl == null}"
    href="javascript:void(0)"
    onclick="history.go(-1)"
+   class="govuk-back-link">
+</a>
+<a id="back-button-url-link"
+   data-th-text="#{button.back}"
+   data-event-id="back-button-link"
+   th:fragment="backLink"
+   th:if="${backLinkUrl != null}"
+   th:href="${backLinkUrl}"
    class="govuk-back-link">
 </a>
 </body>

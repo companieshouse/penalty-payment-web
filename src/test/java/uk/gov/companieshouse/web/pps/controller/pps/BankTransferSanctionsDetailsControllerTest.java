@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,13 +32,13 @@ class BankTransferSanctionsDetailsControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private SessionService sessionService;
-
-    @Mock
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyUtils mockPenaltyUtils;
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
+    @Mock
+    private SessionService mockSessionService;
 
     @InjectMocks
     private BankTransferSanctionsDetailsController controller;
@@ -44,18 +46,22 @@ class BankTransferSanctionsDetailsControllerTest {
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
 
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-
     @BeforeEach
     void setup() {
+        // As this bean is autowired in the base class, we need to use reflection to set it
+        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path")
     void getRequestSuccess() throws Exception {
-        configurePreviousController();
-        configureMockEmailExist();
+        Map<String, Object> sessionData = new HashMap<>(
+                Map.of("signin_info",
+                        Map.of("user_profile",
+                                Map.of("email", "test@gmail.com"))));
+
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
@@ -66,9 +72,6 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path without login")
     void getRequestSuccessWithoutLogin() throws Exception {
-        configurePreviousController();
-        configureMockEmailNotExist();
-
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
@@ -78,30 +81,18 @@ class BankTransferSanctionsDetailsControllerTest {
     @Test
     @DisplayName("Get Bank Transfer Sanctions Details - success path null email")
     void getRequestSuccessNullEmail() throws Exception {
-        configurePreviousController();
-        configureMockEmailNull();
+        Map<String, Object> sessionDataNoEmail = new HashMap<>(
+                Map.of("signin_info",
+                        Map.of("user_profile",
+                                Map.of("email", ""))));
+
+
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionDataNoEmail);
 
         this.mockMvc.perform(get(BANK_TRANSFER_SANCTIONS_DETAILS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(BANK_TRANSFER_SANCTIONS_DETAILS))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
-    }
-
-    private void configurePreviousController() {
-        when(mockNavigatorService.getPreviousControllerPath(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
-    private void configureMockEmailExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("test@gmail.com");
-    }
-
-    private void configureMockEmailNull() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn(null);
-    }
-
-    private void configureMockEmailNotExist() {
-        when(mockPenaltyUtils.getLoginEmail(any())).thenReturn("");
     }
 
 }
