@@ -78,4 +78,18 @@ class WebsecurityTests {
         assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/stylesheets/**")
+    void stylesheetsFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/stylesheets/**")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.stylesheetsSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/images/**")
+    void imagesFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/images/**")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.imagesSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
 }

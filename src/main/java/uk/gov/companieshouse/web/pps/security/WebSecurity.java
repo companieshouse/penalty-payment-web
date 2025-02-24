@@ -68,6 +68,22 @@ public class WebSecurity {
 
     @Bean
     @Order(7)
+    public SecurityFilterChain stylesheetsSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/stylesheets/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(8)
+    public SecurityFilterChain imagesSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/images/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(9)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/**")
