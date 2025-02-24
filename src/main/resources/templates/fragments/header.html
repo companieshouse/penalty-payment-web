@@ -33,12 +33,13 @@
             </div>
         </div>
     </header>
-    <div style="background-color:#1d70b8; margin-top: -10px; padding: 0.305em"></div>
+    <div style="background-color:#1d70b8; margin-top: -10px; padding: 0.305rem 0; width: 100%; height: 2px; max-width: 100%;"></div>
     <div style="border-bottom: 1px solid #b1b4b6; background-color: #f3f2f1;" class="govuk-service-navigation" data-nosnippet role="region" aria-label="Pay a penalty to Companies House" th:if="${serviceBanner != null}">
         <div style="width:100%" class="govuk-cookie-banner govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <a href="/late-filing-penalty" style="color:black" class="govuk-header__link--service-name">Pay a penalty to Companies House</a>
+                    <a href="/late-filing-penalty" style="color:black" class="govuk-header__link--service-name piwik-event"
+                        data-event-id="Service Banner clicked">Pay a penalty to Companies House</a>
                 </div>
             </div>
         </div>

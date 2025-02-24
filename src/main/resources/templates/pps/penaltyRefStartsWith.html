@@ -1,13 +1,35 @@
 <!DOCTYPE html>
-
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title>
-        What does the penalty reference start with?
-    </title>
+    <title>What does the penalty reference start with?</title>
+    <script>
+
+        function trackMatomoEvent(eventId) {
+            if (typeof _paq !== 'undefined') {
+                _paq.push(['trackEvent', 'Penalty Reference', eventId]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('penalty-ref-starts-with-form').addEventListener('submit', function (e) {
+                var selectedOption = document.querySelector('input[name="available-penalty-reference"]:checked');
+
+                if (!selectedOption) {
+                    trackMatomoEvent('Error: No option selected');
+                } else {
+                    var option = selectedOption.value;
+                    if (option === 'A') {
+                        _paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-id')}]]]);
+                    } else if (option === 'P') {
+                        _paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-ref-starts-with-sanction-id')}]]]);
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 
 <div id="penalty-ref-starts-with-main-content" layout:fragment="content">
@@ -37,14 +59,14 @@
                              th:each="penaltyReference : ${availablePenaltyReference}"
                              style="margin-bottom:1em;">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input piwik-event"
+                                <input class="govuk-radios__input"
                                        th:id="${penaltyReference.name}"
                                        name="available-penalty-reference"
                                        type="radio"
                                        th:value="${penaltyReference.name}"
                                        th:field="*{selectedPenaltyReference}"
-                                       th:errorclass="govuk-error-message"
-                                       th:attr="data-event-id=${penaltyReference.name}"/>
+                                       th:errorclass="govuk-error-message"/>
+
                                 <label class="govuk-label govuk-radios__label" th:for="${penaltyReference}"
                                        th:text="${penaltyReference.startsWith}">PenaltyReference.startsWith</label>
                             </div>
@@ -53,11 +75,11 @@
                 </div>
 
                 <div class="govuk-form-group">
-                    <details class="govuk-details piwik-event"
-                             data-event-id="Penalty Ref Starts With - Help with the penalty reference"
+                    <details class="govuk-details"
                              data-module="govuk-details" aria-labelledby="penalty-reference">
                         <summary class="govuk-details__summary" id="penalty-reference">
-                            <span class="govuk-details__summary-text">
+                            <span class="govuk-details__summary-text piwik-event"
+                                  data-event-id="Penalty Ref Starts with - Help with Penalty Reference clicked">
                                 Help with the penalty reference
                             </span>
                         </summary>
@@ -75,9 +97,10 @@
                         </div>
                     </details>
                 </div>
+
                 <div class="form-group">
-                    <input id="next-button" class="govuk-button piwik-event"
-                           data-event-id="Penalty Ref Starts With - Continue" type="submit" role="button"
+                    <input id="next-button" class="govuk-button"
+                           type="submit" role="button"
                            value="Continue"/>
                 </div>
             </div>
