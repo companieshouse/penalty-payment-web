@@ -5,11 +5,11 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title th:text="'Penalties for ' + ${companyName}"></title>
+    <title th:text="'Penalty already been paid'"></title>
 </head>
 
-<div id="no-payment-found-main-content" layout:fragment="content">
-    <form th:action="@{''}" method="post" class="form" id="no-payment-found">
+<div id="penalty-paid-main-content" layout:fragment="content">
+    <form th:action="@{''}" method="post" class="form" id="penalty-paid">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
