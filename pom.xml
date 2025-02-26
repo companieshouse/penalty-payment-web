@@ -39,7 +39,6 @@
         <hamcrest-version>3.0</hamcrest-version>
         <maven-plugin>3.5.2</maven-plugin>
         <jib-maven-plugin>3.4.4</jib-maven-plugin>
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
         <system-stubs.version>2.1.7</system-stubs.version>
 
         <!-- sonar config -->
