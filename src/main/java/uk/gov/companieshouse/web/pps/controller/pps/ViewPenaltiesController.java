@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -84,9 +85,7 @@ public class ViewPenaltiesController extends BaseController {
         if (lateFilingPenalty == null
                 || lateFilingPenalties.size() != 1
                 || !lateFilingPenalty.getId().equals(penaltyRef)
-                || Boolean.TRUE.equals(lateFilingPenalty.getDca())
-                || Boolean.TRUE.equals(lateFilingPenalty.getPaid())
-                || lateFilingPenalty.getOutstanding() <= 0
+                || CLOSED == lateFilingPenalty.getPayableStatus()
                 || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
                 || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
             LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");

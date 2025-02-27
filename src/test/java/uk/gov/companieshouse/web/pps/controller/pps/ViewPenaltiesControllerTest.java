@@ -90,7 +90,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View PPS - success path")
+    @DisplayName("Get View Penalties - success path")
     void getRequestSuccess() throws Exception {
 
         configureValidPenalty(LFP_PENALTY_NUMBER);
@@ -110,7 +110,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View PPS - error returning Late Filing Penalty")
+    @DisplayName("Get View Penalties - error returning Late Filing Penalty")
     void getRequestErrorRetrievingLateFilingPenalty() throws Exception {
 
         configureErrorRetrievingPenalty(LFP_PENALTY_NUMBER);
@@ -128,7 +128,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View PPS - error returning Company Profile")
+    @DisplayName("Get View Penalties - error returning Company Profile")
     void getRequestErrorRetrievingCompanyProfile() throws Exception {
 
         configureErrorRetrievingCompany();
@@ -144,7 +144,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View PPS - late filing penalty is null")
+    @DisplayName("Get View Penalties - late filing penalty is null")
     void getRequestLateFilingPenaltyIsNull() throws Exception {
 
         configureNullPenalty(LFP_PENALTY_NUMBER);
@@ -163,7 +163,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View PPS - late filing penalty is already paid")
+    @DisplayName("Get View Penalties - late filing penalty is already paid")
     void getRequestLateFilingPenaltyIsPaid() throws Exception {
 
         configurePaidPenalty(LFP_PENALTY_NUMBER);
@@ -182,7 +182,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Post View PPS - success path")
+    @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession = PPSTestUtility.payableLateFilingPenaltySession(COMPANY_NUMBER);
@@ -208,7 +208,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Post View PPS - error returning Late Filing Penalty")
+    @DisplayName("Post View Penalties - error returning Late Filing Penalty")
     void postRequestErrorRetrievingLateFilingPenalty() throws Exception {
 
         configureErrorRetrievingPenalty(LFP_PENALTY_NUMBER);
@@ -225,7 +225,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Post View PPS - error creating Late Filing Penalty")
+    @DisplayName("Post View Penalties - error creating Late Filing Penalty")
     void postRequestErrorCreatingLateFilingPenalty() throws Exception {
 
         configureValidPenalty(LFP_PENALTY_NUMBER);
@@ -246,7 +246,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Post View PPS - error creating Payment Session")
+    @DisplayName("Post View Penalties - error creating Payment Session")
     void postRequestErrorCreatingPaymentSession() throws Exception {
 
         PayableLateFilingPenaltySession payableLateFilingPenaltySession = PPSTestUtility.payableLateFilingPenaltySession(COMPANY_NUMBER);
