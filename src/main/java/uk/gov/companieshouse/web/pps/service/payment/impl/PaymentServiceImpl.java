@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
+import static uk.gov.companieshouse.web.pps.util.PenaltyUtils.getPenaltyReferenceType;
+
 import java.util.Arrays;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -39,6 +42,10 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String PAYMENT_URL = "/payments";
 
     private static final String PAYMENT_STATE = "payment_state";
+
+    private static final String REFERENCE_LATE_FILING = "penalty-lfp-";
+
+    private static final String REFERENCE_SANCTIONS = "penalty-sanctions-";
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
@@ -72,7 +79,9 @@ public class PaymentServiceImpl implements PaymentService {
                 + "/confirmation";
         paymentSessionApi.setRedirectUri(redirectUrl);
         paymentSessionApi.setResource(apiUrl + payableLateFilingPenaltySession.getLinks().get("self") + "/payment");
-        paymentSessionApi.setReference("late_filing_penalty_" + payableLateFilingPenaltySession.getId());
+        String referencePrefix = getPenaltyReferenceType(penaltyRef).equals(PenaltyReference.LATE_FILING)
+                ? REFERENCE_LATE_FILING : REFERENCE_SANCTIONS;
+        paymentSessionApi.setReference(referencePrefix + payableLateFilingPenaltySession.getId());
         paymentSessionApi.setState(paymentState);
         LOGGER.info("Creating payment session");
         LOGGER.info("SESSION REDIRECT URI: " + paymentSessionApi.getRedirectUri());
