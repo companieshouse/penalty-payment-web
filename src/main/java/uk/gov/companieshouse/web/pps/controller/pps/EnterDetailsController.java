@@ -94,6 +94,7 @@ public class EnterDetailsController extends BaseController {
     }
 
     @PostMapping
+    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
             BindingResult bindingResult,
             HttpServletRequest request,
