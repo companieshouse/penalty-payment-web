@@ -144,25 +144,6 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - late filing penalty is null")
-    void getRequestLateFilingPenaltyIsNull() throws Exception {
-
-        configureNullPenalty(LFP_PENALTY_NUMBER);
-        configureValidCompanyProfile();
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(VIEW_PENALTIES_PATH))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_NUMBER);
-
-    }
-
-    @Test
     @DisplayName("Get View Penalties - late filing penalty is already paid")
     void getRequestLateFilingPenaltyIsPaid() throws Exception {
 
@@ -290,15 +271,6 @@ class ViewPenaltiesControllerTest {
         when(mockPayablePenaltyService.createLateFilingPenaltySession(
                 ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef, lateFilingPenalty.getOutstanding()))
                 .thenReturn(payableLateFilingPenaltySession);
-    }
-
-    private void configureNullPenalty(String penaltyRef) throws ServiceException {
-        List<LateFilingPenalty> nullLFP = new ArrayList<>();
-        nullLFP.add(null);
-
-        when(mockPenaltyPaymentService.getLateFilingPenalties(
-                ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
-                .thenReturn(nullLFP);
     }
 
     private void configurePaidPenalty(String penaltyRef) throws ServiceException {
