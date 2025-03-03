@@ -4,6 +4,8 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -273,11 +275,51 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Post Details failure path - multiple payable penalties")
+    @DisplayName("Post Details failure path - multiple payable penalties (not found)")
     void postRequestMultiplePayablePenalties() throws Exception {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureMultiplePenalties(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REF_ATTRIBUTE, "P1234567")
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_DETAILS_VIEW));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+    }
+
+    @Test
+    @DisplayName("Post Details success path - multiple payable penalties with one penalty ref match")
+    void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
+
+        configureNextController();
+        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REF_ATTRIBUTE, "A2345678")
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
+                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+    }
+
+    @Test
+    @DisplayName("Post Details failure path - multiple payable penalties with multiple penalty ref match")
+    void postRequestMultiplePayablePenaltiesWithMultiplePenaltyRefMatch() throws Exception {
+
+        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -401,13 +443,12 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_DETAILS_VIEW));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
     }
 
     @Test
@@ -473,12 +514,14 @@ class EnterDetailsControllerTest {
                 .thenReturn(validLFPs);
     }
 
-    private void configureMultiplePenalties(String companyNumber, String penaltyRef) throws ServiceException {
+    private void configureMultipleLateFilingPenalties(String companyNumber) throws ServiceException {
         List<LateFilingPenalty> multipleValidLFPs = new ArrayList<>();
         multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A2345678"));
         multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A3456789"));
+        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty(VALID_PENALTY_REF));
+        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty(VALID_PENALTY_REF));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
+        when(mockPenaltyPaymentService.getLateFilingPenalties(eq(companyNumber), anyString()))
                 .thenReturn(multipleValidLFPs);
     }
 

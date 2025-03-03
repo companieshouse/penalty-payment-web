@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -56,6 +57,7 @@ public class ViewPenaltiesController extends BaseController {
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
+    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String getViewPenalties(@PathVariable String companyNumber,
             @PathVariable String penaltyRef,
             Model model,
@@ -67,36 +69,38 @@ public class ViewPenaltiesController extends BaseController {
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
-        List<LateFilingPenalty> lateFilingPenalties;
-        LateFilingPenalty lateFilingPenalty;
         CompanyProfileApi companyProfileApi;
-
+        List<LateFilingPenalty> payablePenalties;
+        LateFilingPenalty payablePenalty;
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            lateFilingPenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
-            lateFilingPenalty = lateFilingPenalties.getFirst();
+            payablePenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef)
+                    .stream()
+                    .filter(penalty -> penaltyRef.equals(penalty.getId()))
+                    .filter(penalty -> PENALTY_TYPE.equals(penalty.getType()))
+                    .toList();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         // If this screen is accessed directly for an invalid penalty return an error view.
-        if (lateFilingPenalty == null
-                || lateFilingPenalties.size() != 1
-                || !lateFilingPenalty.getId().equals(penaltyRef)
-                || Boolean.TRUE.equals(lateFilingPenalty.getDca())
-                || Boolean.TRUE.equals(lateFilingPenalty.getPaid())
-                || lateFilingPenalty.getOutstanding() <= 0
-                || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
-                || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
-            LOGGER.info("Penalty" + lateFilingPenalty + " is invalid, cannot access 'view penalty' screen");
+        if (payablePenalties.size() != 1) {
+            LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        }
+
+        payablePenalty = payablePenalties.getFirst();
+        if (CLOSED == payablePenalty.getPayableStatus()
+                || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
+            LOGGER.info("Penalty " + payablePenalty + " is invalid, cannot access 'view penalty' screen");
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
-        model.addAttribute(REASON_ATTR, lateFilingPenalty.getReason());
-        model.addAttribute(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(lateFilingPenalty.getOutstanding()));
+        model.addAttribute(REASON_ATTR, payablePenalty.getReason());
+        model.addAttribute(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payablePenalty.getOutstanding()));
 
         return getTemplateName();
     }

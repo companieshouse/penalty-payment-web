@@ -4,6 +4,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,6 +94,7 @@ public class EnterDetailsController extends BaseController {
     }
 
     @PostMapping
+    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
             BindingResult bindingResult,
             HttpServletRequest request,
@@ -115,20 +117,22 @@ public class EnterDetailsController extends BaseController {
         }
 
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        String penaltyNumber = enterDetails.getPenaltyRef().toUpperCase();
+        String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
 
         try {
-            List<LateFilingPenalty> payableLateFilingPenalties = penaltyPaymentService
-                    .getLateFilingPenalties(companyNumber, penaltyNumber);
+            List<LateFilingPenalty> payablePenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef)
+                    .stream()
+                    .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
+                    .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
+                    .toList();
 
             redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
             redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
             redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-            // If there are no payable late filing penalties either the company does not exist or has no penalties.
-            if (payableLateFilingPenalties.isEmpty()) {
-                LOGGER.info("No late filing penalties for company no. "  +  companyNumber
-                        + " and penalty: " +   penaltyNumber);
+            // If there are no payable penalties, then either the company does not exist or has no penalties.
+            if (payablePenalties.isEmpty()) {
+                LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
                 addBaseAttributesToModel(model,
                         setBackLink(),
@@ -138,51 +142,27 @@ public class EnterDetailsController extends BaseController {
             }
 
             // If there is more than one payable penalty.
-            if (payableLateFilingPenalties.size() > 1) {
-                LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payableLateFilingPenalties.size()
-                        + " payable penalties for company no. " + companyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
+            if (payablePenalties.size() > 1) {
+                LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payablePenalties.size()
+                        + " payable penalties for company number: " + companyNumber);
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
-            LateFilingPenalty lateFilingPenalty;
-            // If the only penalty in the List does not have the provided penalty number return Penalty Not Found.
-            if (payableLateFilingPenalties.getFirst().getId().equals(penaltyNumber)) {
-                lateFilingPenalty = payableLateFilingPenalties.getFirst();
-            } else {
-                LOGGER.info("Penalty Not Found - the penalty for " + companyNumber
-                        + " does not have the provided penalty number " + penaltyNumber);
-                bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
-                addBaseAttributesToModel(model,
-                        setBackLink(),
-                        penaltyConfigurationProperties.getSignOutPath(),
-                        penaltyConfigurationProperties.getSurveyLink());
-                return getTemplateName();
+            LateFilingPenalty payablePenalty = payablePenalties.getFirst();
+
+            if (TRUE.equals(payablePenalty.getPaid())) {
+                LOGGER.info("Payable penalty " + payablePenalty.getId() + " is paid");
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAID;
             }
 
-            // If the payable penalty has DCA payments.
-            if (TRUE.equals(lateFilingPenalty.getDca())) {
-                LOGGER.info("Penalty has DCA payments");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
+            if (CLOSED == payablePenalty.getPayableStatus()
+                    || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
+                LOGGER.info(String.format("Payable penalty %s payable status is %s, type is %s",
+                        payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType()));
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
-            // If the penalty is already paid.
-            if (TRUE.equals(lateFilingPenalty.getPaid())) {
-                LOGGER.info("Penalty has already been paid");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + PENALTY_PAID;
-            }
-
-            // If the penalty has a 0 or negative outstanding amount,
-            // Or the outstanding amount is different to the original amount (partially paid),
-            // Or the type is not 'penalty', then return 'Online Payment Unavailable'
-            if (lateFilingPenalty.getOutstanding() <= 0
-                    || !lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding())
-                    || !lateFilingPenalty.getType().equals(PENALTY_TYPE)) {
-                LOGGER.info("Penalty has has 0 or negative outstanding amount : " + (lateFilingPenalty.getOutstanding() <= 0)
-                        + "Or is outstanding amount different to original amount: " + (!lateFilingPenalty.getOriginalAmount().equals(lateFilingPenalty.getOutstanding()))
-                        + "Or is not of type penalty, type : " + lateFilingPenalty.getType() );
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyNumber) + ONLINE_PAYMENT_UNAVAILABLE;
-            }
-            return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyNumber);
+            return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyRef);
 
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);

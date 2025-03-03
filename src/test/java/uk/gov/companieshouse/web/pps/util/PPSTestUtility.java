@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.OPEN;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +27,6 @@ public class PPSTestUtility {
     public static final String DATE = "2018-12-12";
     public static final String PAYABLE_ID = "DD72961607";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
-    public static final String VALID_COMPANY_NUMBER = "N1234567";
     public static final String VALID_PENALTY_NUMBER = "A0000007";
     public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
     public static final String VALID_CS_REASON = "Failure to file a confirmation statement";
@@ -45,6 +47,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setMadeUpDate(DATE);
         lateFilingPenalty.setDueDate(DATE);
         lateFilingPenalty.setReason(VALID_LATE_FILING_REASON);
+        lateFilingPenalty.setPayableStatus(OPEN);
 
         return lateFilingPenalty;
     }
@@ -88,6 +91,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
         lateFilingPenalty.setOutstanding(VALID_AMOUNT);
         lateFilingPenalty.setType(PENALTY_TYPE);
+        lateFilingPenalty.setPayableStatus(CLOSED);
 
         return lateFilingPenalty;
     }
@@ -100,6 +104,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
         lateFilingPenalty.setOutstanding(VALID_AMOUNT);
         lateFilingPenalty.setType(PENALTY_TYPE);
+        lateFilingPenalty.setPayableStatus(CLOSED);
 
         return lateFilingPenalty;
     }
@@ -112,6 +117,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setOriginalAmount(-VALID_AMOUNT);
         lateFilingPenalty.setOutstanding(-VALID_AMOUNT);
         lateFilingPenalty.setType(PENALTY_TYPE);
+        lateFilingPenalty.setPayableStatus(CLOSED);
 
         return lateFilingPenalty;
     }
@@ -124,6 +130,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
         lateFilingPenalty.setOutstanding(PARTIAL_PAID_AMOUNT);
         lateFilingPenalty.setType(PENALTY_TYPE);
+        lateFilingPenalty.setPayableStatus(OPEN);
 
         return lateFilingPenalty;
     }
@@ -136,6 +143,7 @@ public class PPSTestUtility {
         lateFilingPenalty.setOriginalAmount(VALID_AMOUNT);
         lateFilingPenalty.setOutstanding(VALID_AMOUNT);
         lateFilingPenalty.setType(LEGAL_FEES_TYPE);
+        lateFilingPenalty.setPayableStatus(OPEN);
 
         return lateFilingPenalty;
     }

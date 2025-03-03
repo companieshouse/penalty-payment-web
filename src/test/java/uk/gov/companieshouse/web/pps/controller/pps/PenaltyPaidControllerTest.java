@@ -25,7 +25,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 
@@ -34,9 +33,6 @@ import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 class PenaltyPaidControllerTest {
 
     private MockMvc mockMvc;
-
-    @Mock
-    private PenaltyPaymentService mockPenaltyPaymentService;
 
     @Mock
     private CompanyService mockCompanyService;
