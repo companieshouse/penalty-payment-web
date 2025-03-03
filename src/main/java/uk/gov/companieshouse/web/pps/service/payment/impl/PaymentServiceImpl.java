@@ -43,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private static final String PAYMENT_STATE = "payment_state";
 
-    private static final String REFERENCE_PENALTY = "financial_penalty_";
+    private static final String PENALTY_PAYMENT_REFERENCE_PREFIX = "financial_penalty_";
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
                 + "/confirmation";
         paymentSessionApi.setRedirectUri(redirectUrl);
         paymentSessionApi.setResource(apiUrl + payableLateFilingPenaltySession.getLinks().get("self") + "/payment");
-        paymentSessionApi.setReference(REFERENCE_PENALTY + payableLateFilingPenaltySession.getId());
+        paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableLateFilingPenaltySession.getId());
         paymentSessionApi.setState(paymentState);
         LOGGER.info("Creating payment session");
         LOGGER.info("SESSION REDIRECT URI: " + paymentSessionApi.getRedirectUri());
