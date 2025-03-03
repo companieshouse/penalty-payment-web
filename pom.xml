@@ -39,9 +39,15 @@
         <hamcrest-version>3.0</hamcrest-version>
         <maven-plugin>3.5.2</maven-plugin>
         <jib-maven-plugin>3.4.4</jib-maven-plugin>
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
         <system-stubs.version>2.1.7</system-stubs.version>
 
+        <!-- sonar config -->
+        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
+        <sonar.login></sonar.login>
+        <sonar.password></sonar.password>
+        <sonar.projectKey>uk.gov.companieshouse:penalty-payment-web</sonar.projectKey>
+        <sonar.projectName>penalty-payment-web</sonar.projectName>
     </properties>
 
     <dependencyManagement>
