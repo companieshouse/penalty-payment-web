@@ -84,6 +84,14 @@ public class WebSecurity {
 
     @Bean
     @Order(9)
+    public SecurityFilterChain fontsSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/late-filing-penalty/fonts/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(10)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty/**")
