@@ -83,7 +83,9 @@ class PaymentServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_REF = "00531369";
+    private static final String PENALTY_REF = "A0531369";
+
+    private static final String PENALTY_REF_SANCTIONS = "P0531369";
 
     @BeforeEach
     void setUp() {
@@ -115,6 +117,29 @@ class PaymentServiceImplTest {
 
         String journeyUrl = mockPaymentService.createPaymentSession(
                 payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF);
+
+        assertEquals(JOURNEY_URL, journeyUrl);
+
+        verify(sessionData).put(eq(PAYMENT_STATE), anyString());
+    }
+
+    @Test
+    @DisplayName("Create payment session sanctions penalty - success")
+    void createPaymentSessionSanctionsPenaltySuccess()
+            throws ApiErrorResponseException, URIValidationException, ServiceException {
+
+        when(paymentCreate.execute()).thenReturn(apiResponse);
+
+        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+
+        when(apiResponse.getData()).thenReturn(paymentApi);
+
+        when(paymentApi.getLinks()).thenReturn(links);
+
+        when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
+
+        String journeyUrl = mockPaymentService.createPaymentSession(
+                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF_SANCTIONS);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
