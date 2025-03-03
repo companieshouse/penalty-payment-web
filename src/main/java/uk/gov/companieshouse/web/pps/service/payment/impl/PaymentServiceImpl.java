@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
-import static uk.gov.companieshouse.web.pps.util.PenaltyUtils.getPenaltyReferenceType;
-
 import java.util.Arrays;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,6 @@ import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
