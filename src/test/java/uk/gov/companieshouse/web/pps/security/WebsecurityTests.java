@@ -92,4 +92,11 @@ class WebsecurityTests {
         assertEquals(webSecurity.imagesSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty/fonts/**")
+    void fontsFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty/fonts/**")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.fontsSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
 }
