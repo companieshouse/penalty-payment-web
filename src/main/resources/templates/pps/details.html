@@ -112,17 +112,15 @@
                     </div>
 
                     <div class="form-group">
-                        <button id="next-button-late-filing" class="govuk-button"
-                                type="submit" role="button"
-                                th:if="*{penaltyReferenceName == 'LATE_FILING'}"
-                                th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-lfp-goal-id')}]]]);"
-                                th:text="'Continue'"></button>
+                        <input id="next-button-late-filing" class="govuk-button"
+                               type="submit" role="button" value="Continue"
+                               th:if="*{penaltyReferenceName == 'LATE_FILING'}"
+                               th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-lfp-goal-id')}]]]);"/>
 
-                        <button id="next-button-sanctions" class="govuk-button"
-                                type="submit" role="button"
-                                th:if="*{penaltyReferenceName == 'SANCTIONS'}"
-                                th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-sanctions-goal-id')}]]]);"
-                                th:text="'Continue'"></button>
+                        <input id="next-button-sanctions" class="govuk-button"
+                               type="submit" role="button" value="Continue"
+                               th:if="*{penaltyReferenceName == 'SANCTIONS'}"
+                               th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-sanctions-goal-id')}]]]);"/>
                     </div>
                 </div>
             </div>
