@@ -8,6 +8,20 @@
     <title>
         Penalty details
     </title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('enter-details').addEventListener('submit', function (e) {
+                var penaltyReferenceName = document.querySelector('input[name=penaltyReferenceName]').value;
+                if (penaltyReferenceName) {
+                    if (penaltyReferenceName === 'LATE_FILING') {
+                        _paq.push(['trackGoal', document.querySelector("#lfp-goal-id").value]);
+                    } else if (penaltyReferenceName === 'SANCTIONS') {
+                        _paq.push(['trackGoal', document.querySelector("#sanctions-goal-id").value]);
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 
     <div id="enter-details" layout:fragment="content">
@@ -52,6 +66,8 @@
                                    type="text"
                                    maxlength="8">
                         </div>
+                        <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-details-continue-lfp-goal-id')}" id="lfp-goal-id">
+                        <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-details-continue-sanctions-goal-id')}" id="sanctions-goal-id">
                         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyRef')} ? 'govuk-form-group--error' : ''">
                             <h1 class="govuk-label-wrapper">
                                 <div th:switch="*{penaltyReferenceName}">
@@ -109,7 +125,7 @@
                             </details>
                         </div>
                         <div class="form-group">
-                            <input id="next-button" class="govuk-button piwik-event" data-event-id="Details - Continue" type="submit" role="button" value="Continue"/>
+                            <input id="next-button" class="govuk-button" type="submit" role="button" value="Continue"/>
                         </div>
                     </div>
                 </div>
