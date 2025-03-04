@@ -43,6 +43,8 @@ In order to run this Web App locally you will need to install:
  `PENALTY_PAYMENT_MATOMO_PAY_ANOTHER_PENALTY_GOAL_ID`               | Matomo Goal Id: PAY A PENALTY - Pay another penalty                 
  `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_LFP_GOAL_ID`       | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with LFP A       
  `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_SANCTIONS_GOAL_ID` | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with Sanctions P 
+ `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_LFP_GOAL_ID`      | Matomo Goal Id: PAY A PENALTY - Penalty details continue button A
+ `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_SANCTIONS_GOAL_ID`| Matomo Goal Id: PAY A PENALTY - Penalty details continue button P
 
 ### Web Pages
 
