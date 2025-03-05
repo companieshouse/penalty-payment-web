@@ -91,7 +91,7 @@ class PenaltyRefStartsWithControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals("redirect:/late-filing-penalty/enter-details?ref-starts-with=LATE_FILING", modelAndView.getViewName());
+        assertEquals("redirect:/late-filing-penalty/enter-details?ref-starts-with=A", modelAndView.getViewName());
     }
 
     @Test
@@ -143,7 +143,7 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=LATE_FILING"))
+                                + "?ref-starts-with=A"))
                 .andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -163,7 +163,7 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=SANCTIONS"))
+                                + "?ref-starts-with=P"))
                 .andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
