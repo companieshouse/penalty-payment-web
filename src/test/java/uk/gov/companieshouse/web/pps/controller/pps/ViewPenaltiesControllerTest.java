@@ -28,7 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -73,9 +72,6 @@ class ViewPenaltiesControllerTest {
     @Mock
     private SessionService mockSessionService;
 
-    @InjectMocks
-    private ViewPenaltiesController controller;
-
     private static final String COMPANY_NUMBER = "12345678";
     private static final String LFP_PENALTY_NUMBER = "A4444444";
     private static final String SANCTIONS_PENALTY_REF = "P1234567";
@@ -91,6 +87,13 @@ class ViewPenaltiesControllerTest {
 
     @BeforeEach
     void setup() {
+        ViewPenaltiesController controller = new ViewPenaltiesController(
+                mockFeatureFlagChecker,
+                mockPenaltyConfigurationProperties,
+                mockCompanyService,
+                mockPenaltyPaymentService,
+                mockPayablePenaltyService,
+                mockPaymentService);
         // As this bean is autowired in the base class, we need to use reflection to set it
         ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();

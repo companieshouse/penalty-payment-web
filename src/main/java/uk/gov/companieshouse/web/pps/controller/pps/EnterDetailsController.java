@@ -75,7 +75,8 @@ public class EnterDetailsController extends BaseController {
 
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
-            Model model) {
+            Model model,
+            HttpServletRequest request) {
 
         PenaltyReference penaltyReference;
         try {
@@ -84,6 +85,7 @@ public class EnterDetailsController extends BaseController {
                 return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
         } catch (IllegalArgumentException e) {
+            LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 

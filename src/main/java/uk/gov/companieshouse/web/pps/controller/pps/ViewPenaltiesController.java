@@ -6,7 +6,6 @@ import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CL
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,27 +39,30 @@ public class ViewPenaltiesController extends BaseController {
 
     private static final String PENALTY_TYPE = "penalty";
 
+    private final FeatureFlagChecker featureFlagChecker;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final CompanyService companyService;
+    private final PenaltyPaymentService penaltyPaymentService;
+    private final PayablePenaltyService payablePenaltyService;
+    private final PaymentService paymentService;
+
+    public ViewPenaltiesController(FeatureFlagChecker featureFlagChecker,
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            CompanyService companyService,
+            PenaltyPaymentService penaltyPaymentService,
+            PayablePenaltyService payablePenaltyService,
+            PaymentService paymentService) {
+        this.featureFlagChecker = featureFlagChecker;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        this.companyService = companyService;
+        this.penaltyPaymentService = penaltyPaymentService;
+        this.payablePenaltyService = payablePenaltyService;
+        this.paymentService = paymentService;
+    }
+
     @Override protected String getTemplateName() {
         return VIEW_PENALTIES_TEMPLATE_NAME;
     }
-
-    @Autowired
-    private CompanyService companyService;
-
-    @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
-
-    @Autowired
-    private PayablePenaltyService payablePenaltyService;
-
-    @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
-    private FeatureFlagChecker featureFlagChecker;
-
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
     public String getViewPenalties(@PathVariable String companyNumber,
@@ -75,6 +77,7 @@ public class ViewPenaltiesController extends BaseController {
                 return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
         } catch (IllegalArgumentException e) {
+            LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
