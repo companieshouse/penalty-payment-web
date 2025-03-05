@@ -33,7 +33,7 @@ public class OnlinePaymentUnavailableController extends BaseController {
         model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + penaltyReference.name(),
+                        + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();

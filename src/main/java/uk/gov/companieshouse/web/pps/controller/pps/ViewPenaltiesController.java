@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
 
@@ -23,6 +24,8 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -54,6 +57,9 @@ public class ViewPenaltiesController extends BaseController {
     private PaymentService paymentService;
 
     @Autowired
+    private FeatureFlagChecker featureFlagChecker;
+
+    @Autowired
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
@@ -62,9 +68,19 @@ public class ViewPenaltiesController extends BaseController {
             Model model,
             HttpServletRequest request) {
 
+        PenaltyReference penaltyReference;
+        try {
+            penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+            if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+        } catch (IllegalArgumentException e) {
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        }
+
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
+                        + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
