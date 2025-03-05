@@ -1,11 +1,11 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +23,8 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
@@ -37,35 +39,51 @@ public class ViewPenaltiesController extends BaseController {
 
     private static final String PENALTY_TYPE = "penalty";
 
+    private final FeatureFlagChecker featureFlagChecker;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final CompanyService companyService;
+    private final PenaltyPaymentService penaltyPaymentService;
+    private final PayablePenaltyService payablePenaltyService;
+    private final PaymentService paymentService;
+
+    public ViewPenaltiesController(FeatureFlagChecker featureFlagChecker,
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            CompanyService companyService,
+            PenaltyPaymentService penaltyPaymentService,
+            PayablePenaltyService payablePenaltyService,
+            PaymentService paymentService) {
+        this.featureFlagChecker = featureFlagChecker;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        this.companyService = companyService;
+        this.penaltyPaymentService = penaltyPaymentService;
+        this.payablePenaltyService = payablePenaltyService;
+        this.paymentService = paymentService;
+    }
+
     @Override protected String getTemplateName() {
         return VIEW_PENALTIES_TEMPLATE_NAME;
     }
 
-    @Autowired
-    private CompanyService companyService;
-
-    @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
-
-    @Autowired
-    private PayablePenaltyService payablePenaltyService;
-
-    @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     @GetMapping
-    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String getViewPenalties(@PathVariable String companyNumber,
             @PathVariable String penaltyRef,
             Model model,
             HttpServletRequest request) {
 
+        PenaltyReference penaltyReference;
+        try {
+            penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+            if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+        } catch (IllegalArgumentException e) {
+            LOGGER.errorRequest(request, e.getMessage(), e);
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        }
+
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
+                        + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
                 penaltyConfigurationProperties.getSurveyLink());
 
