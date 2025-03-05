@@ -74,15 +74,21 @@ public class EnterDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceName,
+    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
             Model model) {
 
-        if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(penaltyReferenceName)))) {
+        PenaltyReference penaltyReference;
+        try {
+            penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
+            if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+        } catch (IllegalArgumentException e) {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
-        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
+        enterDetails.setPenaltyReferenceName(penaltyReference.name());
         model.addAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
         addBaseAttributesToModel(model,
@@ -94,7 +100,6 @@ public class EnterDetailsController extends BaseController {
     }
 
     @PostMapping
-    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
             BindingResult bindingResult,
             HttpServletRequest request,
@@ -177,12 +182,12 @@ public class EnterDetailsController extends BaseController {
         };
     }
 
-    private String urlGenerator(String companyNumber, String penaltyNumber) {
-        return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyNumber;
+    private String urlGenerator(String companyNumber, String penaltyRef) {
+        return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
     }
 
     private String setBackLink() {
-        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(PenaltyReference.valueOf(SANCTIONS.name())))) {
+        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
             return penaltyConfigurationProperties.getRefStartsWithPath();
         }
         return penaltyConfigurationProperties.getStartPath();

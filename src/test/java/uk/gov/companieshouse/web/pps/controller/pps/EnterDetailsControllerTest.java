@@ -134,7 +134,7 @@ class EnterDetailsControllerTest {
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", lateFilingPenaltyRef.name()))
+                        .queryParam("ref-starts-with", lateFilingPenaltyRef.getStartsWith()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
@@ -152,12 +152,28 @@ class EnterDetailsControllerTest {
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
+                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_VIEW))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
+        verifyNoInteractions(mockEnterDetailsValidator);
+    }
+
+    @Test
+    @DisplayName("Get Details - error path when penalty ref starts with is invalid")
+    void getEnterDetailsErrorWhenPenaltyRefStartsWithIsInvalid() throws Exception {
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", "SANCTIONS"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        verifyNoInteractions(mockFeatureFlagChecker);
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 
@@ -171,11 +187,12 @@ class EnterDetailsControllerTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", sanctionPenaltyRef.name()))
+                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verifyNoInteractions(mockEnterDetailsValidator);
     }
 

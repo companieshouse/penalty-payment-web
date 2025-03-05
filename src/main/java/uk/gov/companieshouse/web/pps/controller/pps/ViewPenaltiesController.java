@@ -57,7 +57,6 @@ public class ViewPenaltiesController extends BaseController {
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
-    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public String getViewPenalties(@PathVariable String companyNumber,
             @PathVariable String penaltyRef,
             Model model,

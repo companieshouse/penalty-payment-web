@@ -30,7 +30,6 @@ public class PenaltyRefStartsWithController extends BaseController {
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
-    @SuppressWarnings("java:S3958") // Stream pipeline is used; toList() is a terminal operation
     public PenaltyRefStartsWithController(NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
@@ -51,7 +50,7 @@ public class PenaltyRefStartsWithController extends BaseController {
     public String getPenaltyRefStartsWith(Model model) {
         if (availablePenaltyReference.size() == 1) {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                    + "?ref-starts-with=" + availablePenaltyReference.getFirst().name();
+                    + "?ref-starts-with=" + availablePenaltyReference.getFirst().getStartsWith();
         }
 
         model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
@@ -84,7 +83,7 @@ public class PenaltyRefStartsWithController extends BaseController {
         }
 
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + penaltyReferenceChoice.getSelectedPenaltyReference().name();
+                + "?ref-starts-with=" + penaltyReferenceChoice.getSelectedPenaltyReference().getStartsWith();
     }
 
 }
