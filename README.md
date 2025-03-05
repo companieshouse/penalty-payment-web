@@ -7,6 +7,7 @@ the [Spring Boot](http://projects.spring.io/spring-boot/) Java framework.
 - Displays payable penalties and redirects to the Payments Service to take payment.
 
 ### Requirements
+
 In order to run this Web App locally you will need to install:
 
 - [Java 21](https://www.oracle.com/java/technologies/downloads/?er=221886#java21)
