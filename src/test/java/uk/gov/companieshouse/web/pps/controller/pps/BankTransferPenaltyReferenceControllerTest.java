@@ -56,9 +56,9 @@ class BankTransferPenaltyReferenceControllerTest {
         penaltyConfigurationProperties.setBankTransferPath(
                 "/late-filing-penalty/bank-transfer");
         penaltyConfigurationProperties.setBankTransferLateFilingDetailsPath(
-                "/late-filing-penalty/bank-transfer/late-filing-details");
+                "/late-filing-penalty/bank-transfer/A");
         penaltyConfigurationProperties.setBankTransferSanctionsPath(
-                "/late-filing-penalty/bank-transfer/sanctions-details");
+                "/late-filing-penalty/bank-transfer/P");
 
         BankTransferPenaltyReferenceController controller = new BankTransferPenaltyReferenceController(
                 mockNavigatorService,
