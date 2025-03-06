@@ -99,7 +99,9 @@ public class PenaltyConfigurationProperties {
         return serviceBannerLink;
     }
 
-    public void setServiceBannerLink(String serviceBannerLink) { this.serviceBannerLink = serviceBannerLink; }
+    public void setServiceBannerLink(String serviceBannerLink) {
+        this.serviceBannerLink = serviceBannerLink;
+    }
 
     public String getStartPath() {
         return startPath;
