@@ -58,6 +58,7 @@ public class EnterDetailsController extends BaseController {
     private final PenaltyPaymentService penaltyPaymentService;
     private final MessageSource messageSource;
 
+    @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
     public EnterDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,

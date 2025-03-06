@@ -35,7 +35,7 @@ public class SignOutController extends BaseController {
     private static final String HOME = "/late-filing-penalty/";
     private static final String BACK_LINK = "backLink";
 
-    protected SignOutController(
+    public SignOutController(
             NavigatorService navigatorService,
             SessionService sessionService,
             AllowlistChecker allowlistChecker,

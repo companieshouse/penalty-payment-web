@@ -48,6 +48,7 @@ public class ViewPenaltiesController extends BaseController {
     private final PayablePenaltyService payablePenaltyService;
     private final PaymentService paymentService;
 
+    @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
     public ViewPenaltiesController(
             NavigatorService navigatorService,
             SessionService sessionService,
