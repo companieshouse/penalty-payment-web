@@ -24,7 +24,7 @@ public class AccessibilityStatementController extends BaseController {
     @GetMapping
     public String getPpsAccessibilityStatement(Model model) {
         addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(), penaltyConfigurationProperties.getServiceBannerLink());
         return getTemplateName();
     }
 
