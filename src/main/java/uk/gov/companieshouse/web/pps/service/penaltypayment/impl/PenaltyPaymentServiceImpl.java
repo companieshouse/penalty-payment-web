@@ -42,38 +42,38 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Override
     public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
-        LateFilingPenalties lateFilingPenalties;
+        LateFilingPenalties financialPenalties;
 
         try {
             String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
             String uri = GET_LFP_URI.expand(companyNumber, penaltyReferenceType).toString();
-            LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
+            LOGGER.debug("Sending request to API to fetch financial penalties for company number "
                     + companyNumber + " and penalty " + penaltyRef);
-            lateFilingPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();
+            financialPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
         } catch (IllegalArgumentException|URIValidationException ex) {
             throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
         }
 
-        List<LateFilingPenalty> payableLateFilingPenalties = new ArrayList<>();
+        List<LateFilingPenalty> payablePenalties = new ArrayList<>();
 
-        // If no Late Filing Penalties for company return an empty list.
-        if (lateFilingPenalties.getTotalResults() == 0) {
+        // If no Financial Penalties for company return an empty list.
+        if (financialPenalties.getTotalResults() == 0) {
             LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
-            return payableLateFilingPenalties;
+            return payablePenalties;
         }
 
         // Compile all payable penalties into one List to be returned.
         // Always include penalty with the ID provided so the correct error page can be displayed.
-        for (LateFilingPenalty lateFilingPenalty : lateFilingPenalties.getItems()) {
-            if ((!lateFilingPenalty.getPaid() && lateFilingPenalty.getType().equals(PENALTY_TYPE))
-                    || lateFilingPenalty.getId().equals(penaltyRef)) {
-                payableLateFilingPenalties.add(lateFilingPenalty);
+        for (LateFilingPenalty financialPenalty : financialPenalties.getItems()) {
+            if ((!financialPenalty.getPaid() && financialPenalty.getType().equals(PENALTY_TYPE))
+                    || financialPenalty.getId().equals(penaltyRef)) {
+                payablePenalties.add(financialPenalty);
             }
         }
         LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
-        return payableLateFilingPenalties;
+        return payablePenalties;
     }
 
     @Override
