@@ -9,7 +9,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 
 @Controller
-@RequestMapping("/late-filing-penalty/bank-transfer/sanctions-details")
+@RequestMapping("/late-filing-penalty/bank-transfer/P")
 public class BankTransferSanctionsDetailsController extends BaseController {
 
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";

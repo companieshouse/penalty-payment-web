@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -43,7 +42,7 @@ class BankTransferSanctionsDetailsControllerTest {
     @InjectMocks
     private BankTransferSanctionsDetailsController controller;
 
-    private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/sanctions-details";
+    private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/P";
     private static final String BANK_TRANSFER_SANCTIONS_DETAILS = "pps/bankTransferSanctionsDetails";
 
     @BeforeEach

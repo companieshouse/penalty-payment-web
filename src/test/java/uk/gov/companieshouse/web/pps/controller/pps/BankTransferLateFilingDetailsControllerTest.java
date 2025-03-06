@@ -42,7 +42,7 @@ class BankTransferLateFilingDetailsControllerTest {
     @InjectMocks
     private BankTransferLateFilingDetailsController controller;
 
-    private static final String BANK_TRANSFER_LATE_FILING_DETAILS_PATH = "/late-filing-penalty/bank-transfer/late-filing-details";
+    private static final String BANK_TRANSFER_LATE_FILING_DETAILS_PATH = "/late-filing-penalty/bank-transfer/A";
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
 
