@@ -92,7 +92,8 @@ public class ViewPenaltiesController extends BaseController {
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
 
         CompanyProfileApi companyProfileApi;
         List<LateFilingPenalty> payablePenalties;

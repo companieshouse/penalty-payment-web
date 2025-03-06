@@ -34,7 +34,8 @@ public class BankTransferSanctionsDetailsController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getBankTransferPath(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
         return getTemplateName();
     }
 

@@ -62,7 +62,8 @@ public class PenaltyRefStartsWithController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getStartPath(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
 
         return getTemplateName();
     }
@@ -81,7 +82,8 @@ public class PenaltyRefStartsWithController extends BaseController {
             addBaseAttributesToModel(model,
                     penaltyConfigurationProperties.getStartPath(),
                     penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSurveyLink(),
+                    penaltyConfigurationProperties.getServiceBannerLink());
             return getTemplateName();
         }
 

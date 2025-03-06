@@ -104,7 +104,8 @@ public class EnterDetailsController extends BaseController {
         addBaseAttributesToModel(model,
                 setBackLink(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
 
         return getTemplateName();
     }
@@ -127,7 +128,8 @@ public class EnterDetailsController extends BaseController {
             addBaseAttributesToModel(model,
                     setBackLink(),
                     penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSurveyLink(),
+                    penaltyConfigurationProperties.getServiceBannerLink());
             return getTemplateName();
         }
 
@@ -152,7 +154,8 @@ public class EnterDetailsController extends BaseController {
                 addBaseAttributesToModel(model,
                         setBackLink(),
                         penaltyConfigurationProperties.getSignOutPath(),
-                        penaltyConfigurationProperties.getSurveyLink());
+                        penaltyConfigurationProperties.getSurveyLink(),
+                        penaltyConfigurationProperties.getServiceBannerLink());
                 return getTemplateName();
             }
 

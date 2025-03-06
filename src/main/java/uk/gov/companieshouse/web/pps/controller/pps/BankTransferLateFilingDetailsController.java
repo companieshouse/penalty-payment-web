@@ -34,7 +34,8 @@ public class BankTransferLateFilingDetailsController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getBankTransferPath(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
         return getTemplateName();
     }
 

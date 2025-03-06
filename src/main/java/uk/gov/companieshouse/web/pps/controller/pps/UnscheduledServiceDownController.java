@@ -34,7 +34,8 @@ public class UnscheduledServiceDownController extends BaseController {
     public String getUnscheduledServiceDown(Model model) {
         addBaseAttributesWithoutBackUrlToModel(model,
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
         return getTemplateName();
     }
 }

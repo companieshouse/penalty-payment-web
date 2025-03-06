@@ -25,6 +25,8 @@ public abstract class BaseController {
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
     public static final String PHASE_BANNER_LINK_ATTR =  "phaseBannerLink";
+    public static final String SERVICE_BANNER_ATTR = "serviceBanner";
+    public static final String SERVICE_BANNER_LINK_ATTR = "serviceBannerLink";
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;
@@ -45,11 +47,11 @@ public abstract class BaseController {
         }
     }
 
-    protected void addBaseAttributesToModel(Model model, String backUrl, String signOutUrl, String surveyLink) {
+    protected void addBaseAttributesToModel(Model model, String backUrl, String signOutUrl, String surveyLink, String serviceBannerLink) {
         addPhaseBannerToModel(model, surveyLink);
         addUserModel(model, signOutUrl);
         addBackPageAttributeToModel(model, backUrl);
-        addServiceBannerToModel(model);
+        addServiceBannerToModel(model, serviceBannerLink);
     }
 
     protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl,
@@ -59,14 +61,14 @@ public abstract class BaseController {
     }
 
     protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData,
-            String signOutUrl, String surveyLink) {
+            String signOutUrl, String surveyLink, String serviceBannerLink) {
         addPhaseBannerToModel(model, surveyLink);
         addUserModel(model, signOutUrl, sessionData);
-        addServiceBannerToModel(model);
+        addServiceBannerToModel(model, serviceBannerLink);
     }
 
-    protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl, String surveyLink) {
-        addBaseAttributesToModel(model, "", signOutUrl, surveyLink);
+    protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl, String surveyLink, String serviceBannerLink) {
+        addBaseAttributesToModel(model, "", signOutUrl, surveyLink, serviceBannerLink);
     }
 
     protected void addUserModel(Model model, String signOutUrl) {
@@ -95,8 +97,9 @@ public abstract class BaseController {
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
 
-    protected void addServiceBannerToModel(Model model) {
-        model.addAttribute("serviceBanner", "1");
+    protected void addServiceBannerToModel(Model model, String serviceBannerLink) {
+        model.addAttribute(SERVICE_BANNER_ATTR, "1");
+        model.addAttribute(SERVICE_BANNER_LINK_ATTR, serviceBannerLink);
     }
 
 }

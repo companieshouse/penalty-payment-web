@@ -110,7 +110,8 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payableResourceTransaction.getAmount()));
 
             addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
-                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink(),
+                    penaltyConfigurationProperties.getServiceBannerLink());
 
             return getTemplateName();
         } catch (ServiceException ex) {

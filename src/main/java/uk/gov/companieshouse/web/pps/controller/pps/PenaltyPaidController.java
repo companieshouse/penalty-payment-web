@@ -62,7 +62,8 @@ public class PenaltyPaidController extends BaseController {
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
 
         return getTemplateName();
     }

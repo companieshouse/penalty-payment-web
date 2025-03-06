@@ -44,7 +44,8 @@ public class OnlinePaymentUnavailableController extends BaseController {
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSurveyLink(),
+                penaltyConfigurationProperties.getServiceBannerLink());
         return getTemplateName();
     }
 
