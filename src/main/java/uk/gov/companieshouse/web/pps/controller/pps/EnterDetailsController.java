@@ -10,7 +10,6 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +29,9 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
@@ -40,28 +41,9 @@ import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 @RequestMapping("/late-filing-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
 
-    private static final String ENTER_DETAILS = "pps/details";
-
-    @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
-
-    @Autowired
-    private CompanyService companyService;
-
-    @Autowired
-    private EnterDetailsValidator enterDetailsValidator;
-
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private FeatureFlagChecker featureFlagChecker;
-
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+    static final String ENTER_DETAILS_TEMPLATE_NAME = "pps/details";
 
     private static final String PENALTY_PAID = "/penalty-paid";
-
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
 
     private static final String PENALTY_TYPE = "penalty";
@@ -69,8 +51,33 @@ public class EnterDetailsController extends BaseController {
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
+    private final FeatureFlagChecker featureFlagChecker;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final EnterDetailsValidator enterDetailsValidator;
+    private final CompanyService companyService;
+    private final PenaltyPaymentService penaltyPaymentService;
+    private final MessageSource messageSource;
+
+    public EnterDetailsController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
+            FeatureFlagChecker featureFlagChecker,
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            EnterDetailsValidator enterDetailsValidator,
+            CompanyService companyService,
+            PenaltyPaymentService penaltyPaymentService,
+            MessageSource messageSource) {
+        super(navigatorService, sessionService);
+        this.featureFlagChecker = featureFlagChecker;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        this.enterDetailsValidator = enterDetailsValidator;
+        this.companyService = companyService;
+        this.penaltyPaymentService = penaltyPaymentService;
+        this.messageSource = messageSource;
+    }
+
     @Override protected String getTemplateName() {
-        return ENTER_DETAILS;
+        return ENTER_DETAILS_TEMPLATE_NAME;
     }
 
     @GetMapping

@@ -20,9 +20,11 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
@@ -46,12 +48,16 @@ public class ViewPenaltiesController extends BaseController {
     private final PayablePenaltyService payablePenaltyService;
     private final PaymentService paymentService;
 
-    public ViewPenaltiesController(FeatureFlagChecker featureFlagChecker,
+    public ViewPenaltiesController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
+            FeatureFlagChecker featureFlagChecker,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
             PayablePenaltyService payablePenaltyService,
             PaymentService paymentService) {
+        super(navigatorService, sessionService);
         this.featureFlagChecker = featureFlagChecker;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.companyService = companyService;

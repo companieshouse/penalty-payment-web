@@ -30,7 +30,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
@@ -38,6 +37,7 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -70,6 +70,9 @@ class ViewPenaltiesControllerTest {
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @Mock
+    private NavigatorService mockNavigatorService;
+
+    @Mock
     private SessionService mockSessionService;
 
     private static final String COMPANY_NUMBER = "12345678";
@@ -88,14 +91,14 @@ class ViewPenaltiesControllerTest {
     @BeforeEach
     void setup() {
         ViewPenaltiesController controller = new ViewPenaltiesController(
+                mockNavigatorService,
+                mockSessionService,
                 mockFeatureFlagChecker,
                 mockPenaltyConfigurationProperties,
                 mockCompanyService,
                 mockPenaltyPaymentService,
                 mockPayablePenaltyService,
                 mockPaymentService);
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

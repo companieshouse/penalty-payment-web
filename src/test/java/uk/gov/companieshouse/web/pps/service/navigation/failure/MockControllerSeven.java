@@ -5,6 +5,8 @@ import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.controller.ConditionalController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 /**
  * Mock controller class for testing missing {@code RequestMapping} value
@@ -15,6 +17,12 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 @NextController(MockControllerEight.class)
 @PreviousController(MockControllerSix.class)
 public class MockControllerSeven extends BaseController implements ConditionalController {
+
+    public MockControllerSeven(
+            NavigatorService navigatorService,
+            SessionService sessionService) {
+        super(navigatorService, sessionService);
+    }
 
     @Override
     protected String getTemplateName() {

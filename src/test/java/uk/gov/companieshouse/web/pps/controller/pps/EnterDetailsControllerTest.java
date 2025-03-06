@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -27,11 +28,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
@@ -78,9 +77,6 @@ class EnterDetailsControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    @InjectMocks
-    private EnterDetailsController controller;
-
     private static final String VALID_PENALTY_REF = "A1234567";
 
     private static final String VALID_COMPANY_NUMBER = "00987654";
@@ -103,8 +99,6 @@ class EnterDetailsControllerTest {
 
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
-    private static final String ENTER_DETAILS_VIEW = "pps/details";
-
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
     private static final String PENALTY_REFERENCE_NAME_ATTRIBUTE = "penaltyReferenceName";
@@ -119,8 +113,15 @@ class EnterDetailsControllerTest {
 
     @BeforeEach
     public void setup() {
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
+        EnterDetailsController controller = new EnterDetailsController(
+                mockNavigatorService,
+                mockSessionService,
+                mockFeatureFlagChecker,
+                mockPenaltyConfigurationProperties,
+                mockEnterDetailsValidator,
+                mockCompanyService,
+                mockPenaltyPaymentService,
+                mockMessageSource);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -136,7 +137,7 @@ class EnterDetailsControllerTest {
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", lateFilingPenaltyRef.getStartsWith()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_VIEW))
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
@@ -154,7 +155,7 @@ class EnterDetailsControllerTest {
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_VIEW))
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
 
@@ -205,7 +206,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_VIEW))
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
                 .andExpect(model().attributeHasFieldErrors(ENTER_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
                 .andExpect(model().attributeErrorCount(ENTER_DETAILS_MODEL_ATTR, 1));
@@ -265,7 +266,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_VIEW));
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -284,7 +285,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_VIEW));
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -303,7 +304,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, "P1234567")
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_VIEW));
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
@@ -364,7 +365,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_VIEW));
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
     }
@@ -461,7 +462,7 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_VIEW));
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);

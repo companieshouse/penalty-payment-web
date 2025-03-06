@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferLateFilingDetailsController.BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
@@ -34,22 +33,19 @@ class BankTransferLateFilingDetailsControllerTest {
     private NavigatorService mockNavigatorService;
 
     @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
-
-    @Mock
     private SessionService mockSessionService;
 
-    @InjectMocks
-    private BankTransferLateFilingDetailsController controller;
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     private static final String BANK_TRANSFER_LATE_FILING_DETAILS_PATH = "/late-filing-penalty/bank-transfer/A";
 
-    private static final String BANK_TRANSFER_LATE_FILING_DETAILS = "pps/bankTransferLateFilingDetails";
-
     @BeforeEach
     void setup() {
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
+        BankTransferLateFilingDetailsController controller = new BankTransferLateFilingDetailsController(
+                mockNavigatorService,
+                mockSessionService,
+                mockPenaltyConfigurationProperties);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -62,7 +58,7 @@ class BankTransferLateFilingDetailsControllerTest {
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
+                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(USER_BAR_ATTR));
     }
 
@@ -72,7 +68,7 @@ class BankTransferLateFilingDetailsControllerTest {
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
+                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
@@ -89,7 +85,7 @@ class BankTransferLateFilingDetailsControllerTest {
 
         this.mockMvc.perform(get(BANK_TRANSFER_LATE_FILING_DETAILS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS))
+                .andExpect(view().name(BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeDoesNotExist(USER_BAR_ATTR));
     }
 
