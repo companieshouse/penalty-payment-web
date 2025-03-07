@@ -51,13 +51,6 @@ class WebsecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/accessibility-statement")
-    void accessibilityStatementPageSecurityConfigTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/accessibility-statement")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.accessibilityStatementPageSecurityConfig(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
     @DisplayName(" apply security filter to /late-filing-penalty/healthcheck")
     void healthcheckSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/late-filing-penalty/healthcheck")).thenReturn(httpSecurity);
