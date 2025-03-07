@@ -33,9 +33,7 @@ public class BankTransferLateFilingDetailsController extends BaseController {
     public String getBankTransferLateFilingDetails(Model model) {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getBankTransferPath(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink(),
-                penaltyConfigurationProperties.getServiceBannerLink());
+                penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }
 

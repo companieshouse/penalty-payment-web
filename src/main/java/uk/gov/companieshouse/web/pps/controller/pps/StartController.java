@@ -67,8 +67,7 @@ public class StartController extends BaseController {
                 return navigatorService.getNextControllerRedirect(this.getClass());
             }
 
-            addBaseAttributesWithoutServiceAndBackToModel(model, penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+            addBaseAttributesWithoutServiceAndBackToModel(model, penaltyConfigurationProperties.getSignOutPath());
             return getTemplateName();
         } else if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());
