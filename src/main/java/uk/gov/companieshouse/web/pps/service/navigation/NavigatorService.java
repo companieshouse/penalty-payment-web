@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.navigation;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,13 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 @Service
 public class NavigatorService {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     private static final int EXPECTED_PATH_VAR_COUNT = 3;
+
+    public NavigatorService(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     /**
      * Searches the controller chain for the next or previous controller in the

@@ -5,6 +5,8 @@ import uk.gov.companieshouse.web.pps.annotation.PreviousController;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.controller.ConditionalController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 /**
  * Mock conditional controller class for testing exception handling.
@@ -16,13 +18,19 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 @PreviousController(MockControllerSeven.class)
 public class MockControllerEight extends BaseController implements ConditionalController {
 
+    public MockControllerEight(
+            NavigatorService navigatorService,
+            SessionService sessionService) {
+        super(navigatorService, sessionService);
+    }
+
     @Override
     protected String getTemplateName() {
         return null;
     }
 
     @Override
-    public boolean willRender(String companyNumber, String transactionId, String companylfpId) throws ServiceException {
+    public boolean willRender(String companyNumber, String transactionId, String companyLfpId) throws ServiceException {
         throw new ServiceException("Test exception", null);
     }
 }

@@ -19,6 +19,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
@@ -27,7 +28,7 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
 public class ConfirmationController extends BaseController {
 
-    private static final String CONFIRMATION_PAGE = "pps/confirmationPage";
+    static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";
 
     private static final String PAYMENT_STATE = "payment_state";
 
@@ -39,27 +40,26 @@ public class ConfirmationController extends BaseController {
     static final String PAYMENT_DATE_ATTR = "paymentDate";
     static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
-    @Override protected String getTemplateName() {
-        return CONFIRMATION_PAGE;
-    }
-
     private final CompanyService companyService;
-
     private final PayablePenaltyService payablePenaltyService;
-
-    private final SessionService sessionService;
-
-    private final PenaltyConfigurationProperties  penaltyConfigurationProperties;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Autowired
-    public ConfirmationController(CompanyService companyService,
-            PayablePenaltyService payablePenaltyService,
+    public ConfirmationController(
+            NavigatorService navigatorService,
             SessionService sessionService,
+            CompanyService companyService,
+            PayablePenaltyService payablePenaltyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        super(navigatorService, sessionService);
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
-        this.sessionService = sessionService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+    }
+
+    @Override
+    protected String getTemplateName() {
+        return CONFIRMATION_PAGE_TEMPLATE_NAME;
     }
 
     @GetMapping

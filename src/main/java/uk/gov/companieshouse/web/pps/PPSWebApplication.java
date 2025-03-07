@@ -5,8 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.gov.companieshouse.web.pps.interceptor.UserDetailsInterceptor;
 import uk.gov.companieshouse.web.pps.interceptor.LoggingInterceptor;
+import uk.gov.companieshouse.web.pps.interceptor.UserDetailsInterceptor;
 
 @SpringBootApplication
 public class PPSWebApplication implements WebMvcConfigurer {
@@ -32,7 +32,6 @@ public class PPSWebApplication implements WebMvcConfigurer {
         registry.addInterceptor(loggingInterceptor);
         registry.addInterceptor(userDetailsInterceptor)
                 .excludePathPatterns("/late-filing-penalty",
-                        "/late-filing-penalty/accessibility-statement",
                         "/late-filing-penalty/ref-starts-with",
                         "/late-filing-penalty/bank-transfer/**",
                         "/late-filing-penalty/unscheduled-service-down"

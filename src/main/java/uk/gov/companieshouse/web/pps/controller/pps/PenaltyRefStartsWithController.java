@@ -16,6 +16,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
@@ -23,17 +24,19 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 @RequestMapping("/late-filing-penalty/ref-starts-with")
 public class PenaltyRefStartsWithController extends BaseController {
 
-    static final String PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";
+    static final String PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
-    public PenaltyRefStartsWithController(NavigatorService navigatorService,
+    public PenaltyRefStartsWithController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
-        this.navigatorService = navigatorService;
+        super(navigatorService, sessionService);
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
@@ -43,7 +46,7 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @Override
     protected String getTemplateName() {
-        return PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
+        return PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
     }
 
     @GetMapping

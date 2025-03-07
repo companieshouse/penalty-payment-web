@@ -3,7 +3,6 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,26 +13,35 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
 public class PenaltyPaidController extends BaseController {
 
-    private static final String PPS_PENALTY_PAID = "pps/penaltyPaid";
+    static final String PENALTY_PAID_TEMPLATE_NAME = "pps/penaltyPaid";
 
     @Override protected String getTemplateName() {
-        return PPS_PENALTY_PAID;
+        return PENALTY_PAID_TEMPLATE_NAME;
     }
 
-    @Autowired
-    private CompanyService companyService;
+    private final CompanyService companyService;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+    public PenaltyPaidController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
+            CompanyService companyService,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        super(navigatorService, sessionService);
+        this.companyService = companyService;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+    }
 
     @GetMapping
-    public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
+    public String getPenaltyPaid(@PathVariable String companyNumber,
                                        @PathVariable String penaltyRef,
                                        Model model,
                                        HttpServletRequest request) {

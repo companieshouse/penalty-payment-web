@@ -16,13 +16,14 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 @Controller
 @RequestMapping("/late-filing-penalty/bank-transfer")
 public class BankTransferPenaltyReferenceController extends BaseController {
 
-    static final String PPS_BANK_TRANSFER_PENALTY_REFERENCE = "pps/bankTransferPenaltyReference";
+    static final String BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME = "pps/bankTransferPenaltyReference";
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferences";
 
@@ -31,15 +32,16 @@ public class BankTransferPenaltyReferenceController extends BaseController {
 
     public BankTransferPenaltyReferenceController(
             NavigatorService navigatorService,
+            SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        this.navigatorService = navigatorService;
+        super(navigatorService, sessionService);
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith();
     }
 
     @Override
     protected String getTemplateName() {
-        return PPS_BANK_TRANSFER_PENALTY_REFERENCE;
+        return BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME;
     }
 
     @GetMapping

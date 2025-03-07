@@ -2,7 +2,6 @@ package uk.gov.companieshouse.web.pps.controller;
 
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.gov.companieshouse.logging.Logger;
@@ -13,12 +12,6 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 public abstract class BaseController {
-
-    @Autowired
-    protected NavigatorService navigatorService;
-
-    @Autowired
-    private SessionService sessionService;
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
@@ -33,7 +26,12 @@ public abstract class BaseController {
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
     public static final String PHASE_BANNER_LINK_ATTR =  "phaseBannerLink";
 
-    protected BaseController() {
+    protected final NavigatorService navigatorService;
+    protected final SessionService sessionService;
+
+    protected BaseController(NavigatorService navigatorService, SessionService sessionService) {
+        this.navigatorService = navigatorService;
+        this.sessionService = sessionService;
     }
 
     @ModelAttribute("templateName")

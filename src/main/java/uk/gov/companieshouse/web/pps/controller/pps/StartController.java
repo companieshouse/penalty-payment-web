@@ -6,8 +6,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,32 +18,38 @@ import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
 @RequestMapping("/late-filing-penalty")
 public class StartController extends BaseController {
 
-    private static final String PPS_TEMP_HOME = "pps/home";
-    private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
+    static final String HOME_TEMPLATE_NAME = "pps/home";
+    static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
-    @Autowired
-    private PenaltyPaymentService penaltyPaymentService;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final PenaltyPaymentService penaltyPaymentService;
 
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
+    public StartController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            PenaltyPaymentService penaltyPaymentService) {
+        super(navigatorService, sessionService);
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        this.penaltyPaymentService = penaltyPaymentService;
+    }
 
     @Override
     protected String getTemplateName() {
-        return PPS_TEMP_HOME;
+        return HOME_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getPpsHome(@RequestParam("start") Optional<Integer> startId, Model model) throws ParseException {
+    public String getStart(@RequestParam("start") Optional<Integer> startId, Model model) throws ParseException {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
@@ -73,7 +77,7 @@ public class StartController extends BaseController {
             model.addAttribute("date", displayDateFormat.format(
                     inputDateFormat.parse(financeHealthcheck.getMaintenanceEndTime())));
             LOGGER.error("Service is unavailable");
-            return PPS_SERVICE_UNAVAILABLE;
+            return SERVICE_UNAVAILABLE_VIEW_NAME;
         } else {
             return redirectPathUnscheduledServiceDown;
         }

@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.StartController.HOME_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -20,11 +22,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ViewResolver;
@@ -57,13 +57,13 @@ class StartControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    @InjectMocks
-    private StartController controller;
-
     @BeforeEach
     void setup() {
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
+        StartController controller = new StartController(
+                mockNavigatorService,
+                mockSessionService,
+                mockPenaltyConfigurationProperties,
+                mockPenaltyPaymentService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
@@ -71,9 +71,6 @@ class StartControllerTest {
     private static final String START_PATH_PARAM = "/late-filing-penalty?start=0";
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
-
-    private static final String PPS_START_VIEW = "pps/home";
-    private static final String PPS_SERVICE_UNAVAILABLE = "pps/serviceUnavailable";
 
     private static final String DATE_MODEL_ATTR = "date";
 
@@ -87,7 +84,7 @@ class StartControllerTest {
 
         this.mockMvc.perform(get(START_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_START_VIEW));
+                .andExpect(view().name(HOME_TEMPLATE_NAME));
 
         verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
 
@@ -113,13 +110,13 @@ class StartControllerTest {
     @DisplayName("Get View Start Page - finance system offline")
     void getRequestFinanceSystemOffline() throws Exception {
 
-        configureUnhealthyFinanceHealthcheckResponse(MAINTENANCE_END_TIME);
+        configureUnhealthyFinanceHealthcheckResponse();
 
         this.mockMvc.perform(get(START_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_SERVICE_UNAVAILABLE))
+                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME))
                 .andExpect(model().attributeExists(DATE_MODEL_ATTR))
-                .andExpect(model().attribute(DATE_MODEL_ATTR, convertTimeToModelFormat(MAINTENANCE_END_TIME)));
+                .andExpect(model().attribute(DATE_MODEL_ATTR, convertTimeToModelFormat()));
 
         verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
 
@@ -181,10 +178,10 @@ class StartControllerTest {
                 .when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
     }
 
-    private void configureUnhealthyFinanceHealthcheckResponse(String maintenanceEndTime)
+    private void configureUnhealthyFinanceHealthcheckResponse()
             throws ServiceException {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime())
-                .thenReturn(PPSTestUtility.financeHealthcheckServiceUnavailable(maintenanceEndTime));
+                .thenReturn(PPSTestUtility.financeHealthcheckServiceUnavailable(StartControllerTest.MAINTENANCE_END_TIME));
     }
 
     private void configureInvalidFinanceHealthcheckResponse()
@@ -193,11 +190,11 @@ class StartControllerTest {
                 .thenReturn(PPSTestUtility.financeHealthcheckServiceInvalid());
     }
 
-    private String convertTimeToModelFormat(String inputTime) throws ParseException {
+    private String convertTimeToModelFormat() throws ParseException {
         DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         DateFormat displayDateFormat = new SimpleDateFormat("h:mm a z 'on' EEEE d MMMM yyyy");
         return displayDateFormat.format(
-                inputDateFormat.parse(inputTime));
+                inputDateFormat.parse(StartControllerTest.MAINTENANCE_END_TIME));
     }
 
     private void configureNextController() {
