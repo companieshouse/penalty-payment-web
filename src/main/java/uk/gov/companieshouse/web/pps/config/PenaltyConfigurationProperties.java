@@ -19,6 +19,7 @@ public class PenaltyConfigurationProperties {
     private String unscheduledServiceDownPath;
     private String signOutPath;
     private String surveyLink;
+    private String serviceBannerLink;
     private String startPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
@@ -92,6 +93,14 @@ public class PenaltyConfigurationProperties {
 
     public void setSurveyLink(String surveyLink) {
         this.surveyLink = surveyLink;
+    }
+
+    public String getServiceBannerLink() {
+        return serviceBannerLink;
+    }
+
+    public void setServiceBannerLink(String serviceBannerLink) {
+        this.serviceBannerLink = serviceBannerLink;
     }
 
     public String getStartPath() {

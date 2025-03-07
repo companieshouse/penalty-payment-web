@@ -91,8 +91,7 @@ public class ViewPenaltiesController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
 
         CompanyProfileApi companyProfileApi;
         List<LateFilingPenalty> payablePenalties;

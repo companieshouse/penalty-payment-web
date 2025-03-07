@@ -33,8 +33,7 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     public String getBankTransferSanctionsDetails(Model model) {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getBankTransferPath(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }
 
