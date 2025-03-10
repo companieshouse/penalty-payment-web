@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.ApiClient;
@@ -62,8 +61,7 @@ class PenaltyPaymentServiceImplTest {
     @Mock
     private ApiResponse<FinanceHealthcheck> healthcheckApiResponse;
 
-    @InjectMocks
-    private PenaltyPaymentService mockPenaltyPaymentService = new PenaltyPaymentServiceImpl();
+    private PenaltyPaymentService penaltyPaymentService;
 
     private static final String COMPANY_NUMBER = "12345678";
 
@@ -79,6 +77,8 @@ class PenaltyPaymentServiceImplTest {
 
     @BeforeEach
     void init() {
+        penaltyPaymentService = new PenaltyPaymentServiceImpl(apiClientService);
+
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
     }
 
@@ -102,7 +102,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(1, payableLateFilingPenalties.size());
         assertEquals(validLateFilingPenalty, payableLateFilingPenalties.getFirst());
@@ -128,7 +128,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(2, payableLateFilingPenalties.size());
         assertEquals(validLateFilingPenalty1, payableLateFilingPenalties.get(0));
@@ -149,7 +149,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(0, payableLateFilingPenalties.size());
     }
@@ -173,7 +173,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<LateFilingPenalty> payableLateFilingPenalties =
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF_TWO);
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF_TWO);
 
         assertEquals(0, payableLateFilingPenalties.size());
     }
@@ -188,7 +188,7 @@ class PenaltyPaymentServiceImplTest {
         when(lateFilingPenaltyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF));
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF));
     }
 
     @Test
@@ -201,14 +201,14 @@ class PenaltyPaymentServiceImplTest {
         when(lateFilingPenaltyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF));
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, PENALTY_REF));
     }
 
     @Test
     @DisplayName("Get Payable Late Filing Penalties - Throws IllegalArgumentException when penalty reference is invalid")
     void getPayableLateFilingPenaltiesThrowsIllegalArgumentExceptionWhenPenaltyReferenceIsInvalid() {
         assertThrows(ServiceException.class, () ->
-                mockPenaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, ""));
+                penaltyPaymentService.getLateFilingPenalties(COMPANY_NUMBER, ""));
     }
 
     @Test
@@ -225,7 +225,7 @@ class PenaltyPaymentServiceImplTest {
         when(healthcheckGet.execute()).thenReturn(healthcheckApiResponse);
         when(healthcheckApiResponse.getData()).thenReturn(financeHealthcheckHealthy);
 
-        FinanceHealthcheck financeHealthcheck = mockPenaltyPaymentService.checkFinanceSystemAvailableTime();
+        FinanceHealthcheck financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
 
         assertEquals(FinanceHealthcheckStatus.HEALTHY.getStatus(), financeHealthcheck.getMessage());
         assertNull(financeHealthcheck.getMaintenanceEndTime());
@@ -243,7 +243,7 @@ class PenaltyPaymentServiceImplTest {
         when(healthcheckGet.execute()).thenThrow(
                 new ApiErrorResponseException(serviceUnavailablePlannedMaintenance()));
 
-        FinanceHealthcheck financeHealthcheck = mockPenaltyPaymentService.checkFinanceSystemAvailableTime();
+        FinanceHealthcheck financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
 
         assertEquals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus(),
                 financeHealthcheck.getMessage());
@@ -262,7 +262,7 @@ class PenaltyPaymentServiceImplTest {
         when(healthcheckGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPenaltyPaymentService.checkFinanceSystemAvailableTime());
+                penaltyPaymentService.checkFinanceSystemAvailableTime());
     }
 
     @Test
@@ -277,7 +277,7 @@ class PenaltyPaymentServiceImplTest {
         when(healthcheckGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                mockPenaltyPaymentService.checkFinanceSystemAvailableTime());
+                penaltyPaymentService.checkFinanceSystemAvailableTime());
     }
 
     public static HttpResponseException.Builder serviceUnavailablePlannedMaintenance() {

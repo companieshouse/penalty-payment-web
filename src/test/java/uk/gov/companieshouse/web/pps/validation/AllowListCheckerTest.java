@@ -1,14 +1,14 @@
 package uk.gov.companieshouse.web.pps.validation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.MockitoAnnotations;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
      class AllowListCheckerTest {
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     private static final String VALID_URL  = "/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_NUMBER + "/legal-fees-required";
     private static final String SIGN_OUT = "late-filing-penalty/sign-out";
 
-    private AllowlistChecker allowListChecker = new AllowlistChecker();
+    private final AllowlistChecker allowListChecker = new AllowlistChecker();
 
     @BeforeEach
     public void init() {
@@ -30,28 +30,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
     @Test
     @DisplayName("test if regex returns invalid value")
-    void getInvalidUrl() throws Exception {
+    void getInvalidUrl() {
         String result = allowListChecker.checkURL(INVALID_URL);
         assertEquals(HOME, result);
     }
 
     @Test
     @DisplayName("test if regex returns correct value")
-    void getValidUrl() throws Exception {
+    void getValidUrl() {
         String result = allowListChecker.checkURL(VALID_URL);
         assertEquals(VALID_URL, result);
     }
 
     @Test
     @DisplayName("test sign out is detected")
-    void checkForSignOut() throws Exception {
+    void checkForSignOut() {
         boolean isSignOut = allowListChecker.checkSignOutIsReferer(SIGN_OUT);
         assertTrue(isSignOut);
     }
 
     @Test
     @DisplayName("test sign out is detected")
-    void checkForSignOutWithNonSignOutUrl() throws Exception {
+    void checkForSignOutWithNonSignOutUrl() {
         boolean isSignOut = allowListChecker.checkSignOutIsReferer(HOME);
         assertFalse(isSignOut);
     }

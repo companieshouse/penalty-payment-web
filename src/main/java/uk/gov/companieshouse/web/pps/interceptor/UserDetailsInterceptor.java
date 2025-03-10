@@ -1,17 +1,15 @@
 package uk.gov.companieshouse.web.pps.interceptor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class UserDetailsInterceptor implements AsyncHandlerInterceptor {
@@ -22,8 +20,11 @@ public class UserDetailsInterceptor implements AsyncHandlerInterceptor {
     private static final String USER_PROFILE_KEY = "user_profile";
     private static final String EMAIL_KEY = "email";
 
-    @Autowired
-    private SessionService sessionService;
+    private final SessionService sessionService;
+
+    public UserDetailsInterceptor(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     @Override
     public void postHandle(HttpServletRequest request,
