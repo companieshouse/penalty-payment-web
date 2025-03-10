@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Collections;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
@@ -15,8 +15,6 @@ import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 
-import java.util.Collections;
-
 @Service
 public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
@@ -26,8 +24,11 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     private static final UriTemplate POST_LFP_URI =
             new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
 
-    @Autowired
-    private ApiClientService apiClientService;
+    private final ApiClientService apiClientService;
+
+    public PayablePenaltyServiceImpl(ApiClientService apiClientService) {
+        this.apiClientService = apiClientService;
+    }
 
     @Override
     public PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String payableRef) throws ServiceException {

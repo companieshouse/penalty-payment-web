@@ -2,7 +2,6 @@ package uk.gov.companieshouse.web.pps.service.payment.impl;
 
 import java.util.Arrays;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
@@ -45,9 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    @Autowired
     public PaymentServiceImpl(ApiClientService apiClientService, SessionService sessionService, EnvironmentReader environmentReader) {
-
         this.apiClientService = apiClientService;
         this.sessionService = sessionService;
         this.chsUrl = environmentReader.getMandatoryString(CHS_URL);
