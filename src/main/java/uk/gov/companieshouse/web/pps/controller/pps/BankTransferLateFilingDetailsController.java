@@ -15,14 +15,11 @@ public class BankTransferLateFilingDetailsController extends BaseController {
 
     static final String BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME = "pps/bankTransferLateFilingDetails";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     public BankTransferLateFilingDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override protected String getTemplateName() {

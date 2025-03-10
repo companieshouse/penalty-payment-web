@@ -28,7 +28,6 @@ public class PenaltyPaidController extends BaseController {
     }
 
     private final CompanyService companyService;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     public PenaltyPaidController(
             NavigatorService navigatorService,
@@ -37,7 +36,6 @@ public class PenaltyPaidController extends BaseController {
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @GetMapping

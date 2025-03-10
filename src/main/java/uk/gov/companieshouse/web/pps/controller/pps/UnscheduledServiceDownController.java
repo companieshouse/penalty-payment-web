@@ -15,14 +15,11 @@ public class UnscheduledServiceDownController extends BaseController {
 
     static final String UNSCHEDULED_SERVICE_DOWN_TEMPLATE_NAME = "pps/unscheduledServiceDown";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     public UnscheduledServiceDownController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override

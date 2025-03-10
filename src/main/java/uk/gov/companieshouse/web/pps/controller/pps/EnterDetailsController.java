@@ -52,7 +52,6 @@ public class EnterDetailsController extends BaseController {
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private final FeatureFlagChecker featureFlagChecker;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final EnterDetailsValidator enterDetailsValidator;
     private final CompanyService companyService;
     private final PenaltyPaymentService penaltyPaymentService;
@@ -70,7 +69,6 @@ public class EnterDetailsController extends BaseController {
             MessageSource messageSource) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.enterDetailsValidator = enterDetailsValidator;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;

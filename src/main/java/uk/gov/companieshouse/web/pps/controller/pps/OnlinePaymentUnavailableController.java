@@ -19,14 +19,11 @@ public class OnlinePaymentUnavailableController extends BaseController {
 
     private static final String PENALTY_REFERENCE_MODEL_ATTR = "penaltyReference";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     public OnlinePaymentUnavailableController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override protected String getTemplateName() {

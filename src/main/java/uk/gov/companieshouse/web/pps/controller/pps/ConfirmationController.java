@@ -42,7 +42,6 @@ public class ConfirmationController extends BaseController {
 
     private final CompanyService companyService;
     private final PayablePenaltyService payablePenaltyService;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @Autowired
     public ConfirmationController(
@@ -54,7 +53,6 @@ public class ConfirmationController extends BaseController {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override

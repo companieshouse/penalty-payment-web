@@ -27,7 +27,6 @@ public class BankTransferPenaltyReferenceController extends BaseController {
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferences";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
     public BankTransferPenaltyReferenceController(
@@ -35,7 +34,6 @@ public class BankTransferPenaltyReferenceController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith();
     }
 

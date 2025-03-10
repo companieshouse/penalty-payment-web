@@ -28,7 +28,6 @@ public class PenaltyRefStartsWithController extends BaseController {
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
     public PenaltyRefStartsWithController(
@@ -37,7 +36,6 @@ public class PenaltyRefStartsWithController extends BaseController {
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
                 .filter(featureFlagChecker::isPenaltyRefEnabled)

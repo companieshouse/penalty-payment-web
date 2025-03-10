@@ -30,7 +30,7 @@ public abstract class BaseController {
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    protected final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     protected BaseController(NavigatorService navigatorService, SessionService sessionService, PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.navigatorService = navigatorService;
@@ -50,27 +50,22 @@ public abstract class BaseController {
     }
 
     protected void addBaseAttributesToModel(Model model, String backUrl, String signOutUrl) {
-        String surveyLink = penaltyConfigurationProperties.getSurveyLink();
-        String serviceBannerLink = penaltyConfigurationProperties.getServiceBannerLink();
-        addPhaseBannerToModel(model, surveyLink);
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl);
         addBackPageAttributeToModel(model, backUrl);
-        addServiceBannerToModel(model, serviceBannerLink);
+        addServiceBannerToModel(model, penaltyConfigurationProperties.getServiceBannerLink());
     }
 
     protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl) {
-        String surveyLink = penaltyConfigurationProperties.getSurveyLink();
-        addPhaseBannerToModel(model, surveyLink);
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl);
     }
 
     protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData,
             String signOutUrl) {
-        String surveyLink = penaltyConfigurationProperties.getSurveyLink();
-        String serviceBannerLink = penaltyConfigurationProperties.getServiceBannerLink();
-        addPhaseBannerToModel(model, surveyLink);
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl, sessionData);
-        addServiceBannerToModel(model, serviceBannerLink);
+        addServiceBannerToModel(model, penaltyConfigurationProperties.getServiceBannerLink());
     }
 
     protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl) {

@@ -30,7 +30,6 @@ public class StartController extends BaseController {
     static final String HOME_TEMPLATE_NAME = "pps/home";
     static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final PenaltyPaymentService penaltyPaymentService;
 
     public StartController(
@@ -39,7 +38,6 @@ public class StartController extends BaseController {
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             PenaltyPaymentService penaltyPaymentService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.penaltyPaymentService = penaltyPaymentService;
     }
 
