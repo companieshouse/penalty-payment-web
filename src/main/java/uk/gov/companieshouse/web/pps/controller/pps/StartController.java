@@ -38,7 +38,7 @@ public class StartController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             PenaltyPaymentService penaltyPaymentService) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.penaltyPaymentService = penaltyPaymentService;
     }

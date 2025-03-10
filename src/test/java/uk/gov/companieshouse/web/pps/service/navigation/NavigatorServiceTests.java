@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.ConditionalController;
 import uk.gov.companieshouse.web.pps.exception.MissingAnnotationException;
 import uk.gov.companieshouse.web.pps.exception.NavigationException;
@@ -39,6 +40,9 @@ class NavigatorServiceTests {
 
     @Mock
     private SessionService mockSessionService;
+
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     private static final String COMPANY_NUMBER = "companyNumber";
     private static final String TRANSACTION_ID = "transactionId";
@@ -109,8 +113,8 @@ class NavigatorServiceTests {
     @Test
     void successfulRedirectStartingFromMandatoryControllerWithExpectedNumberOfPathVariables() {
         when(mockApplicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService))
-                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService));
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
         String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerOne.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_LFP_ID);
 
@@ -121,7 +125,7 @@ class NavigatorServiceTests {
     @Test
     void successfulRedirectStartingFromConditionalControllerWithExpectedNumberOfPathVariables() {
         when(mockApplicationContext.getBean(ConditionalController.class)).thenReturn(
-                new MockSuccessJourneyControllerThree(navigatorService, mockSessionService));
+                new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
         String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerTwo.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_LFP_ID);
 
@@ -132,8 +136,8 @@ class NavigatorServiceTests {
     @Test
     void successfulPathReturnedWithSingleConditionalControllerInChain() {
         when(mockApplicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService))
-                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService));
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
         String redirect = navigatorService.getPreviousControllerPath(MockSuccessJourneyControllerThree.class, COMPANY_NUMBER, TRANSACTION_ID,
                 COMPANY_LFP_ID);
@@ -145,11 +149,11 @@ class NavigatorServiceTests {
     @Test
     void navigationExceptionThrownWhenWillRenderThrowsServiceException() {
         when(mockApplicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService))
-                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService));
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
         when(mockApplicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockControllerSeven(navigatorService, mockSessionService))
-                .thenReturn(new MockControllerEight(navigatorService, mockSessionService));
+                .thenReturn(new MockControllerSeven(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockControllerEight(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
         assertThrows(NavigationException.class,
                 () -> navigatorService.getNextControllerRedirect(MockControllerSeven.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_LFP_ID));

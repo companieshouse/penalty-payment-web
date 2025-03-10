@@ -68,7 +68,7 @@ public class EnterDetailsController extends BaseController {
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
             MessageSource messageSource) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.enterDetailsValidator = enterDetailsValidator;

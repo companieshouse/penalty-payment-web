@@ -51,7 +51,7 @@ public class ConfirmationController extends BaseController {
             CompanyService companyService,
             PayablePenaltyService payablePenaltyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;

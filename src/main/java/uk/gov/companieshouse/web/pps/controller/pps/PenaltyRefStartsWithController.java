@@ -36,7 +36,7 @@ public class PenaltyRefStartsWithController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()

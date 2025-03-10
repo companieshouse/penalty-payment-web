@@ -35,7 +35,7 @@ public class PenaltyPaidController extends BaseController {
             SessionService sessionService,
             CompanyService companyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }

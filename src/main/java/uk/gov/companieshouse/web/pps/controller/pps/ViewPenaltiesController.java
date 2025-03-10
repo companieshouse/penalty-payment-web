@@ -58,7 +58,7 @@ public class ViewPenaltiesController extends BaseController {
             PenaltyPaymentService penaltyPaymentService,
             PayablePenaltyService payablePenaltyService,
             PaymentService paymentService) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.companyService = companyService;

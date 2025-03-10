@@ -40,7 +40,7 @@ public class SignOutController extends BaseController {
             SessionService sessionService,
             AllowlistChecker allowlistChecker,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.allowlistChecker = allowlistChecker;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }

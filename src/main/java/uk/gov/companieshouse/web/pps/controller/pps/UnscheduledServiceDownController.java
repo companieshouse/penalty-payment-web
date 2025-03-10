@@ -21,7 +21,7 @@ public class UnscheduledServiceDownController extends BaseController {
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
