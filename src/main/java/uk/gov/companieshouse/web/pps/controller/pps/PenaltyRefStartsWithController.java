@@ -28,7 +28,6 @@ public class PenaltyRefStartsWithController extends BaseController {
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final List<PenaltyReference> availablePenaltyReference;
 
     public PenaltyRefStartsWithController(
@@ -36,8 +35,7 @@ public class PenaltyRefStartsWithController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker) {
-        super(navigatorService, sessionService);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
                 .filter(featureFlagChecker::isPenaltyRefEnabled)
@@ -61,8 +59,7 @@ public class PenaltyRefStartsWithController extends BaseController {
 
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getStartPath(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
 
         return getTemplateName();
     }
@@ -80,8 +77,7 @@ public class PenaltyRefStartsWithController extends BaseController {
             model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
             addBaseAttributesToModel(model,
                     penaltyConfigurationProperties.getStartPath(),
-                    penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSignOutPath());
             return getTemplateName();
         }
 

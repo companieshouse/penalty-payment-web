@@ -26,7 +26,6 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 public class SignOutController extends BaseController {
 
     private final AllowlistChecker allowlistChecker;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
@@ -40,9 +39,8 @@ public class SignOutController extends BaseController {
             SessionService sessionService,
             AllowlistChecker allowlistChecker,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.allowlistChecker = allowlistChecker;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
 

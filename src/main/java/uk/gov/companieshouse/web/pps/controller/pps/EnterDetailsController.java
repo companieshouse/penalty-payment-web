@@ -52,7 +52,6 @@ public class EnterDetailsController extends BaseController {
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private final FeatureFlagChecker featureFlagChecker;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final EnterDetailsValidator enterDetailsValidator;
     private final CompanyService companyService;
     private final PenaltyPaymentService penaltyPaymentService;
@@ -68,9 +67,8 @@ public class EnterDetailsController extends BaseController {
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
             MessageSource messageSource) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.enterDetailsValidator = enterDetailsValidator;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;
@@ -103,8 +101,7 @@ public class EnterDetailsController extends BaseController {
 
         addBaseAttributesToModel(model,
                 setBackLink(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
 
         return getTemplateName();
     }
@@ -126,8 +123,7 @@ public class EnterDetailsController extends BaseController {
 
             addBaseAttributesToModel(model,
                     setBackLink(),
-                    penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSignOutPath());
             return getTemplateName();
         }
 
@@ -151,8 +147,7 @@ public class EnterDetailsController extends BaseController {
                 bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
                 addBaseAttributesToModel(model,
                         setBackLink(),
-                        penaltyConfigurationProperties.getSignOutPath(),
-                        penaltyConfigurationProperties.getSurveyLink());
+                        penaltyConfigurationProperties.getSignOutPath());
                 return getTemplateName();
             }
 

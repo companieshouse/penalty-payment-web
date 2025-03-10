@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.service.navigation.failure;
 
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.annotation.PreviousController;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -18,8 +19,9 @@ public class MockControllerTwo extends BaseController {
 
     public MockControllerTwo(
             NavigatorService navigatorService,
-            SessionService sessionService) {
-        super(navigatorService, sessionService);
+            SessionService sessionService,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
     @Override

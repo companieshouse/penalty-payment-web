@@ -15,14 +15,11 @@ public class BankTransferSanctionsDetailsController extends BaseController {
 
     static final String BANK_TRANSFER_SANCTIONS_DETAILS_TEMPLATE_NAME = "pps/bankTransferSanctionsDetails";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     public BankTransferSanctionsDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
     @Override protected String getTemplateName() {
@@ -33,8 +30,7 @@ public class BankTransferSanctionsDetailsController extends BaseController {
     public String getBankTransferSanctionsDetails(Model model) {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getBankTransferPath(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }
 

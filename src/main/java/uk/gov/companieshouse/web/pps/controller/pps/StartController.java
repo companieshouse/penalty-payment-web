@@ -30,7 +30,6 @@ public class StartController extends BaseController {
     static final String HOME_TEMPLATE_NAME = "pps/home";
     static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final PenaltyPaymentService penaltyPaymentService;
 
     public StartController(
@@ -38,8 +37,7 @@ public class StartController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             PenaltyPaymentService penaltyPaymentService) {
-        super(navigatorService, sessionService);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.penaltyPaymentService = penaltyPaymentService;
     }
 
@@ -67,8 +65,7 @@ public class StartController extends BaseController {
                 return navigatorService.getNextControllerRedirect(this.getClass());
             }
 
-            addBaseAttributesWithoutServiceAndBackToModel(model, penaltyConfigurationProperties.getSignOutPath(),
-                    penaltyConfigurationProperties.getSurveyLink());
+            addBaseAttributesWithoutServiceAndBackToModel(model, penaltyConfigurationProperties.getSignOutPath());
             return getTemplateName();
         } else if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
@@ -28,10 +29,12 @@ public abstract class BaseController {
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;
+    protected final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
-    protected BaseController(NavigatorService navigatorService, SessionService sessionService) {
+    protected BaseController(NavigatorService navigatorService, SessionService sessionService, PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.navigatorService = navigatorService;
         this.sessionService = sessionService;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @ModelAttribute("templateName")
@@ -45,28 +48,25 @@ public abstract class BaseController {
         }
     }
 
-    protected void addBaseAttributesToModel(Model model, String backUrl, String signOutUrl, String surveyLink) {
-        addPhaseBannerToModel(model, surveyLink);
+    protected void addBaseAttributesToModel(Model model, String backUrl, String signOutUrl) {
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl);
         addBackPageAttributeToModel(model, backUrl);
-        addServiceBannerToModel(model);
     }
 
-    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl,
-            String surveyLink) {
-        addPhaseBannerToModel(model, surveyLink);
+    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl) {
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl);
     }
 
     protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData,
-            String signOutUrl, String surveyLink) {
-        addPhaseBannerToModel(model, surveyLink);
+            String signOutUrl) {
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl, sessionData);
-        addServiceBannerToModel(model);
     }
 
-    protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl, String surveyLink) {
-        addBaseAttributesToModel(model, "", signOutUrl, surveyLink);
+    protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl) {
+        addBaseAttributesToModel(model, "", signOutUrl);
     }
 
     protected void addUserModel(Model model, String signOutUrl) {
@@ -94,9 +94,4 @@ public abstract class BaseController {
         model.addAttribute(PHASE_BANNER_ATTR, "Beta");
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
-
-    protected void addServiceBannerToModel(Model model) {
-        model.addAttribute("serviceBanner", "1");
-    }
-
 }
