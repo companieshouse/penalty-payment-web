@@ -26,7 +26,6 @@ public abstract class BaseController {
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
     public static final String PHASE_BANNER_LINK_ATTR =  "phaseBannerLink";
-    public static final String SERVICE_BANNER_LINK_ATTR = "serviceBannerLink";
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;
@@ -53,7 +52,6 @@ public abstract class BaseController {
         addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl);
         addBackPageAttributeToModel(model, backUrl);
-        addServiceBannerToModel(model, penaltyConfigurationProperties.getServiceBannerLink());
     }
 
     protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl) {
@@ -65,7 +63,6 @@ public abstract class BaseController {
             String signOutUrl) {
         addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         addUserModel(model, signOutUrl, sessionData);
-        addServiceBannerToModel(model, penaltyConfigurationProperties.getServiceBannerLink());
     }
 
     protected void addBaseAttributesWithoutBackUrlToModel(Model model, String signOutUrl) {
@@ -97,10 +94,4 @@ public abstract class BaseController {
         model.addAttribute(PHASE_BANNER_ATTR, "Beta");
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
-
-    protected void addServiceBannerToModel(Model model, String serviceBannerLink) {
-        model.addAttribute("serviceBanner", "1");
-        model.addAttribute(SERVICE_BANNER_LINK_ATTR, serviceBannerLink);
-    }
-
 }
