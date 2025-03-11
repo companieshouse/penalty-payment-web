@@ -3,7 +3,6 @@ package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
@@ -36,8 +35,11 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    @Autowired
-    private ApiClientService apiClientService;
+    private final ApiClientService apiClientService;
+
+    public PenaltyPaymentServiceImpl(ApiClientService apiClientService) {
+        this.apiClientService = apiClientService;
+    }
 
     @Override
     public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException {

@@ -4,7 +4,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +43,6 @@ public class ConfirmationController extends BaseController {
     private final PayablePenaltyService payablePenaltyService;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
-    @Autowired
     public ConfirmationController(
             NavigatorService navigatorService,
             SessionService sessionService,
