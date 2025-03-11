@@ -19,14 +19,11 @@ public class OnlinePaymentUnavailableController extends BaseController {
 
     private static final String PENALTY_REFERENCE_MODEL_ATTR = "penaltyReference";
 
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
-
     public OnlinePaymentUnavailableController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
     @Override protected String getTemplateName() {
@@ -43,8 +40,7 @@ public class OnlinePaymentUnavailableController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }
 

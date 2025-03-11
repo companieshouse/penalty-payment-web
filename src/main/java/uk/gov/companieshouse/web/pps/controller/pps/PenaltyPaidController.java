@@ -28,16 +28,14 @@ public class PenaltyPaidController extends BaseController {
     }
 
     private final CompanyService companyService;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     public PenaltyPaidController(
             NavigatorService navigatorService,
             SessionService sessionService,
             CompanyService companyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @GetMapping
@@ -61,8 +59,7 @@ public class PenaltyPaidController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
 
         return getTemplateName();
     }

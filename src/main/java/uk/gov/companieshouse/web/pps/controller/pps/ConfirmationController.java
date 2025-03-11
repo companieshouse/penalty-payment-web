@@ -41,7 +41,6 @@ public class ConfirmationController extends BaseController {
 
     private final CompanyService companyService;
     private final PayablePenaltyService payablePenaltyService;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     public ConfirmationController(
             NavigatorService navigatorService,
@@ -49,10 +48,9 @@ public class ConfirmationController extends BaseController {
             CompanyService companyService,
             PayablePenaltyService payablePenaltyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override
@@ -108,7 +106,7 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payableResourceTransaction.getAmount()));
 
             addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
-                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSignOutPath());
 
             return getTemplateName();
         } catch (ServiceException ex) {

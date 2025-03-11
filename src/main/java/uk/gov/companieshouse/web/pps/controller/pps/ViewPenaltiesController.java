@@ -42,7 +42,6 @@ public class ViewPenaltiesController extends BaseController {
     private static final String PENALTY_TYPE = "penalty";
 
     private final FeatureFlagChecker featureFlagChecker;
-    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final CompanyService companyService;
     private final PenaltyPaymentService penaltyPaymentService;
     private final PayablePenaltyService payablePenaltyService;
@@ -58,9 +57,8 @@ public class ViewPenaltiesController extends BaseController {
             PenaltyPaymentService penaltyPaymentService,
             PayablePenaltyService payablePenaltyService,
             PaymentService paymentService) {
-        super(navigatorService, sessionService);
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;
         this.payablePenaltyService = payablePenaltyService;
@@ -91,8 +89,7 @@ public class ViewPenaltiesController extends BaseController {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath(),
-                penaltyConfigurationProperties.getSurveyLink());
+                penaltyConfigurationProperties.getSignOutPath());
 
         CompanyProfileApi companyProfileApi;
         List<LateFilingPenalty> payablePenalties;
