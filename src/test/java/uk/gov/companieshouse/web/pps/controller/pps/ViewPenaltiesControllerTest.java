@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -219,6 +221,26 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
+    @DisplayName("Get View Penalties - multiple late filing penalties")
+    void getRequestMultipleLateFilingPenalties() throws Exception {
+
+        configureMultiplePenalties();
+        configureValidCompanyProfile();
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+
+        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
+        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
+        verify(mockPenaltyPaymentService, times(1)).getLateFilingPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
+    }
+
+    @Test
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 
@@ -307,6 +329,18 @@ class ViewPenaltiesControllerTest {
         verify(mockPaymentService, times(1))
                 .createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
                         LFP_PENALTY_NUMBER);
+    }
+
+    private void configureMultiplePenalties() throws ServiceException {
+
+        List<LateFilingPenalty> validLFPs = new ArrayList<>();
+        validLFPs.add(PPSTestUtility.validLateFilingPenalty(LFP_PENALTY_NUMBER));
+        validLFPs.add(PPSTestUtility.validLateFilingPenalty("A4444441"));
+        validLFPs.add(PPSTestUtility.validLateFilingPenalty("A4444442"));
+
+        when(mockPenaltyPaymentService.getLateFilingPenalties(
+                COMPANY_NUMBER, LFP_PENALTY_NUMBER))
+                .thenReturn(validLFPs);
     }
 
     private void configureValidPenalty(String penaltyRef) throws ServiceException {
