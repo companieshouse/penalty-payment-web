@@ -110,7 +110,9 @@ public class ViewPenaltiesController extends BaseController {
 
         LateFilingPenalty payablePenalty = penalties.stream()
                 .filter(p -> penaltyRef.equals(p.getId()))
-                .filter(p -> PENALTY_TYPE.equals(p.getType())).findFirst().orElse(null);
+                .filter(p -> PENALTY_TYPE.equals(p.getType()))
+                .findFirst()
+                .orElse(null);
 
         // Return an error view when requested penalty is not found
         // This is possible at this stage if this screen is accessed directly for an invalid penalty.

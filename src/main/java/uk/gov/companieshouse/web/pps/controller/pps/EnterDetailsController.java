@@ -135,7 +135,8 @@ public class EnterDetailsController extends BaseController {
             List<LateFilingPenalty> payablePenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
             Optional<LateFilingPenalty> requestedPayablePenalty = payablePenalties.stream()
                     .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
-                    .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType())).findFirst();
+                    .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
+                    .findFirst();
 
             redirectAttributes.addFlashAttribute(TEMPLATE_NAME_MODEL_ATTR, getTemplateName());
             redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
