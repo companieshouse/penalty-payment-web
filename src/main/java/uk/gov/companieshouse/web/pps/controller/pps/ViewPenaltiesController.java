@@ -6,6 +6,7 @@ import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CL
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -108,18 +109,19 @@ public class ViewPenaltiesController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        LateFilingPenalty payablePenalty = penalties.stream()
+        Optional<LateFilingPenalty> payablePenaltyOptional = penalties.stream()
                 .filter(p -> penaltyRef.equals(p.getId()))
                 .filter(p -> PENALTY_TYPE.equals(p.getType()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
 
         // Return an error view when requested penalty is not found
         // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (payablePenalty == null) {
+        if (payablePenaltyOptional.isEmpty()) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
+
+        LateFilingPenalty payablePenalty = payablePenaltyOptional.get();
 
         if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {

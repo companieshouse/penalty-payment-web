@@ -142,11 +142,7 @@ public class EnterDetailsController extends BaseController {
             redirectAttributes.addFlashAttribute(BACK_LINK_MODEL_ATTR, model.getAttribute(BACK_LINK_MODEL_ATTR));
             redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
-            if (payablePenalties.size() > 1 && requestedPayablePenalty.isPresent()) { // More than one payable penalty including the requested penalty.
-                LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payablePenalties.size()
-                        + " payable penalties for company number: " + companyNumber);
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
-            } else if (requestedPayablePenalty.isPresent()) { // Only one payable penalty: the requested penalty
+            if (payablePenalties.size() == 1 && requestedPayablePenalty.isPresent()) { // Only one payable penalty: the requested penalty
                 LateFilingPenalty payablePenalty = requestedPayablePenalty.get();
 
                 if (TRUE.equals(payablePenalty.getPaid())) {
@@ -162,15 +158,18 @@ public class EnterDetailsController extends BaseController {
                 }
 
                 return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyRef);
-            } else { // Requested penalty not available (0 or more payable penalties but not the requested penalty)
-                LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
-                bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
-                addBaseAttributesToModel(model,
-                        setBackLink(),
-                        penaltyConfigurationProperties.getSignOutPath());
-                return getTemplateName();
+            } else if (payablePenalties.size() > 1 && requestedPayablePenalty.isPresent()) { // More than one payable penalty including the requested penalty.
+                LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payablePenalties.size()
+                        + " payable penalties for company number: " + companyNumber);
+                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
+            // Requested penalty not available (0 or more payable penalties but not the requested penalty)
+            LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+            bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+            addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignOutPath());
+
+            return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
