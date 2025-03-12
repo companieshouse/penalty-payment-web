@@ -312,29 +312,8 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Post Details success path - multiple payable penalties with one penalty ref match")
+    @DisplayName("Post Details failure path - multiple payable penalties (found)")
     void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
-
-        configureNextController();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, "A2345678")
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - multiple payable penalties with multiple penalty ref match")
-    void postRequestMultiplePayablePenaltiesWithMultiplePenaltyRefMatch() throws Exception {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
@@ -536,7 +515,6 @@ class EnterDetailsControllerTest {
         List<LateFilingPenalty> multipleValidLFPs = new ArrayList<>();
         multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A2345678"));
         multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A3456789"));
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty(VALID_PENALTY_REF));
         multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty(VALID_PENALTY_REF));
 
         when(mockPenaltyPaymentService.getLateFilingPenalties(eq(companyNumber), anyString()))
