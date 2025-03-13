@@ -24,7 +24,6 @@ class WebSecurityTests {
 
     @InjectMocks
     private WebSecurity webSecurity;
-
     @SystemStub
     private EnvironmentVariables environmentVariables;
 
