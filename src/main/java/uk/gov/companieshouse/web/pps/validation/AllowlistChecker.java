@@ -15,7 +15,7 @@ public class AllowlistChecker {
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private static final Pattern URL_PATTERN = Pattern.compile(
-            "/late-filing-penalty[/a-zA-Z0-9-?=+]+$");
+            "/late-filing-penalty[/a-zA-Z\\d-?=+]+$");
     private static final Pattern SIGNOUT_PATTERN = Pattern.compile(
             "late-filing-penalty/sign-out");
 
