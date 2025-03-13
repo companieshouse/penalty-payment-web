@@ -21,6 +21,7 @@ public class PenaltyConfigurationProperties {
     private String surveyLink;
     private String serviceBannerLink;
     private String startPath;
+    private String signedOutUrl;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -109,5 +110,13 @@ public class PenaltyConfigurationProperties {
 
     public void setStartPath(String startPath) {
         this.startPath = startPath;
+    }
+
+    public String getSignedOutUrl() {
+        return signedOutUrl;
+    }
+
+    public void setSignedOutUrl (String signedOutUrl) {
+        this.signedOutUrl = signedOutUrl;
     }
 }
