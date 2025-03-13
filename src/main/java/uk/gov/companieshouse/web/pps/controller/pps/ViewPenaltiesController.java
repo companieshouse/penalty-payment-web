@@ -1,12 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -29,6 +23,13 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
 
 @Controller
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
@@ -93,10 +94,10 @@ public class ViewPenaltiesController extends BaseController {
                 penaltyConfigurationProperties.getSignOutPath());
 
         CompanyProfileApi companyProfileApi;
-        List<LateFilingPenalty> penalties;
+        List<FinancialPenalty> payablePenalties;
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            penalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
+            payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
@@ -104,24 +105,24 @@ public class ViewPenaltiesController extends BaseController {
 
         // Return an error view when account has multiple unpaid penalties.
         // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (penalties.size() > 1) {
+        if (payablePenalties.size() > 1) {
             LOGGER.info("Multiple unpaid penalties found for company number " + companyNumber);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        Optional<LateFilingPenalty> payablePenaltyOptional = penalties.stream()
-                .filter(p -> penaltyRef.equals(p.getId()))
-                .filter(p -> PENALTY_TYPE.equals(p.getType()))
+        Optional<FinancialPenalty> requestedPayablePenalty = payablePenalties.stream()
+                .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
+                .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
                 .findFirst();
 
         // Return an error view when requested penalty is not found
         // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (payablePenaltyOptional.isEmpty()) {
+        if (requestedPayablePenalty.isEmpty()) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        LateFilingPenalty payablePenalty = payablePenaltyOptional.get();
+        FinancialPenalty payablePenalty = requestedPayablePenalty.get();
 
         if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
@@ -142,19 +143,19 @@ public class ViewPenaltiesController extends BaseController {
             @PathVariable String penaltyRef,
                                     HttpServletRequest request) {
 
-        PayableLateFilingPenaltySession payableLateFilingPenaltySession;
+        PayableFinancialPenaltySession payableFinancialPenaltySession;
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         try {
             // Call penalty details for create request
-            LateFilingPenalty lateFilingPenalty = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef).getFirst();
+            FinancialPenalty financialPenalty = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef).getFirst();
 
             // Create payable session
-            payableLateFilingPenaltySession = payablePenaltyService.createLateFilingPenaltySession(
+            payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                     companyNumber,
                     penaltyRef,
-                    lateFilingPenalty.getOutstanding());
+                    financialPenalty.getOutstanding());
 
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
@@ -164,7 +165,7 @@ public class ViewPenaltiesController extends BaseController {
         try {
             // Return the payment session URL and add query parameter to indicate Review Payments screen isn't wanted
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
-                    payableLateFilingPenaltySession, companyNumber, penaltyRef) + "?summary=false";
+                    payableFinancialPenaltySession, companyNumber, penaltyRef) + "?summary=false";
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return redirectPathUnscheduledServiceDown;

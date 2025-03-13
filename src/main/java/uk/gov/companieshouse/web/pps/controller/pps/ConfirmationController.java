@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
-import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
+import uk.gov.companieshouse.api.model.financialpenalty.TransactionPayableFinancialPenalty;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -22,6 +19,10 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+
+import java.util.Map;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
@@ -86,8 +87,8 @@ public class ConfirmationController extends BaseController {
         }
 
         try {
-            PayableLateFilingPenalty payableResource = payablePenaltyService.getPayableLateFilingPenalty(companyNumber, payableRef);
-            TransactionPayableLateFilingPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
+            PayableFinancialPenalties payableResource = payablePenaltyService.getPayableFinancialPenalties(companyNumber, payableRef);
+            TransactionPayableFinancialPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {

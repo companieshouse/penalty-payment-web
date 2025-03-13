@@ -1,5 +1,32 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindingResult;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.models.EnterDetails;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
@@ -20,32 +47,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.BindingResult;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
-import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.models.EnterDetails;
-import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -256,7 +257,7 @@ class EnterDetailsControllerTest {
 
     @Test
     @DisplayName("Post Details failure path - no payable late filing penalties found")
-    void postRequestNoPayableLateFilingPenaltyFound() throws Exception {
+    void postRequestNoPayableFinancialPenaltyFound() throws Exception {
 
         configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
@@ -297,7 +298,7 @@ class EnterDetailsControllerTest {
     void postRequestMultiplePayablePenalties() throws Exception {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
+        configureMultiplePenalties(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -316,7 +317,7 @@ class EnterDetailsControllerTest {
     void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureMultipleLateFilingPenalties(VALID_COMPANY_NUMBER);
+        configureMultiplePenalties(VALID_COMPANY_NUMBER);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -504,82 +505,82 @@ class EnterDetailsControllerTest {
     }
 
     private void configureValidPenalty(String companyNumber, String penaltyRef) throws ServiceException {
-        List<LateFilingPenalty> validLFPs = new ArrayList<>();
-        validLFPs.add(PPSTestUtility.validLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(validLFPs);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(validFinancialPenalties);
     }
 
-    private void configureMultipleLateFilingPenalties(String companyNumber) throws ServiceException {
-        List<LateFilingPenalty> multipleValidLFPs = new ArrayList<>();
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A2345678"));
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty("A3456789"));
-        multipleValidLFPs.add(PPSTestUtility.validLateFilingPenalty(VALID_PENALTY_REF));
+    private void configureMultiplePenalties(String companyNumber) throws ServiceException {
+        List<FinancialPenalty> multipleValidFinancialPenalties = new ArrayList<>();
+        multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A2345678"));
+        multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A3456789"));
+        multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(VALID_PENALTY_REF));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(eq(companyNumber), anyString()))
-                .thenReturn(multipleValidLFPs);
+        when(mockPenaltyPaymentService.getFinancialPenalties(eq(companyNumber), anyString()))
+                .thenReturn(multipleValidFinancialPenalties);
     }
 
     private void configurePenaltyWrongID(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> wrongIdLfp = new ArrayList<>();
-        wrongIdLfp.add(PPSTestUtility.validLateFilingPenalty(companyNumber));
+        List<FinancialPenalty> wrongId = new ArrayList<>();
+        wrongId.add(PPSTestUtility.validFinancialPenalty(companyNumber));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(wrongIdLfp);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(wrongId);
     }
 
     private void configurePenaltyDCA(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> dcaLfp = new ArrayList<>();
-        dcaLfp.add(PPSTestUtility.dcaLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> dcaFinancialPenalty = new ArrayList<>();
+        dcaFinancialPenalty.add(PPSTestUtility.dcaFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(dcaLfp);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(dcaFinancialPenalty);
     }
 
     private void configurePenaltyAlreadyPaid(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> paidLfp = new ArrayList<>();
-        paidLfp.add(PPSTestUtility.paidLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> paidFinancialPenalty = new ArrayList<>();
+        paidFinancialPenalty.add(PPSTestUtility.paidFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(paidLfp);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(paidFinancialPenalty);
     }
 
     private void configurePenaltyNegativeOutstanding(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> negativeLFP = new ArrayList<>();
-        negativeLFP.add(PPSTestUtility.negativeOustandingLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> negativeOustandingFinancialPenalty = new ArrayList<>();
+        negativeOustandingFinancialPenalty.add(PPSTestUtility.negativeOustandingFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(negativeLFP);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(negativeOustandingFinancialPenalty);
     }
 
     private void configurePenaltyPartiallyPaid(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> partialPaidLFP = new ArrayList<>();
-        partialPaidLFP.add(PPSTestUtility.partialPaidLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> partialPaidFinancialPenalty = new ArrayList<>();
+        partialPaidFinancialPenalty.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(partialPaidLFP);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(partialPaidFinancialPenalty);
     }
 
     private void configurePenaltyNotPenaltyType(String companyNumber, String penaltyRef)
             throws ServiceException {
-        List<LateFilingPenalty> notPenaltyTypeLfp = new ArrayList<>();
-        notPenaltyTypeLfp.add(PPSTestUtility.notPenaltyTypeLateFilingPenalty(penaltyRef));
+        List<FinancialPenalty> notPenaltyTypeFinancialPenalty = new ArrayList<>();
+        notPenaltyTypeFinancialPenalty.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(penaltyRef));
 
-        when(mockPenaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef))
-                .thenReturn(notPenaltyTypeLfp);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(notPenaltyTypeFinancialPenalty);
     }
 
     private void configureErrorRetrievingPenalty(String companyNumber, String penaltyRef)
             throws ServiceException {
 
         doThrow(ServiceException.class)
-                .when(mockPenaltyPaymentService).getLateFilingPenalties(companyNumber, penaltyRef);
+                .when(mockPenaltyPaymentService).getFinancialPenalties(companyNumber, penaltyRef);
     }
 
     private void configureStartPathProperty() {

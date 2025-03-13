@@ -35,7 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -101,8 +101,8 @@ class ConfirmationControllerTest {
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
+        when(mockPayablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
@@ -127,8 +127,8 @@ class ConfirmationControllerTest {
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, CS_PENALTY_REF, VALID_CS_REASON));
+        when(mockPayablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableFinancialPenalties(COMPANY_NUMBER, CS_PENALTY_REF, VALID_CS_REASON));
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_CS)
@@ -156,12 +156,12 @@ class ConfirmationControllerTest {
                         Map.of("email", "test@gmail.com"))));
         sessionData.put(PAYMENT_STATE, STATE);
 
-        PayableLateFilingPenalty penalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON);
+        PayableFinancialPenalties penalty = PPSTestUtility.validPayableFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON);
         penalty.setPayment(null);
 
         when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER))
                 .thenReturn(PPSTestUtility.validCompanyProfile(COMPANY_NUMBER));
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
+        when(mockPayablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF))
                 .thenReturn(penalty);
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
@@ -216,8 +216,8 @@ class ConfirmationControllerTest {
 
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
 
-        when(mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF))
-                .thenReturn(PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
+        when(mockPayablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF, VALID_LATE_FILING_REASON));
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
                         .param("ref", REF)
@@ -236,7 +236,7 @@ class ConfirmationControllerTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
         doThrow(ServiceException.class)
-                .when(mockPayablePenaltyService).getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
+                .when(mockPayablePenaltyService).getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF);
 
         this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_LFP)
                         .param("ref", REF)
