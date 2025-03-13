@@ -69,8 +69,9 @@ class StartControllerTest {
     }
 
     private static final String START_PATH = "/late-filing-penalty";
-    private static final String GDS_START_PATH = "/pay-penalty";
     private static final String START_PATH_PARAM = "/late-filing-penalty?start=0";
+    private static final String GDS_START_PATH = "/pay-penalty";
+    private static final String GDS_START_PATH_PARAM = "/late-filing-penalty?start=0";
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
 
@@ -146,6 +147,20 @@ class StartControllerTest {
         configureNextController();
 
         this.mockMvc.perform(get(START_PATH_PARAM))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+
+        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
+    }
+
+    @Test
+    @DisplayName("Get View Start Page GDS - redirect to sign in")
+    void getRequestRedirectToSignInWhenVisitFromGovUkGds() throws Exception {
+
+        configureValidFinanceHealthcheckResponse();
+        configureNextController();
+
+        this.mockMvc.perform(get(GDS_START_PATH_PARAM))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(MOCK_CONTROLLER_PATH));
 
