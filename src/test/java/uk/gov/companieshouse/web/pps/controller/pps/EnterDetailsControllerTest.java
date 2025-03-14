@@ -1,28 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.Locale.UK;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +23,30 @@ import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.Locale.UK;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -85,17 +86,17 @@ class EnterDetailsControllerTest {
 
     private static final String LOWER_CASE_LLP = "oc123456";
 
-    private static final String ENTER_DETAILS_PATH = "/late-filing-penalty/enter-details";
+    private static final String ENTER_DETAILS_PATH = "/pay-penalty/enter-details";
 
     private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH =
-            "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
+            "redirect:/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
 
     private static final String ALREADY_PAID_PATH =
-            "redirect:/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
+            "redirect:/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-paid";
 
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
-    private static final String START_PATH = "/late-filing-penalty";
+    private static final String START_PATH = "/pay-penalty";
 
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 

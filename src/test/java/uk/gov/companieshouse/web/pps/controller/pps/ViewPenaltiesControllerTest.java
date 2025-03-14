@@ -1,28 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.REASON_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +21,30 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.REASON_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -79,10 +80,10 @@ class ViewPenaltiesControllerTest {
     private static final String LFP_PENALTY_NUMBER = "A4444444";
     private static final String SANCTIONS_PENALTY_REF = "P1234567";
 
-    private static final String VIEW_PENALTIES_PATH = "/late-filing-penalty/company/%s/penalty/%s/view-penalties";
+    private static final String VIEW_PENALTIES_PATH = "/pay-penalty/company/%s/penalty/%s/view-penalties";
     private static final String LFP_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, LFP_PENALTY_NUMBER);
     private static final String SANCTIONS_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, SANCTIONS_PENALTY_REF);
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String REDIRECT_PATH = "redirect:";
     private static final String MOCK_PAYMENTS_URL = "pay.companieshouse/payments/987654321987654321/pay";

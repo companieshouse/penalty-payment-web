@@ -5,8 +5,8 @@ import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class AllowlistChecker {
@@ -15,9 +15,9 @@ public class AllowlistChecker {
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private static final Pattern URL_PATTERN = Pattern.compile(
-            "/late-filing-penalty?[/a-zA-Z\\d-?=+]+$");
+            "/pay-penalty?[/a-zA-Z\\d-?=+]+$");
     private static final Pattern SIGNOUT_PATTERN = Pattern.compile(
-            "late-filing-penalty/sign-out");
+            "pay-penalty/sign-out");
 
 
     public String checkURL(String url) {
@@ -27,7 +27,7 @@ public class AllowlistChecker {
             return url;
         }
         LOGGER.error("URL not valid. Returning to landing page...");
-        return "/late-filing-penalty/ref-starts-with";
+        return "/pay-penalty/ref-starts-with";
     }
 
     public boolean checkSignOutIsReferer(String url) {

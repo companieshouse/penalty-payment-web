@@ -1,20 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.AVAILABLE_PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +15,22 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.AVAILABLE_PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PENALTY_REFERENCE_CHOICE_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -53,11 +54,11 @@ class BankTransferPenaltyReferenceControllerTest {
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
                 LATE_FILING, SANCTIONS));
         penaltyConfigurationProperties.setBankTransferPath(
-                "/late-filing-penalty/bank-transfer");
+                "/pay-penalty/bank-transfer");
         penaltyConfigurationProperties.setBankTransferLateFilingDetailsPath(
-                "/late-filing-penalty/bank-transfer/A");
+                "/pay-penalty/bank-transfer/A");
         penaltyConfigurationProperties.setBankTransferSanctionsPath(
-                "/late-filing-penalty/bank-transfer/P");
+                "/pay-penalty/bank-transfer/P");
 
         BankTransferPenaltyReferenceController controller = new BankTransferPenaltyReferenceController(
                 mockNavigatorService,

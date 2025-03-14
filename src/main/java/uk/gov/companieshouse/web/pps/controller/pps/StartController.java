@@ -25,7 +25,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
-@RequestMapping({"/late-filing-penalty", "/pay-penalty"})
+@RequestMapping("/pay-penalty")
 public class StartController extends BaseController {
 
     static final String HOME_TEMPLATE_NAME = "pps/home";

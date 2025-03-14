@@ -1,16 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.Locale.UK;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,9 +28,19 @@ import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
 @Controller
 @NextController(ViewPenaltiesController.class)
-@RequestMapping("/late-filing-penalty/enter-details")
+@RequestMapping("/pay-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
 
     static final String ENTER_DETAILS_TEMPLATE_NAME = "pps/details";
@@ -184,7 +185,7 @@ public class EnterDetailsController extends BaseController {
     }
 
     private String urlGenerator(String companyNumber, String penaltyRef) {
-        return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
+        return "/pay-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
     }
 
     private String setBackLink() {

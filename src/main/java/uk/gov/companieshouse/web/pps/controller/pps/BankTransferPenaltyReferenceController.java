@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,8 +16,12 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
+import java.util.List;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 @Controller
-@RequestMapping("/late-filing-penalty/bank-transfer")
+@RequestMapping("/pay-penalty/bank-transfer")
 public class BankTransferPenaltyReferenceController extends BaseController {
 
     static final String BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME = "pps/bankTransferPenaltyReference";

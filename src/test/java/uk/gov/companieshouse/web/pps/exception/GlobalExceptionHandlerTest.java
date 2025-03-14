@@ -1,8 +1,5 @@
 package uk.gov.companieshouse.web.pps.exception;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,11 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GlobalExceptionHandlerTest {
 
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;

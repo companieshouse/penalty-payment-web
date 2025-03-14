@@ -1,13 +1,5 @@
 package uk.gov.companieshouse.web.pps.util;
 
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.OPEN;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheckStatus;
@@ -17,6 +9,15 @@ import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalt
 import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
 import uk.gov.companieshouse.api.model.latefilingpenalty.Payment;
 import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.OPEN;
 
 public class PPSTestUtility {
 
@@ -59,7 +60,7 @@ public class PPSTestUtility {
         Payment payment = new Payment();
         payment.setPaidAt(DATE_TIME);
         payment.setAmount(VALID_AMOUNT.toString());
-        String resumeURI = "/late-filing-penalty/company/" + companyNumber + "/penalty/" + id + "/view-penalties";
+        String resumeURI = "/pay-penalty/company/" + companyNumber + "/penalty/" + id + "/view-penalties";
 
         payableLateFilingPenalty.setLinks(new HashMap<>(){{put("resume_journey_uri", resumeURI);}});
         payableLateFilingPenalty.setPayment(payment);

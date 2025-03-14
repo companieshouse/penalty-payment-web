@@ -1,12 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +24,15 @@ import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
+
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
     static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";

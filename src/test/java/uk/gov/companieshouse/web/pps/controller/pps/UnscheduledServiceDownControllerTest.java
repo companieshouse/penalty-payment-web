@@ -1,14 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.UnscheduledServiceDownController.UNSCHEDULED_SERVICE_DOWN_TEMPLATE_NAME;
-
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +13,23 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.UnscheduledServiceDownController.UNSCHEDULED_SERVICE_DOWN_TEMPLATE_NAME;
+
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UnscheduledServiceDownControllerTest {
 
     private MockMvc mockMvc;
 
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @Mock
     private NavigatorService mockNavigatorService;

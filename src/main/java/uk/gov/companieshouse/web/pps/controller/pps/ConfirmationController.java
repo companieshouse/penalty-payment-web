@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +20,12 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyServic
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
+import java.util.Map;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
 public class ConfirmationController extends BaseController {
 
     static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";

@@ -68,12 +68,10 @@ class StartControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
-    private static final String START_PATH = "/late-filing-penalty";
-    private static final String START_PATH_PARAM = "/late-filing-penalty?start=0";
-    private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
-    private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
+    private static final String START_PATH = "/pay-penalty";
+    private static final String START_PATH_PARAM = "/pay-penalty?start=0";
     private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String DATE_MODEL_ATTR = "date";
 
@@ -86,20 +84,6 @@ class StartControllerTest {
         configureValidFinanceHealthcheckResponse();
 
         this.mockMvc.perform(get(START_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(HOME_TEMPLATE_NAME));
-
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
-    }
-
-    @Test
-    @DisplayName("Get View Start Page Pay Penalty - success path")
-    void getPayPenaltyHomeRequestSuccess() throws Exception {
-
-        configureValidFinanceHealthcheckResponse();
-
-        this.mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(HOME_TEMPLATE_NAME));
 
@@ -147,20 +131,6 @@ class StartControllerTest {
         configureNextController();
 
         this.mockMvc.perform(get(START_PATH_PARAM))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-    }
-
-    @Test
-    @DisplayName("Get View Start Page GDS - redirect to sign in")
-    void getRequestRedirectToSignInWhenVisitFromGovUkGds() throws Exception {
-
-        configureValidFinanceHealthcheckResponse();
-        configureNextController();
-
-        this.mockMvc.perform(get(PAY_PENALTY_START_PATH_PARAM))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(MOCK_CONTROLLER_PATH));
 
