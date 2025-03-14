@@ -1,16 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.Locale.UK;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.latefilingpenalty.PayableStatus.CLOSED;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
@@ -36,6 +27,16 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
+
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.Locale.UK;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
 @NextController(ViewPenaltiesController.class)
@@ -132,8 +133,8 @@ public class EnterDetailsController extends BaseController {
         String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
 
         try {
-            List<LateFilingPenalty> payablePenalties = penaltyPaymentService.getLateFilingPenalties(companyNumber, penaltyRef);
-            Optional<LateFilingPenalty> requestedPayablePenalty = payablePenalties.stream()
+            List<FinancialPenalty> payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            Optional<FinancialPenalty> requestedPayablePenalty = payablePenalties.stream()
                     .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
                     .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
                     .findFirst();
@@ -143,7 +144,7 @@ public class EnterDetailsController extends BaseController {
             redirectAttributes.addFlashAttribute(ENTER_DETAILS_MODEL_ATTR, enterDetails);
 
             if (payablePenalties.size() == 1 && requestedPayablePenalty.isPresent()) { // Only one payable penalty: the requested penalty
-                LateFilingPenalty payablePenalty = requestedPayablePenalty.get();
+                FinancialPenalty payablePenalty = requestedPayablePenalty.get();
 
                 if (TRUE.equals(payablePenalty.getPaid())) {
                     LOGGER.info("Payable penalty " + payablePenalty.getId() + " is paid");

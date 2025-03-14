@@ -1,12 +1,10 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
-import java.util.Arrays;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.payment.PaymentApi;
 import uk.gov.companieshouse.api.model.payment.PaymentSessionApi;
 import uk.gov.companieshouse.environment.EnvironmentReader;
@@ -17,6 +15,9 @@ import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -53,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPaymentSession(
-            PayableLateFilingPenaltySession payableLateFilingPenaltySession,
+            PayableFinancialPenaltySession payableFinancialPenaltySession,
             String companyNumber,
             String penaltyRef)
             throws ServiceException {
@@ -67,11 +68,11 @@ public class PaymentServiceImpl implements PaymentService {
                 + "/penalty/"
                 + penaltyRef
                 + "/payable/"
-                + payableLateFilingPenaltySession.getId()
+                + payableFinancialPenaltySession.getId()
                 + "/confirmation";
         paymentSessionApi.setRedirectUri(redirectUrl);
-        paymentSessionApi.setResource(apiUrl + payableLateFilingPenaltySession.getLinks().get("self") + "/payment");
-        paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableLateFilingPenaltySession.getId());
+        paymentSessionApi.setResource(apiUrl + payableFinancialPenaltySession.getLinks().get("self") + "/payment");
+        paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableFinancialPenaltySession.getId());
         paymentSessionApi.setState(paymentState);
         LOGGER.info("Creating payment session");
         LOGGER.info("SESSION REDIRECT URI: " + paymentSessionApi.getRedirectUri());

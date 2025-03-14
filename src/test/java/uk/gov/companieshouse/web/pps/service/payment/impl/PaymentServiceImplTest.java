@@ -13,7 +13,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.handler.payment.PaymentResourceHandler;
 import uk.gov.companieshouse.api.handler.payment.request.PaymentCreate;
 import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.payment.PaymentApi;
 import uk.gov.companieshouse.api.model.payment.PaymentSessionApi;
 import uk.gov.companieshouse.environment.EnvironmentReader;
@@ -62,7 +62,7 @@ class PaymentServiceImplTest {
     private ApiResponse<PaymentApi> apiResponse;
 
     @Mock
-    private PayableLateFilingPenaltySession payableLateFilingPenaltySession;
+    private PayableFinancialPenaltySession payableFinancialPenaltySession;
 
     @Mock
     private PaymentApi paymentApi;
@@ -116,7 +116,7 @@ class PaymentServiceImplTest {
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
         String journeyUrl = mockPaymentService.createPaymentSession(
-                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF);
+                payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
@@ -139,7 +139,7 @@ class PaymentServiceImplTest {
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
         String journeyUrl = mockPaymentService.createPaymentSession(
-                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF_SANCTIONS);
+                payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF_SANCTIONS);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
@@ -155,7 +155,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
+                        payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }
@@ -169,7 +169,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
+                        payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }

@@ -5,7 +5,7 @@
     <artifactId>penalty-payment-web</artifactId>
     <version>unversioned</version>
     <name>penalty-payment-web</name>
-    <description>Companies House Service for paying LFP penalties and associated fees</description>
+    <description>Companies House Service for paying financial penalties</description>
     <parent>
         <groupId>uk.gov.companieshouse</groupId>
 
@@ -24,7 +24,7 @@
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
-        <api-sdk-java.version>6.0.37</api-sdk-java.version>
+        <api-sdk-java.version>6.1.0</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.4.1</spring-boot-dependencies.version>
