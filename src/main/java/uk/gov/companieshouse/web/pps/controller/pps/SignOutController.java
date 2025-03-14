@@ -29,7 +29,6 @@ public class SignOutController extends BaseController {
 
     static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
-    private static final String ACCOUNT_URL = System.getenv("ACCOUNT_URL");
     private static final String SIGN_OUT_URL = "/late-filing-penalty/sign-out";
     private static final String HOME = "/late-filing-penalty/";
     private static final String BACK_LINK = "backLink";
@@ -91,7 +90,7 @@ public class SignOutController extends BaseController {
             return new RedirectView(SIGN_OUT_URL, true, false);
         }
         if (valueGet.equals("yes")) {
-            return new RedirectView(ACCOUNT_URL + "/signout");
+            return new RedirectView(penaltyConfigurationProperties.getSignedOutUrl() + "/signout");
         }
         if (valueGet.equals("no")) {
             return new RedirectView(url);
