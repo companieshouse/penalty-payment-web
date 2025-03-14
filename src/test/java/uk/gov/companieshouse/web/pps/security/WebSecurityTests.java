@@ -17,14 +17,13 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MockitoExtension.class)
-class WebsecurityTests {
+class WebSecurityTests {
 
     @Mock
     private HttpSecurity httpSecurity;
 
     @InjectMocks
     private WebSecurity webSecurity;
-
     @SystemStub
     private EnvironmentVariables environmentVariables;
 
@@ -39,6 +38,13 @@ class WebsecurityTests {
     void temporaryStartPageSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/late-filing-penalty")).thenReturn(httpSecurity);
         assertEquals(webSecurity.temporaryStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /pay-penalty")
+    void temporaryGdsStartPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/pay-penalty")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.temporaryGdsStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
