@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AllowListCheckerTest {
 
-    private static final String HOME = "/late-filing-penalty";
+    private static final String HOME = "/late-filing-penalty/ref-starts-with";
 
     private final AllowlistChecker allowListChecker = new AllowlistChecker();
 
