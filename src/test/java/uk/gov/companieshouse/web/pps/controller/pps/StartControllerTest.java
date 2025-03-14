@@ -94,8 +94,8 @@ class StartControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Start Page GDS - success path")
-    void getGdsRequestSuccess() throws Exception {
+    @DisplayName("Get View Start Page Pay Penalty - success path")
+    void getPayPenaltyHomeRequestSuccess() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
 
