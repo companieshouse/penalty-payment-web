@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AllowListCheckerTest {
 
-    private static final String HOME = "/late-filing-penalty/ref-starts-with";
+    private static final String PENALTY_REF_STARTS_WITH = "/late-filing-penalty/ref-starts-with";
 
     private final AllowlistChecker allowListChecker = new AllowlistChecker();
 
@@ -33,7 +33,7 @@ class AllowListCheckerTest {
     })
     void getInvalidUrl(String url) {
         String result = allowListChecker.checkURL(url);
-        assertEquals(HOME, result);
+        assertEquals(PENALTY_REF_STARTS_WITH, result);
     }
 
     @DisplayName("test if regex returns correct value")
@@ -59,7 +59,7 @@ class AllowListCheckerTest {
     @Test
     @DisplayName("test sign out is detected")
     void checkForSignOutWithNonSignOutUrl() {
-        boolean isSignOut = allowListChecker.checkSignOutIsReferer(HOME);
+        boolean isSignOut = allowListChecker.checkSignOutIsReferer(PENALTY_REF_STARTS_WITH);
         assertFalse(isSignOut);
     }
 
