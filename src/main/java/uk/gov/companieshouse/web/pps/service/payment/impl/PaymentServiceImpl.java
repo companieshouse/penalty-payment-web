@@ -63,7 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         PaymentSessionApi paymentSessionApi = new PaymentSessionApi();
         String redirectUrl = chsUrl
-                + "/late-filing-penalty/company/"
+                + "/pay-penalty/company/"
                 + companyNumber
                 + "/penalty/"
                 + penaltyRef

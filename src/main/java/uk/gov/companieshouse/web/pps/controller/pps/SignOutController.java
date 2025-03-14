@@ -23,15 +23,15 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
 @Controller
 @NextController(StartController.class)
-@RequestMapping("/late-filing-penalty/sign-out")
+@RequestMapping("/pay-penalty/sign-out")
 public class SignOutController extends BaseController {
 
     private final AllowlistChecker allowlistChecker;
 
     static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
-    private static final String SIGN_OUT_URL = "/late-filing-penalty/sign-out";
-    private static final String HOME = "/late-filing-penalty/";
+    private static final String SIGN_OUT_URL = "/pay-penalty/sign-out";
+    private static final String HOME = "/pay-penalty/";
     private static final String BACK_LINK = "backLink";
 
     public SignOutController(

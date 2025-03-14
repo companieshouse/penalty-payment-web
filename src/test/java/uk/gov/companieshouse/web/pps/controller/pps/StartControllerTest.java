@@ -67,12 +67,10 @@ class StartControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
-    private static final String LEGACY_START_PATH = "/late-filing-penalty";
-    private static final String LEGACY_START_PATH_PARAM = "/late-filing-penalty?start=0";
-    private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
-    private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
+    private static final String LEGACY_START_PATH = "/pay-penalty";
+    private static final String LEGACY_START_PATH_PARAM = "/pay-penalty?start=0";
     private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/late-filing-penalty/ref-starts-with";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
 
     private static final String DATE_MODEL_ATTR = "date";

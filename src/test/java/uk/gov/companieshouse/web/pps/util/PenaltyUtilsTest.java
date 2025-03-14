@@ -13,7 +13,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
 class PenaltyUtilsTest {
 
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @BeforeEach
     void setup() {

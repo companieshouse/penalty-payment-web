@@ -34,67 +34,60 @@ class WebSecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty")
+    @DisplayName(" apply security filter to /pay-penalty")
     void temporaryStartPageSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty")).thenReturn(httpSecurity);
         assertEquals(webSecurity.temporaryStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /pay-penalty")
-    void temporaryGdsStartPageSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.temporaryGdsStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/ref-starts-with")
+    @DisplayName(" apply security filter to /pay-penalty/ref-starts-with")
     void penaltyRefStartsWithPageSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/ref-starts-with"))
+        when(httpSecurity.securityMatcher("/pay-penalty/ref-starts-with"))
                 .thenReturn(httpSecurity);
         assertEquals(webSecurity.penaltyRefStartsWithPageSecurityFilterChain(httpSecurity),
                 httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/healthcheck")
+    @DisplayName(" apply security filter to /pay-penalty/healthcheck")
     void healthcheckSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/healthcheck")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/healthcheck")).thenReturn(httpSecurity);
         assertEquals(webSecurity.healthcheckSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/bank-transfer/**")
+    @DisplayName(" apply security filter to /pay-penalty/bank-transfer/**")
     void bankTransferSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/bank-transfer/**")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/bank-transfer/**")).thenReturn(httpSecurity);
         assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/unscheduled-service-down")
+    @DisplayName(" apply security filter to /pay-penalty/unscheduled-service-down")
     void scheduledServiceDownSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
         assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/stylesheets/**")
+    @DisplayName(" apply security filter to /pay-penalty/stylesheets/**")
     void stylesheetsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/stylesheets/**")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/stylesheets/**")).thenReturn(httpSecurity);
         assertEquals(webSecurity.stylesheetsSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/images/**")
+    @DisplayName(" apply security filter to /pay-penalty/images/**")
     void imagesFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/images/**")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/images/**")).thenReturn(httpSecurity);
         assertEquals(webSecurity.imagesSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/fonts/**")
+    @DisplayName(" apply security filter to /pay-penalty/fonts/**")
     void fontsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/fonts/**")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/fonts/**")).thenReturn(httpSecurity);
         assertEquals(webSecurity.fontsSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 

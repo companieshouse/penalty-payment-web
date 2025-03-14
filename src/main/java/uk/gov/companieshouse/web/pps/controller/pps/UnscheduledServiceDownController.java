@@ -10,7 +10,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Controller
-@RequestMapping("/late-filing-penalty/unscheduled-service-down")
+@RequestMapping("/pay-penalty/unscheduled-service-down")
 public class UnscheduledServiceDownController extends BaseController {
 
     static final String UNSCHEDULED_SERVICE_DOWN_TEMPLATE_NAME = "pps/unscheduledServiceDown";

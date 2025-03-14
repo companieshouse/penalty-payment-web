@@ -39,7 +39,7 @@ class BankTransferSanctionsDetailsControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/late-filing-penalty/bank-transfer/P";
+    private static final String BANK_TRANSFER_SANCTIONS_DETAILS_PATH = "/pay-penalty/bank-transfer/P";
 
     @BeforeEach
     void setup() {
