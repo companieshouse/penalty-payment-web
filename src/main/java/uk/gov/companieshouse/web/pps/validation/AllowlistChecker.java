@@ -11,29 +11,27 @@ import java.util.regex.Matcher;
 @Component
 public class AllowlistChecker {
 
-
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    private static final String HOME = "/late-filing-penalty";
-    private static final String REGEX = "\\/late-filing-penalty[\\/[a-zA-Z0-9-]+]+$";
-    private static final String SIGN_OUT = "late-filing-penalty/sign-out";
+    private static final Pattern URL_PATTERN = Pattern.compile(
+            "/late-filing-penalty?[/a-zA-Z\\d-?=+]+$");
+    private static final Pattern SIGNOUT_PATTERN = Pattern.compile(
+            "late-filing-penalty/sign-out");
 
 
     public String checkURL(String url) {
-        Pattern p = Pattern.compile(REGEX);
-        Matcher m = p.matcher(url);
+        Matcher m = URL_PATTERN.matcher(url);
         if (m.find()) {
             LOGGER.info("URL valid, returning to " + url);
             return url;
         }
         LOGGER.error("URL not valid. Returning to landing page...");
-        return HOME;
+        return "/late-filing-penalty/ref-starts-with";
     }
 
     public boolean checkSignOutIsReferer(String url) {
-        Pattern p = Pattern.compile(SIGN_OUT);
-        Matcher m = p.matcher(url);
+        Matcher m = SIGNOUT_PATTERN.matcher(url);
         return m.find();
     }
 
