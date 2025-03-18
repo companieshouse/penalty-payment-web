@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +14,8 @@ import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
 @RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")

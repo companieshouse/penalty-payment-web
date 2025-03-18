@@ -1,14 +1,15 @@
 package uk.gov.companieshouse.web.pps.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
 class PenaltyUtilsTest {
 
