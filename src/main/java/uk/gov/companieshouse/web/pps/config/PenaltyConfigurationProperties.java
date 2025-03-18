@@ -23,6 +23,7 @@ public class PenaltyConfigurationProperties {
     private String serviceBannerLink;
     private String startPath;
     private String signedOutUrl;
+    private String govUkPayPenaltyUrl;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -120,4 +121,13 @@ public class PenaltyConfigurationProperties {
     public void setSignedOutUrl (String signedOutUrl) {
         this.signedOutUrl = signedOutUrl;
     }
+
+    public String getGovUkPayPenaltyUrl() {
+        return govUkPayPenaltyUrl;
+    }
+
+    public void setGovUkPayPenaltyUrl(String govUkPayPenaltyUrl) {
+        this.govUkPayPenaltyUrl = govUkPayPenaltyUrl;
+    }
+
 }
