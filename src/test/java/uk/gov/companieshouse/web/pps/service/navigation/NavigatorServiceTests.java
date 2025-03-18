@@ -1,9 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.navigation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +24,10 @@ import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourn
 import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourneyControllerThree;
 import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourneyControllerTwo;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
