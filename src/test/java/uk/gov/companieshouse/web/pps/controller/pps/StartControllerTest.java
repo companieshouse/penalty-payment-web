@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.security.WebSecurity;
@@ -27,8 +26,8 @@ import java.text.SimpleDateFormat;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.controller.pps.StartController.HOME_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,144 +53,142 @@ class StartControllerTest {
     @Mock
     private SessionService mockSessionService;
 
-    @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
-
     @BeforeEach
     void setup() {
+        PenaltyConfigurationProperties penaltyConfigurationProperties = new PenaltyConfigurationProperties();
+        penaltyConfigurationProperties.setUnscheduledServiceDownPath("/late-filing-penalty/unscheduled-service-down");
+        penaltyConfigurationProperties.setGovUkPayPenaltyUrl((GOV_UK_PAY_PENALTY_URL));
+
         StartController controller = new StartController(
                 mockNavigatorService,
                 mockSessionService,
-                mockPenaltyConfigurationProperties,
+                penaltyConfigurationProperties,
                 mockPenaltyPaymentService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
-    private static final String START_PATH = "/late-filing-penalty";
-    private static final String START_PATH_PARAM = "/late-filing-penalty?start=0";
+    private static final String LEGACY_START_PATH = "/late-filing-penalty";
+    private static final String LEGACY_START_PATH_PARAM = "/late-filing-penalty?start=0";
     private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
     private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
-    private static final String MOCK_CONTROLLER_PATH = UrlBasedViewResolver.REDIRECT_URL_PREFIX + "mockControllerPath";
+    private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/late-filing-penalty/ref-starts-with";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
 
     private static final String DATE_MODEL_ATTR = "date";
 
     private static final String MAINTENANCE_END_TIME = "2001-02-03T04:05:06-00:00";
 
     @Test
-    @DisplayName("Get View Start Page - success path")
-    void getRequestSuccess() throws Exception {
+    @DisplayName("Get legacy start page - redirect to GOV UK Pay Penalty - Start now page")
+    void getOldStartPathRequestRedirectToGovUkPayPenalty() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
 
-        this.mockMvc.perform(get(START_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(HOME_TEMPLATE_NAME));
+        mockMvc.perform(get(LEGACY_START_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Get View Start Page Pay Penalty - success path")
-    void getPayPenaltyHomeRequestSuccess() throws Exception {
+    @DisplayName("Get pay penalty start page - redirect to GOV UK Pay Penalty - Start now page")
+    void getRequestRedirectToGovUkPayPenalty() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
 
-        this.mockMvc.perform(get(PAY_PENALTY_START_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(HOME_TEMPLATE_NAME));
+        mockMvc.perform(get(PAY_PENALTY_START_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
     }
 
     @Test
-    @DisplayName("Get View Start Page - error checking finance system")
+    @DisplayName("Get pay penalty start page - error checking finance system")
     void getRequestErrorCheckingFinanceSystem() throws Exception {
 
         configureErrorFinanceHealthcheckResponse();
 
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(START_PATH))
+        mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Get View Start Page - finance system offline")
+    @DisplayName("Get pay penalty start page - finance system offline")
     void getRequestFinanceSystemOffline() throws Exception {
 
         configureUnhealthyFinanceHealthcheckResponse();
 
-        this.mockMvc.perform(get(START_PATH))
+        mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME))
                 .andExpect(model().attributeExists(DATE_MODEL_ATTR))
                 .andExpect(model().attribute(DATE_MODEL_ATTR, convertTimeToModelFormat()));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Get View Start Page - redirect to sign in")
-    void getRequestRedirectToSignInWhenVisitFromGovUk() throws Exception {
+    @DisplayName("Get legacy start path param - redirect to penalty ref starts with")
+    void getLegacyStartPathParamRequestRedirectToPenaltyRefStartsWithWhenVisitFromGovUk() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
         configureNextController();
 
-        this.mockMvc.perform(get(START_PATH_PARAM))
+        mockMvc.perform(get(LEGACY_START_PATH_PARAM))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+                .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Get View Start Page GDS - redirect to sign in")
-    void getRequestRedirectToSignInWhenVisitFromGovUkGds() throws Exception {
+    @DisplayName("Get pay penalty start path param - redirect to penalty ref starts with")
+    void getStartPathParamRequestRedirectToPenaltyRefStartsWithWhenVisitFromGovUk() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
         configureNextController();
 
-        this.mockMvc.perform(get(PAY_PENALTY_START_PATH_PARAM))
+        mockMvc.perform(get(PAY_PENALTY_START_PATH_PARAM))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+                .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Get View Start Page - invalid finance healthcheck state")
+    @DisplayName("Get pay penalty start page - invalid finance healthcheck state")
     void getRequestFinanceSystemInvalidState() throws Exception {
 
         configureInvalidFinanceHealthcheckResponse();
 
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
-                UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(START_PATH))
+        mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockPenaltyPaymentService, times(1)).checkFinanceSystemAvailableTime();
-
+        verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verifyNoMoreInteractions(mockPenaltyPaymentService);
     }
 
     @Test
-    @DisplayName("Post View Start Page - success path")
+    @DisplayName("Post pay penalty start page - success path")
     void postRequestSuccess() throws Exception {
 
         configureNextController();
 
-        this.mockMvc.perform(post(START_PATH))
+        mockMvc.perform(post(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+                .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
     }
 
     private void configureValidFinanceHealthcheckResponse()
@@ -230,8 +226,9 @@ class StartControllerTest {
 
     private void configureNextController() {
        when(mockNavigatorService.getNextControllerRedirect(any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
+               .thenReturn(PENALTY_REF_STARTS_WITH_PATH);
     }
+
     private ViewResolver viewResolver()
     {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();

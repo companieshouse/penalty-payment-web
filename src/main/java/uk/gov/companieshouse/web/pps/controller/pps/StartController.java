@@ -22,13 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
 @RequestMapping({"/late-filing-penalty", "/pay-penalty"})
 public class StartController extends BaseController {
 
-    static final String HOME_TEMPLATE_NAME = "pps/home";
     static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
     private final PenaltyPaymentService penaltyPaymentService;
@@ -44,7 +44,7 @@ public class StartController extends BaseController {
 
     @Override
     protected String getTemplateName() {
-        return HOME_TEMPLATE_NAME;
+        return PENALTY_REF_STARTS_WITH_TEMPLATE_NAME; // No home template - use GOV UK pay penalty instead
     }
 
     @GetMapping
@@ -62,12 +62,11 @@ public class StartController extends BaseController {
 
         if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
             LOGGER.debug("Financial health check: " + financeHealthcheck.getMessage());
-            if(startId.isPresent() && startId.get() == 0) {
+            if (startId.isPresent() && startId.get() == 0) {
                 return navigatorService.getNextControllerRedirect(this.getClass());
             }
 
-            addBaseAttributesWithoutServiceAndBackToModel(model, penaltyConfigurationProperties.getSignOutPath());
-            return getTemplateName();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getGovUkPayPenaltyUrl();
         } else if (financeHealthcheck.getMessage().equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());
             DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
@@ -82,8 +81,7 @@ public class StartController extends BaseController {
     }
 
     @PostMapping
-    public String postEnterDetails() {
-
+    public String postStart() {
         return navigatorService.getNextControllerRedirect(this.getClass());
     }
 
