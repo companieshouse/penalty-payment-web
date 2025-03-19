@@ -55,11 +55,6 @@ public abstract class BaseController {
         addBackPageAttributeToModel(model, backUrl);
     }
 
-    protected void addBaseAttributesWithoutServiceAndBackToModel(Model model, String signOutUrl) {
-        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
-        addUserModel(model, signOutUrl);
-    }
-
     protected void addBaseAttributesWithoutBackToModel(Model model, Map<String, Object> sessionData,
             String signOutUrl) {
         addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());

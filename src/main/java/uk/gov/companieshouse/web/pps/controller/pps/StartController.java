@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
@@ -43,7 +44,7 @@ public class StartController extends BaseController {
 
     @Override
     protected String getTemplateName() {
-        return SERVICE_UNAVAILABLE_VIEW_NAME; // No home template - use GOV UK pay penalty instead
+        return PENALTY_REF_STARTS_WITH_TEMPLATE_NAME; // No home template - use GOV UK pay penalty instead
     }
 
     @GetMapping
