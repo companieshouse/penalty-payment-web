@@ -26,7 +26,7 @@ import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithC
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
-@RequestMapping("/pay-penalty")
+@RequestMapping({"/pay-penalty", "/late-filing-penalty"})
 public class StartController extends BaseController {
 
     static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";

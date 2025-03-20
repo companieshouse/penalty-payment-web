@@ -53,22 +53,23 @@ class StartControllerTest {
     @Mock
     private SessionService mockSessionService;
 
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     @BeforeEach
     void setup() {
-        PenaltyConfigurationProperties penaltyConfigurationProperties = new PenaltyConfigurationProperties();
-        penaltyConfigurationProperties.setUnscheduledServiceDownPath("/late-filing-penalty/unscheduled-service-down");
-        penaltyConfigurationProperties.setGovUkPayPenaltyUrl((GOV_UK_PAY_PENALTY_URL));
-
         StartController controller = new StartController(
                 mockNavigatorService,
                 mockSessionService,
-                penaltyConfigurationProperties,
+                mockPenaltyConfigurationProperties,
                 mockPenaltyPaymentService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
-    private static final String LEGACY_START_PATH = "/pay-penalty";
-    private static final String LEGACY_START_PATH_PARAM = "/pay-penalty?start=0";
+    private static final String LEGACY_START_PATH = "/late-filing-penalty";
+    private static final String LEGACY_START_PATH_PARAM = "/late-filing-penalty?start=0";
+    private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
+    private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
     private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/late-filing-penalty/ref-starts-with";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
@@ -82,13 +83,16 @@ class StartControllerTest {
     void getOldStartPathRequestRedirectToGovUkPayPenalty() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
+        when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
         mockMvc.perform(get(LEGACY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verify(mockPenaltyConfigurationProperties).getGovUkPayPenaltyUrl();
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
@@ -96,12 +100,16 @@ class StartControllerTest {
     void getRequestRedirectToGovUkPayPenalty() throws Exception {
 
         configureValidFinanceHealthcheckResponse();
+        when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
         mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
+        verify(mockPenaltyConfigurationProperties).getGovUkPayPenaltyUrl();
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
@@ -110,12 +118,15 @@ class StartControllerTest {
 
         configureErrorFinanceHealthcheckResponse();
 
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+
         mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
@@ -130,8 +141,9 @@ class StartControllerTest {
                 .andExpect(model().attributeExists(DATE_MODEL_ATTR))
                 .andExpect(model().attribute(DATE_MODEL_ATTR, convertTimeToModelFormat()));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
@@ -145,8 +157,9 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
@@ -160,8 +173,9 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
@@ -170,12 +184,16 @@ class StartControllerTest {
 
         configureInvalidFinanceHealthcheckResponse();
 
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
+                UNSCHEDULED_SERVICE_DOWN_PATH);
+
         mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
+        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test

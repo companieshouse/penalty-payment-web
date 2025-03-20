@@ -28,9 +28,16 @@ class WebSecurityTests {
     private EnvironmentVariables environmentVariables;
 
     @BeforeEach
-    public void beforeEach(){
+    void beforeEach(){
         environmentVariables.set("COOKIE_NAME", "__SID");
         environmentVariables.set("COOKIE_DOMAIN", "chs.local");
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /late-filing-penalty")
+    void legacyStartPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/late-filing-penalty")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.legacyStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
