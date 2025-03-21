@@ -18,7 +18,7 @@ import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
 public class PenaltyPaidController extends BaseController {
 
     static final String PENALTY_PAID_TEMPLATE_NAME = "pps/penaltyPaid";

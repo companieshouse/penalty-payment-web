@@ -22,7 +22,7 @@ import java.util.List;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
-@RequestMapping("/late-filing-penalty/ref-starts-with")
+@RequestMapping("/pay-penalty/ref-starts-with")
 public class PenaltyRefStartsWithController extends BaseController {
 
     static final String PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";

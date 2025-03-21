@@ -49,13 +49,13 @@ import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIG
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    private static final String SIGN_OUT_PATH = "/late-filing-penalty/sign-out";
+    private static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
     private static final String SIGN_IN_KEY = "signin_info";
     private static final String RADIO = "radio";
-    private static final String PREVIOUS_PATH = "/late-filing-penalty/enter-details";
+    private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String SIGN_OUT = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @BeforeEach
     void setup() {

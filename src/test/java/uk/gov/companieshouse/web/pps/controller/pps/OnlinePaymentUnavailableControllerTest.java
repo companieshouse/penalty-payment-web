@@ -37,7 +37,7 @@ class OnlinePaymentUnavailableControllerTest {
     private static final String VALID_COMPANY_NUMBER = "12345678";
     private static final String VALID_PENALTY_REF = "A4444444";
 
-    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/late-filing-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
 
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
 

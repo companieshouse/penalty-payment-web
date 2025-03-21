@@ -25,7 +25,7 @@ import java.util.Map;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
 public class ConfirmationController extends BaseController {
 
     static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";

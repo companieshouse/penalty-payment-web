@@ -21,7 +21,7 @@ import java.util.List;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
-@RequestMapping("/late-filing-penalty/bank-transfer")
+@RequestMapping("/pay-penalty/bank-transfer")
 public class BankTransferPenaltyReferenceController extends BaseController {
 
     static final String BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME = "pps/bankTransferPenaltyReference";

@@ -71,11 +71,11 @@ class ConfirmationControllerTest {
     private static final String CS_PENALTY_REF = "P1234567";
     private static final String PAYABLE_REF = "PR_123456";
 
-    private static final String VIEW_CONFIRMATION_PATH_LFP = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
-    private static final String VIEW_CONFIRMATION_PATH_CS = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + CS_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
+    private static final String VIEW_CONFIRMATION_PATH_LFP = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
+    private static final String VIEW_CONFIRMATION_PATH_CS = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + CS_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
 
-    private static final String RESUME_URL_PATH = "redirect:/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/view-penalties";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String RESUME_URL_PATH = "redirect:/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/view-penalties";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String REF = "ref";
     private static final String STATE = "state";

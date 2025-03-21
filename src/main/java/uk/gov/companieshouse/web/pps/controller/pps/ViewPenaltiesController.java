@@ -32,7 +32,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
 public class ViewPenaltiesController extends BaseController {
 
     static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";

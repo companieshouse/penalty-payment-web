@@ -60,9 +60,9 @@ class PenaltyRefStartsWithControllerTest {
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
                 LATE_FILING, SANCTIONS));
         penaltyConfigurationProperties.setRefStartsWithPath(
-                "/late-filing-penalty/ref-starts-with");
+                "/pay-penalty/ref-starts-with");
         penaltyConfigurationProperties.setEnterDetailsPath(
-                "/late-filing-penalty/enter-details");
+                "/pay-penalty/enter-details");
 
         featureFlagConfigurationProperties = new FeatureFlagConfigurationProperties();
     }
@@ -90,7 +90,7 @@ class PenaltyRefStartsWithControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals("redirect:/late-filing-penalty/enter-details?ref-starts-with=A", modelAndView.getViewName());
+        assertEquals("redirect:/pay-penalty/enter-details?ref-starts-with=A", modelAndView.getViewName());
     }
 
     @Test

@@ -59,7 +59,7 @@ public class PPSTestUtility {
         Payment payment = new Payment();
         payment.setPaidAt(DATE_TIME);
         payment.setAmount(VALID_AMOUNT.toString());
-        String resumeURI = "/late-filing-penalty/company/" + companyNumber + "/penalty/" + id + "/view-penalties";
+        String resumeURI = "/pay-penalty/company/" + companyNumber + "/penalty/" + id + "/view-penalties";
 
         payableFinancialPenalties.setLinks(new HashMap<>() {{
             put("resume_journey_uri", resumeURI);
