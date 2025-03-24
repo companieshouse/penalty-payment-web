@@ -143,6 +143,8 @@ import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIG
       @Test
     @DisplayName("Post Sign Out - error message - a radio button has not been selected")
     void postRequestRadioNull() throws Exception {
+          when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+
         this.mockMvc.perform(post(SIGN_OUT_PATH))
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attribute("errorMessage",true));
