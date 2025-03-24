@@ -10,7 +10,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Controller
-@RequestMapping("/late-filing-penalty/bank-transfer/P")
+@RequestMapping("/pay-penalty/bank-transfer/P")
 public class BankTransferSanctionsDetailsController extends BaseController {
 
     static final String BANK_TRANSFER_SANCTIONS_DETAILS_TEMPLATE_NAME = "pps/bankTransferSanctionsDetails";

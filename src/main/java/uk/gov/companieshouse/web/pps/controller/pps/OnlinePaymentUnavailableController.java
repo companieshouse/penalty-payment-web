@@ -12,7 +12,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/online-payment-unavailable")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/online-payment-unavailable")
 public class OnlinePaymentUnavailableController extends BaseController {
 
     static final String ONLINE_PAYMENT_UNAVAILABLE_TEMPLATE_NAME = "pps/onlinePaymentUnavailable";
