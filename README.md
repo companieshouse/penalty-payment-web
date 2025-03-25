@@ -45,6 +45,7 @@ In order to run this Web App locally you will need to install:
  `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_SANCTIONS_GOAL_ID` | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with Sanctions P 
  `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_LFP_GOAL_ID`      | Matomo Goal Id: PAY A PENALTY - Penalty details continue button A
  `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_SANCTIONS_GOAL_ID`| Matomo Goal Id: PAY A PENALTY - Penalty details continue button P
+ `PENALTY_PAYMENT_MATOMO_PENALTY_IN_DCA_STOP_SCREEN_GOAL_ID`        | Matomo Goal Id: PAY A PENALTY - Penalty in DCA Stop Screen
  `GOV_UK_PAY_PENALTY_URL`                                           | GOV.UK service banner URL: Pay a penalty to Companies House
 
 ### Web Pages
