@@ -12,7 +12,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-in-dca")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-in-dca")
 public class PenaltyInDcaController extends BaseController {
 
     static final String PENALTY_IN_DCA_TEMPLATE_NAME = "pps/penaltyInDCA";
