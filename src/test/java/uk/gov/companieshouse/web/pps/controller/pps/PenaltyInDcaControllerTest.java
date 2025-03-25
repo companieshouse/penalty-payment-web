@@ -39,9 +39,9 @@ class PenaltyInDcaControllerTest {
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_NUMBER = "A4444444";
 
-    private static final String PENALTY_IN_DCA_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-in-dca";
+    private static final String PENALTY_IN_DCA_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-in-dca";
 
-    private static final String ENTER_DETAILS_PATH = "/late-filing-penalty/enter-details";
+    private static final String ENTER_DETAILS_PATH = "/pay-penalty/enter-details";
     private static final String SIGN_OUT_PATH = "/sign-out";
 
     @BeforeEach
