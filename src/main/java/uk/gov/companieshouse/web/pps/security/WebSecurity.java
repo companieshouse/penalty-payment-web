@@ -21,7 +21,7 @@ public class WebSecurity {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain legacyStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty")
         ).build();
@@ -29,7 +29,7 @@ public class WebSecurity {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain temporaryGdsStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty")
         ).build();
@@ -39,7 +39,7 @@ public class WebSecurity {
     @Order(3)
     public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/ref-starts-with")
+                http.securityMatcher("/pay-penalty/ref-starts-with")
         ).build();
     }
 
@@ -47,7 +47,7 @@ public class WebSecurity {
     @Order(4)
     public SecurityFilterChain healthcheckSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureApiCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/healthcheck")
+                http.securityMatcher("/pay-penalty/healthcheck")
         ).build();
     }
 
@@ -55,7 +55,7 @@ public class WebSecurity {
     @Order(5)
     public SecurityFilterChain bankTransferSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/bank-transfer/**")
+                http.securityMatcher("/pay-penalty/bank-transfer/**")
         ).build();
     }
 
@@ -63,7 +63,7 @@ public class WebSecurity {
     @Order(6)
     public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/unscheduled-service-down")
+                http.securityMatcher("/pay-penalty/unscheduled-service-down")
         ).build();
     }
 
@@ -71,7 +71,7 @@ public class WebSecurity {
     @Order(7)
     public SecurityFilterChain stylesheetsSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/stylesheets/**")
+                http.securityMatcher("/pay-penalty/stylesheets/**")
         ).build();
     }
 
@@ -79,7 +79,7 @@ public class WebSecurity {
     @Order(8)
     public SecurityFilterChain imagesSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/images/**")
+                http.securityMatcher("/pay-penalty/images/**")
         ).build();
     }
 
@@ -87,7 +87,7 @@ public class WebSecurity {
     @Order(9)
     public SecurityFilterChain fontsSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/fonts/**")
+                http.securityMatcher("/pay-penalty/fonts/**")
         ).build();
     }
 
@@ -95,7 +95,7 @@ public class WebSecurity {
     @Order(10)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/**")
+                http.securityMatcher("/pay-penalty/**")
                         .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
                         .addFilterBefore(new UserAuthFilter(), BasicAuthenticationFilter.class)
         ).build();

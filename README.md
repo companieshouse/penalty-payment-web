@@ -52,8 +52,8 @@ In order to run this Web App locally you will need to install:
 
  Page                                        | Address                                
 ---------------------------------------------|----------------------------------------
- Start page for Penalty Payment Service      | `/late-filing-penalty`                 
- What does the penalty reference start with? | `/late-filing-penalty/ref-starts-with` 
+ Start page for Penalty Payment Service      | `/pay-penalty`                 
+ What does the penalty reference start with? | `/pay-penalty/ref-starts-with` 
 
 ## Terraform ECS
 

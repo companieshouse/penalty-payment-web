@@ -16,7 +16,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GlobalExceptionHandlerTest {
 
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;

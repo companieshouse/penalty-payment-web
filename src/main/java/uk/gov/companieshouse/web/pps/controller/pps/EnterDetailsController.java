@@ -40,7 +40,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
 @NextController(ViewPenaltiesController.class)
-@RequestMapping("/late-filing-penalty/enter-details")
+@RequestMapping("/pay-penalty/enter-details")
 public class EnterDetailsController extends BaseController {
 
     static final String ENTER_DETAILS_TEMPLATE_NAME = "pps/details";
@@ -191,7 +191,7 @@ public class EnterDetailsController extends BaseController {
     }
 
     private String urlGenerator(String companyNumber, String penaltyRef) {
-        return "/late-filing-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
+        return "/pay-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
     }
 
     private String setBackLink() {

@@ -48,8 +48,8 @@ class PenaltyPaidControllerTest {
     private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_NUMBER = "A4444444";
 
-    private static final String PENALTY_PAID_PATH = "/late-filing-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String COMPANY_NAME_ATTR = "companyName";
