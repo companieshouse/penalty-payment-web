@@ -153,7 +153,7 @@ public class EnterDetailsController extends BaseController {
                 }
 
                 if (TRUE.equals(payablePenalty.getDca())) {
-                    LOGGER.info("Penalty " + payablePenalty.getId() + " is in DCA");
+                    LOGGER.info("Payable penalty " + payablePenalty.getId() + " is with DCA");
                     return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_IN_DCA;
                 }
 
