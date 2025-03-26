@@ -64,9 +64,9 @@ class PayablePenaltyServiceImplTest {
 
     private static final Integer AMOUNT = 750;
 
-    private static final String POST_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/financial-penalties/payable";
+    private static final String POST_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/penalties/payable";
 
-    private static final String GET_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/financial-penalties/payable/" + PAYABLE_REF;
+    private static final String GET_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/penalties/payable/" + PAYABLE_REF;
 
     @BeforeEach
     void init() {

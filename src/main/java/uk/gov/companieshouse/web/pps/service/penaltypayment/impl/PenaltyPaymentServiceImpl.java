@@ -24,7 +24,7 @@ import java.util.List;
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
     private static final UriTemplate GET_FINANCIAL_PENALTIES_URI =
-            new UriTemplate("/company/{companyNumber}/financial-penalties/{penaltyReferenceType}");
+            new UriTemplate("/company/{companyNumber}/penalties/{penaltyReferenceType}");
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/penalty-payment-api/healthcheck/finance-system");
