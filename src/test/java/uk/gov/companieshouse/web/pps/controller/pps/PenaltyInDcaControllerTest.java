@@ -37,9 +37,9 @@ class PenaltyInDcaControllerTest {
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "A4444444";
+    private static final String PENALTY_REF = "A4444444";
 
-    private static final String PENALTY_IN_DCA_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-in-dca";
+    private static final String PENALTY_IN_DCA_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/penalty-in-dca";
 
     private static final String ENTER_DETAILS_PATH = "/pay-penalty/enter-details";
     private static final String SIGN_OUT_PATH = "/sign-out";
@@ -62,9 +62,7 @@ class PenaltyInDcaControllerTest {
         this.mockMvc.perform(get(PENALTY_IN_DCA_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(PenaltyInDcaController.PENALTY_IN_DCA_TEMPLATE_NAME))
-                .andExpect(model().attributeExists("backLink"))
-                .andExpect(model().attributeExists("companyNumber"))
-                .andExpect(model().attributeExists("penaltyRef"));
+                .andExpect(model().attributeExists("backLink"));
 
         verify(mockPenaltyConfigurationProperties, times(1)).getEnterDetailsPath();
         verify(mockPenaltyConfigurationProperties, times(1)).getSignOutPath();
