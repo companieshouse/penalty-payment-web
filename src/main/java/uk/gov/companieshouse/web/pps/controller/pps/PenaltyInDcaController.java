@@ -34,8 +34,6 @@ public class PenaltyInDcaController extends BaseController {
                                               Model model) {
 
         var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
-        model.addAttribute("penaltyRef", penaltyRef);
-        model.addAttribute("companyNumber", companyNumber);
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),
