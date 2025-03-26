@@ -47,6 +47,7 @@ public class EnterDetailsController extends BaseController {
 
     private static final String PENALTY_PAID = "/penalty-paid";
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
+    private static final String PENALTY_IN_DCA = "/penalty-in-dca";
 
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
@@ -149,6 +150,11 @@ public class EnterDetailsController extends BaseController {
                 if (TRUE.equals(payablePenalty.getPaid())) {
                     LOGGER.info("Payable penalty " + payablePenalty.getId() + " is paid");
                     return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAID;
+                }
+
+                if (TRUE.equals(payablePenalty.getDca())) {
+                    LOGGER.info("Payable penalty " + payablePenalty.getId() + " is with DCA");
+                    return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_IN_DCA;
                 }
 
                 if (CLOSED == payablePenalty.getPayableStatus()
