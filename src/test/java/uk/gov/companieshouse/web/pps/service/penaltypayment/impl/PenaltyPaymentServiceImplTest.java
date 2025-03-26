@@ -70,7 +70,7 @@ class PenaltyPaymentServiceImplTest {
     private static final String PENALTY_REF_TWO = "A0000001";
 
     private static final String GET_FINANCIAL_PENALTIES_LATE_FILING_URI =
-            "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PenaltyReference.LATE_FILING;
+            "/company/" + COMPANY_NUMBER + "/financial-penalties/" + PenaltyReference.LATE_FILING;
 
     private static final String GET_FINANCE_HEALTHCHECK_URI = "/penalty-payment-api/healthcheck/finance-system";
 
@@ -161,7 +161,7 @@ class PenaltyPaymentServiceImplTest {
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.financialPenalty()).thenReturn(financialPenaltyResourceHandler);
 
-        String uri = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/" + PenaltyReference.LATE_FILING;
+        String uri = "/company/" + COMPANY_NUMBER + "/financial-penalties/" + PenaltyReference.LATE_FILING;
         FinancialPenalty paidFinancialPenalty = PPSTestUtility.paidFinancialPenalty(
                 PENALTY_REF);
 
