@@ -54,7 +54,7 @@ public class PPSTestUtility {
 
     public static PayableFinancialPenalties validPayableFinancialPenalties(String companyNumber, String id, String reason) {
         PayableFinancialPenalties payableFinancialPenalties = new PayableFinancialPenalties();
-        payableFinancialPenalties.setCompanyNumber(companyNumber);
+        payableFinancialPenalties.setCustomerCode(companyNumber);
 
         Payment payment = new Payment();
         payment.setPaidAt(DATE_TIME);
