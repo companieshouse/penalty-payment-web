@@ -153,8 +153,7 @@ public class PPSTestUtility {
     public static PayableFinancialPenaltySession payableFinancialPenaltySession(String companyNumber) {
         PayableFinancialPenaltySession payableFinancialPenaltySession = new PayableFinancialPenaltySession();
         Map<String, String> links = new HashMap<>() {{
-            put("self",
-                    "/company/" + companyNumber + "/penalties/late-filing/payable/" + PAYABLE_ID);
+            put("self", "/company/" + companyNumber + "/penalties/payable/" + PAYABLE_ID);
         }};
 
         payableFinancialPenaltySession.setId(PAYABLE_ID);

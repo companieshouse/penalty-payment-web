@@ -20,10 +20,10 @@ import java.util.Collections;
 public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     private static final UriTemplate GET_PAYABLE_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{payableRef}");
+            new UriTemplate("/company/{companyNumber}/penalties/payable/{payableRef}");
 
     private static final UriTemplate POST_PAYABLE_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
+            new UriTemplate("/company/{companyNumber}/penalties/payable");
 
     private final ApiClientService apiClientService;
 
