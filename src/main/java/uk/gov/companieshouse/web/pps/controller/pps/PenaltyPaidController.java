@@ -54,7 +54,7 @@ public class PenaltyPaidController extends BaseController {
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
-        model.addAttribute("penaltyNumber", penaltyRef);
+        model.addAttribute("penaltyRef", penaltyRef);
 
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()

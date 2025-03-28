@@ -337,7 +337,7 @@ class EnterDetailsControllerTest {
 
     @Test
     @DisplayName("Post Details failure path - payable penalty does not match provided penalty ref")
-    void postRequestPenaltyNumbersDoNotMatch() throws Exception {
+    void postRequestPenaltyRefsDoNotMatch() throws Exception {
 
         configureStartPathProperty();
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
