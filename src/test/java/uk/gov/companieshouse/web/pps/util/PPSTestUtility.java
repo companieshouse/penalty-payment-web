@@ -26,9 +26,9 @@ public class PPSTestUtility {
     public static final String PENALTY_TYPE = "penalty";
     public static final String LEGAL_FEES_TYPE = "legal-fees";
     public static final String DATE = "2018-12-12";
-    public static final String PAYABLE_ID = "DD72961607";
+    public static final String PAYABLE_REF = "DD72961607";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
-    public static final String VALID_PENALTY_NUMBER = "A0000007";
+    public static final String VALID_PENALTY_REF = "A0000007";
     public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
     public static final String VALID_CS_REASON = "Failure to file a confirmation statement";
 
@@ -67,7 +67,7 @@ public class PPSTestUtility {
         payableFinancialPenalties.setPayment(payment);
 
         TransactionPayableFinancialPenalty payablePenalty = new TransactionPayableFinancialPenalty();
-        payablePenalty.setTransactionId(VALID_PENALTY_NUMBER);
+        payablePenalty.setPenaltyRef(VALID_PENALTY_REF);
         payablePenalty.setAmount(VALID_AMOUNT);
         payablePenalty.setType(PENALTY_TYPE);
         payablePenalty.setMadeUpDate(DATE);
@@ -153,10 +153,10 @@ public class PPSTestUtility {
     public static PayableFinancialPenaltySession payableFinancialPenaltySession(String companyNumber) {
         PayableFinancialPenaltySession payableFinancialPenaltySession = new PayableFinancialPenaltySession();
         Map<String, String> links = new HashMap<>() {{
-            put("self", "/company/" + companyNumber + "/penalties/payable/" + PAYABLE_ID);
+            put("self", "/company/" + companyNumber + "/penalties/payable/" + PAYABLE_REF);
         }};
 
-        payableFinancialPenaltySession.setId(PAYABLE_ID);
+        payableFinancialPenaltySession.setPayableRef(PAYABLE_REF);
         payableFinancialPenaltySession.setLinks(links);
 
         return payableFinancialPenaltySession;

@@ -68,11 +68,11 @@ public class PaymentServiceImpl implements PaymentService {
                 + "/penalty/"
                 + penaltyRef
                 + "/payable/"
-                + payableFinancialPenaltySession.getId()
+                + payableFinancialPenaltySession.getPayableRef()
                 + "/confirmation";
         paymentSessionApi.setRedirectUri(redirectUrl);
         paymentSessionApi.setResource(apiUrl + payableFinancialPenaltySession.getLinks().get("self") + "/payment");
-        paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableFinancialPenaltySession.getId());
+        paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableFinancialPenaltySession.getPayableRef());
         paymentSessionApi.setState(paymentState);
         LOGGER.info("Creating payment session");
         LOGGER.info("SESSION REDIRECT URI: " + paymentSessionApi.getRedirectUri());

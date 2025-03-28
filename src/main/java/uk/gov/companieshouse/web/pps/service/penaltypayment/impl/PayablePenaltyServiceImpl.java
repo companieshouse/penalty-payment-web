@@ -69,7 +69,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     private FinancialPenaltySession generateFinancialPenaltySessionData(String penaltyRef, Integer amount) {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(penaltyRef);
+        transaction.setPenaltyRef(penaltyRef);
         transaction.setAmount(amount);
 
         FinancialPenaltySession financialPenaltySession = new FinancialPenaltySession();
