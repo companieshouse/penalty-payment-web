@@ -6,6 +6,16 @@
 
 <head>
     <title>This service is unavailable - Pay a penalty to Companies House - GOV.UK</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var goalId = document.getElementById('scheduled-service-down-stop-screen-goal-id').value;
+
+          if (goalId) {
+            window._paq = window._paq || [];
+            _paq.push(['trackGoal', goalId]);
+          }
+        });
+    </script>
 </head>
 
 <div id="service-unavailable-main-content" layout:fragment="content">
@@ -161,6 +171,8 @@
                 </p>
             </div>
         </div>
+        <input type="hidden" th:value="${@environment.getProperty('matomo.scheduled-service-down-stop-screen-goal-id')}"
+               id="scheduled-service-down-stop-screen-goal-id">
     </form>
 </div>
 </html>
