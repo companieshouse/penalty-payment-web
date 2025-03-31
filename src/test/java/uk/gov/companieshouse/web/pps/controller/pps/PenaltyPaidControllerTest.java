@@ -45,10 +45,10 @@ class PenaltyPaidControllerTest {
     @Mock
     private SessionService mockSessionService;
 
-    private static final String CUSTOMER_CODE = "12345678";
+    private static final String COMPANY_NUMBER = "12345678";
     private static final String PENALTY_REF = "A4444444";
 
-    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + CUSTOMER_CODE + "/penalty/" + PENALTY_REF
+    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF
             + "/penalty-paid";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
@@ -70,7 +70,7 @@ class PenaltyPaidControllerTest {
     @DisplayName("Get Penalty Paid - success path")
     void getRequestSuccess() throws Exception {
 
-        configureValidCompanyProfile(CUSTOMER_CODE);
+        configureValidCompanyProfile(COMPANY_NUMBER);
 
         this.mockMvc.perform(get(PENALTY_PAID_PATH))
                 .andExpect(status().isOk())
@@ -79,14 +79,14 @@ class PenaltyPaidControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR));
 
-        verify(mockCompanyService, times(1)).getCompanyProfile(CUSTOMER_CODE);
+        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
     }
 
     @Test
     @DisplayName("Get Penalty Paid - error retrieving company details")
     void getRequestErrorRetrievingCompanyDetails() throws Exception {
 
-        configureErrorRetrievingCompany(CUSTOMER_CODE);
+        configureErrorRetrievingCompany(COMPANY_NUMBER);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -94,7 +94,7 @@ class PenaltyPaidControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockCompanyService, times(1)).getCompanyProfile(CUSTOMER_CODE);
+        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
     }
 
     private void configureValidCompanyProfile(String companyNumber) throws ServiceException {

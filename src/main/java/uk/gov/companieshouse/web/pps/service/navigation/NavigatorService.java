@@ -118,7 +118,7 @@ public class NavigatorService {
             return controllerClass;
         }
 
-        String customerCode = pathVars[0];
+        String companyNumber = pathVars[0];
         String penaltyRef = pathVars[1];
         String companyAccountsId = pathVars[2];
 
@@ -130,7 +130,7 @@ public class NavigatorService {
                 ConditionalController conditionalController = applicationContext.getBean(ConditionalController.class);
 
                 try {
-                    if (!conditionalController.willRender(customerCode, penaltyRef, companyAccountsId)) {
+                    if (!conditionalController.willRender(companyNumber, penaltyRef, companyAccountsId)) {
                         controllerClass = getControllerClass(controllerClass, direction);
                         continue;
                     }

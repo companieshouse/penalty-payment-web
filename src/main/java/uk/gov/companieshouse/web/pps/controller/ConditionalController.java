@@ -21,8 +21,8 @@ public interface ConditionalController {
      * navigation service and result in an error page being returned to the
      * user agent.
      *
-     * @param customerCode     the customer code
-     * @param penaltyRef     the penalty ref
+     * @param companyNumber     the company number
+     * @param transactionId     the transaction identifier
      * @param companyAccountsId the company accounts identifier
      *
      * @see uk.gov.companieshouse.web.pps.service.navigation.NavigatorService
@@ -30,5 +30,5 @@ public interface ConditionalController {
      *
      * @return true if the template for a controller will be rendered
      */
-    boolean willRender(String customerCode, String penaltyRef, String companyAccountsId) throws ServiceException;
+    boolean willRender(String companyNumber, String transactionId, String companyAccountsId) throws ServiceException;
 }
