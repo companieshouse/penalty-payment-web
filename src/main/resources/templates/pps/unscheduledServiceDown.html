@@ -8,6 +8,16 @@
   <title>
     This service is unavailable - Pay a penalty to Companies House - GOV.UK
   </title>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var goalId = document.getElementById('unscheduled-service-down-stop-screen-goal-id').value;
+
+      if (goalId) {
+        window._paq = window._paq || [];
+        _paq.push(['trackGoal', goalId]);
+      }
+    });
+  </script>
 </head>
 
 <div id="unscheduled-service-down-main-content" layout:fragment="content">
@@ -154,6 +164,8 @@
           <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
       </div>
     </div>
+    <input type="hidden" th:value="${@environment.getProperty('matomo.unscheduled-service-down-stop-screen-goal-id')}"
+           id="unscheduled-service-down-stop-screen-goal-id">
   </form>
 </div>
 </html>
