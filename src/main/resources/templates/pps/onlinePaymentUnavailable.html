@@ -8,6 +8,28 @@
     <title>
         You need to pay by bank transfer - Pay a penalty to Companies House - GOV.UK
     </title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var penaltyReference = '[[${penaltyReference}]]';
+            console.log("penaltyReference: ", penaltyReference);
+
+            if (penaltyReference === 'LATE_FILING') {
+                var goalId = document.getElementById('online-payment-unavailable-stop-screen-lfp-goal-id').value;
+                if (goalId) {
+                    if (window._paq) {
+                        _paq.push(['trackGoal', goalId]);
+                    }
+                }
+            } else if (penaltyReference === 'SANCTIONS') {
+                var goalId = document.getElementById('online-payment-unavailable-stop-screen-sanctions-goal-id').value;
+                if (goalId) {
+                    if (window._paq) {
+                        _paq.push(['trackGoal', goalId]);
+                    }
+                }
+            }
+        });
+    </script>
 </head>
 
 <div id="online-payment-unavailable-main-content" layout:fragment="content">
@@ -97,6 +119,10 @@
                     <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
             </div>
         </div>
+        <input type="hidden" th:value="${@environment.getProperty('matomo.online-payment-unavailable-stop-screen-lfp-goal-id')}"
+               id="online-payment-unavailable-stop-screen-lfp-goal-id">
+        <input type="hidden" th:value="${@environment.getProperty('matomo.online-payment-unavailable-stop-screen-sanctions-goal-id')}"
+               id="online-payment-unavailable-stop-screen-sanctions-goal-id">
     </form>
 </div>
 </html>
