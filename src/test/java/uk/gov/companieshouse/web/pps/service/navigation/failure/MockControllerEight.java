@@ -32,7 +32,7 @@ public class MockControllerEight extends BaseController implements ConditionalCo
     }
 
     @Override
-    public boolean willRender(String customerCode, String penaltyRef, String companyLfpId) throws ServiceException {
+    public boolean willRender(String companyNumber, String penaltyRef, String companyLfpId) throws ServiceException {
         throw new ServiceException("Test exception", null);
     }
 }

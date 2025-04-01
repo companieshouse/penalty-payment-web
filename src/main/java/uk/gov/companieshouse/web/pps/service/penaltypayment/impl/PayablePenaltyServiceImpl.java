@@ -59,7 +59,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
             FinancialPenaltySession financialPenaltySession = generateFinancialPenaltySessionData(penaltyRef, amount);
             apiResponse = apiClient.payableFinancialPenalty().create(uri, financialPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving  payable financial penalty from API", ex);
+            throw new ServiceException("Error creating payable financial penalty session", ex);
         } catch (URIValidationException ex) {
             throw new ServiceException("Invalid URI for payable financial penalty", ex);
         }

@@ -31,7 +31,7 @@ public class MockControllerFour extends BaseController implements ConditionalCon
     }
 
     @Override
-    public boolean willRender(String customerCode, String penaltyRef, String companyLfpId) {
+    public boolean willRender(String companyNumber, String penaltyRef, String companyLfpId) {
         return false;
     }
 }

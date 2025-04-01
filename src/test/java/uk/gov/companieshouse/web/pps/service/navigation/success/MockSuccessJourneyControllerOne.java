@@ -11,7 +11,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
  * Mock controller class for success scenario testing of navigation.
  */
 @NextController(MockSuccessJourneyControllerTwo.class)
-@RequestMapping("/mock-success-journey-controller-one/{customerCode}/{penaltyRef}/{companyLfpId}")
+@RequestMapping("/mock-success-journey-controller-one/{companyNumber}/{penaltyRef}/{companyLfpId}")
 public class MockSuccessJourneyControllerOne extends BaseController {
 
     public MockSuccessJourneyControllerOne(
