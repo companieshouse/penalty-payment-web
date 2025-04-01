@@ -220,26 +220,6 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - multiple late filing penalties")
-    void getRequestMultipleLateFilingPenalties() throws Exception {
-
-        configureMultiplePenalties();
-        configureValidCompanyProfile();
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
-        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService, times(1)).getFinancialPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_NUMBER);
-    }
-
-    @Test
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 

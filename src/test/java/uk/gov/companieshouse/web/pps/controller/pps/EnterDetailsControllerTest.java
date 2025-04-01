@@ -316,8 +316,29 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Post Details failure path - multiple payable penalties (found)")
+    @DisplayName("Post Details success path - multiple payable penalties with one penalty ref match")
     void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
+
+        configureNextController();
+        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+        configureMultiplePenalties(VALID_COMPANY_NUMBER);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REF_ATTRIBUTE, "A2345678")
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
+                .andExpect(flash().attributeExists(ENTER_DETAILS_MODEL_ATTR))
+                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+    }
+
+    @Test
+    @DisplayName("Post Details failure path - multiple payable penalties with multiple penalty ref match")
+    void postRequestMultiplePayablePenaltiesWithMultiplePenaltyRefMatch() throws Exception {
 
         configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
         configureMultiplePenalties(VALID_COMPANY_NUMBER);
@@ -519,6 +540,7 @@ class EnterDetailsControllerTest {
         List<FinancialPenalty> multipleValidFinancialPenalties = new ArrayList<>();
         multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A2345678"));
         multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A3456789"));
+        multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(VALID_PENALTY_REF));
         multipleValidFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(VALID_PENALTY_REF));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(eq(companyNumber), anyString()))
