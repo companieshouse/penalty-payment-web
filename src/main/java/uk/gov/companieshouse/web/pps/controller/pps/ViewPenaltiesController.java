@@ -25,7 +25,6 @@ import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
@@ -95,35 +94,26 @@ public class ViewPenaltiesController extends BaseController {
 
         CompanyProfileApi companyProfileApi;
         List<FinancialPenalty> payablePenalties;
+        FinancialPenalty payablePenalty;
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef)
+                    .stream()
+                    .filter(penalty -> penaltyRef.equals(penalty.getId()))
+                    .filter(penalty -> PENALTY_TYPE.equals(penalty.getType()))
+                    .toList();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        // Return an error view when account has multiple unpaid penalties.
-        // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (payablePenalties.size() > 1) {
-            LOGGER.info("Multiple unpaid penalties found for company number " + companyNumber);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
-        }
-
-        Optional<FinancialPenalty> requestedPayablePenalty = payablePenalties.stream()
-                .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
-                .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
-                .findFirst();
-
-        // Return an error view when requested penalty is not found
-        // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (requestedPayablePenalty.isEmpty()) {
+        // If this screen is accessed directly for an invalid penalty return an error view.
+        if (payablePenalties.size() != 1) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        FinancialPenalty payablePenalty = requestedPayablePenalty.get();
-
+        payablePenalty = payablePenalties.getFirst();
         if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
             LOGGER.info("Penalty " + payablePenalty + " is invalid, cannot access 'view penalty' screen");
