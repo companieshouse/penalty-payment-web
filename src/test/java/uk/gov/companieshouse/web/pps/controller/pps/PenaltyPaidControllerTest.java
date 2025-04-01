@@ -46,14 +46,15 @@ class PenaltyPaidControllerTest {
     private SessionService mockSessionService;
 
     private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_NUMBER = "A4444444";
+    private static final String PENALTY_REF = "A4444444";
 
-    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_NUMBER + "/penalty-paid";
+    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF
+            + "/penalty-paid";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
     private static final String COMPANY_NAME_ATTR = "companyName";
-    private static final String PENALTY_NUMBER_ATTR = "penaltyNumber";
+    private static final String PENALTY_REF_ATTR = "penaltyRef";
 
     @BeforeEach
     void setup() {
@@ -76,7 +77,7 @@ class PenaltyPaidControllerTest {
                 .andExpect(view().name(PENALTY_PAID_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
-                .andExpect(model().attributeExists(PENALTY_NUMBER_ATTR));
+                .andExpect(model().attributeExists(PENALTY_REF_ATTR));
 
         verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
     }

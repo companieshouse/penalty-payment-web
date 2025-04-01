@@ -14,7 +14,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
  */
 @NextController(MockSuccessJourneyControllerThree.class)
 @PreviousController(MockSuccessJourneyControllerOne.class)
-@RequestMapping("/mock-success-journey-controller-two/{companyNumber}/{transactionId}/{companyLfpId}")
+@RequestMapping("/mock-success-journey-controller-two/{companyNumber}/{penaltyRef}/{companyLfpId}")
 public class MockSuccessJourneyControllerTwo extends BaseController implements ConditionalController {
 
     public MockSuccessJourneyControllerTwo(
@@ -30,7 +30,7 @@ public class MockSuccessJourneyControllerTwo extends BaseController implements C
     }
 
     @Override
-    public boolean willRender(String companyNumber, String transactionId, String companyLfpId) {
+    public boolean willRender(String companyNumber, String penaltyRef, String companyLfpId) {
         return false;
     }
 }

@@ -119,7 +119,7 @@ public class NavigatorService {
         }
 
         String companyNumber = pathVars[0];
-        String transactionId = pathVars[1];
+        String penaltyRef = pathVars[1];
         String companyAccountsId = pathVars[2];
 
         boolean foundController = false;
@@ -130,7 +130,7 @@ public class NavigatorService {
                 ConditionalController conditionalController = applicationContext.getBean(ConditionalController.class);
 
                 try {
-                    if (!conditionalController.willRender(companyNumber, transactionId, companyAccountsId)) {
+                    if (!conditionalController.willRender(companyNumber, penaltyRef, companyAccountsId)) {
                         controllerClass = getControllerClass(controllerClass, direction);
                         continue;
                     }

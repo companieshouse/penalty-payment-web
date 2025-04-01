@@ -59,9 +59,9 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
             FinancialPenaltySession financialPenaltySession = generateFinancialPenaltySessionData(penaltyRef, amount);
             apiResponse = apiClient.payableFinancialPenalty().create(uri, financialPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
+            throw new ServiceException("Error creating payable financial penalty session", ex);
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
+            throw new ServiceException("Invalid URI for payable financial penalty", ex);
         }
 
         return apiResponse.getData();
@@ -69,7 +69,7 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
     private FinancialPenaltySession generateFinancialPenaltySessionData(String penaltyRef, Integer amount) {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(penaltyRef);
+        transaction.setPenaltyRef(penaltyRef);
         transaction.setAmount(amount);
 
         FinancialPenaltySession financialPenaltySession = new FinancialPenaltySession();

@@ -12,7 +12,7 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
  * Mock controller class for success scenario testing of navigation.
  */
 @PreviousController(MockSuccessJourneyControllerTwo.class)
-@RequestMapping("/mock-success-journey-controller-three/{companyNumber}/{transactionId}/{companyLfpId}")
+@RequestMapping("/mock-success-journey-controller-three/{companyNumber}/{penaltyRef}/{companyLfpId}")
 public class MockSuccessJourneyControllerThree extends BaseController implements ConditionalController {
 
     public MockSuccessJourneyControllerThree(
@@ -28,7 +28,7 @@ public class MockSuccessJourneyControllerThree extends BaseController implements
     }
 
     @Override
-    public boolean willRender(String companyNumber, String transactionId, String companyLfpId) {
+    public boolean willRender(String companyNumber, String penaltyRef, String companyLfpId) {
         return true;
     }
 }
