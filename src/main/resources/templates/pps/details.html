@@ -56,7 +56,7 @@
                             <div th:switch="*{penaltyReferenceName}">
                                 <label class="govuk-label govuk-label--m" for="penalty-ref"
                                        th:case="'LATE_FILING'" th:text="#{details.penalty-ref-label.LATE_FILING}">
-                                    What is the reference number?
+                                    What is the penalty reference?
                                 </label>
                                 <label class="govuk-label govuk-label--m" for="penalty-ref"
                                        th:case="'SANCTIONS'" th:text="#{details.penalty-ref-label.SANCTIONS}">
@@ -73,7 +73,8 @@
 
                         <div id="penalty-ref-hint.LATE_FILING" class="govuk-hint" th:if="*{penaltyReferenceName == 'LATE_FILING'}"
                              th:text="#{details.penalty-ref-hint.LATE_FILING}">
-                            This starts with A, followed by 7 numbers. For example, A1234567.
+                            This starts with A, followed by 7 numbers. For example, A1234567. It is sometimes called a reference
+                            number on the penalty notice.
                         </div>
                         <div id="penalty-ref-hint.SANCTIONS" class="govuk-hint" th:if="*{penaltyReferenceName == 'SANCTIONS'}"
                              th:text="#{details.penalty-ref-hint.SANCTIONS}">
