@@ -28,7 +28,7 @@ import java.util.List;
 
 import static java.lang.Boolean.FALSE;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
 
 @Controller
 @RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
@@ -94,14 +94,9 @@ public class ViewPenaltiesController extends BaseController {
 
         CompanyProfileApi companyProfileApi;
         List<FinancialPenalty> payablePenalties;
-        FinancialPenalty payablePenalty;
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef)
-                    .stream()
-                    .filter(penalty -> penaltyRef.equals(penalty.getId()))
-                    .filter(penalty -> PENALTY_TYPE.equals(penalty.getType()))
-                    .toList();
+            payablePenalties = getFinancialPenalties(companyNumber, penaltyRef);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
@@ -113,9 +108,8 @@ public class ViewPenaltiesController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        payablePenalty = payablePenalties.getFirst();
-        if (CLOSED == payablePenalty.getPayableStatus()
-                || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
+        FinancialPenalty payablePenalty = payablePenalties.getFirst();
+        if (!payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
             LOGGER.info("Penalty " + payablePenalty + " is invalid, cannot access 'view penalty' screen");
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
@@ -138,14 +132,17 @@ public class ViewPenaltiesController extends BaseController {
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         try {
-            // Call penalty details for create request
-            FinancialPenalty financialPenalty = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef).getFirst();
+            List<FinancialPenalty> payablePenalties = getFinancialPenalties(companyNumber, penaltyRef);
 
-            // Create payable session
+            if (payablePenalties.size() != 1) {
+                LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+
             payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                     companyNumber,
                     penaltyRef,
-                    financialPenalty.getOutstanding());
+                    payablePenalties.getFirst().getOutstanding());
 
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
@@ -160,6 +157,15 @@ public class ViewPenaltiesController extends BaseController {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return redirectPathUnscheduledServiceDown;
         }
+    }
+
+    private List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef) throws ServiceException {
+        return penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef)
+                .stream()
+                .filter(penalty -> penaltyRef.equals(penalty.getId()))
+                .filter(penalty -> OPEN == penalty.getPayableStatus())
+                .filter(penalty -> PENALTY_TYPE.equals(penalty.getType()))
+                .toList();
     }
 
 }
