@@ -220,6 +220,23 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
+    @DisplayName("Get View Penalties - partial paid penalty")
+    void getRequestLateFilingPenaltyPartialPaid() throws Exception {
+
+        configurePartialPaidPenalty(LFP_PENALTY_NUMBER);
+        configureValidCompanyProfile();
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+
+        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
+        verify(mockCompanyService, times(1)).getCompanyProfile(COMPANY_NUMBER);
+    }
+
+    @Test
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 
@@ -284,6 +301,23 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
+    @DisplayName("Post View Penalties - error returning multiple Late Filing Penalty")
+    void postRequestErrorRetrievingMultiplePenalty() throws Exception {
+
+        configureMultiplePenalty(LFP_PENALTY_NUMBER);
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+
+        this.mockMvc.perform(post(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        verify(mockPenaltyPaymentService, times(1)).getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_NUMBER);
+
+    }
+
+    @Test
     @DisplayName("Post View Penalties - error creating Payment Session")
     void postRequestErrorCreatingPaymentSession() throws Exception {
 
@@ -310,21 +344,20 @@ class ViewPenaltiesControllerTest {
                         LFP_PENALTY_NUMBER);
     }
 
-    private void configureMultiplePenalties() throws ServiceException {
-
-        List<FinancialPenalty> validLFPs = new ArrayList<>();
-        validLFPs.add(PPSTestUtility.validFinancialPenalty(LFP_PENALTY_NUMBER));
-        validLFPs.add(PPSTestUtility.validFinancialPenalty("A4444441"));
-        validLFPs.add(PPSTestUtility.validFinancialPenalty("A4444442"));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(
-                COMPANY_NUMBER, LFP_PENALTY_NUMBER))
-                .thenReturn(validLFPs);
-    }
-
     private void configureValidPenalty(String penaltyRef) throws ServiceException {
 
         List<FinancialPenalty> validLFPs = new ArrayList<>();
+        validLFPs.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(
+                ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
+                .thenReturn(validLFPs);
+    }
+
+    private void configureMultiplePenalty(String penaltyRef) throws ServiceException {
+
+        List<FinancialPenalty> validLFPs = new ArrayList<>();
+        validLFPs.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
         validLFPs.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
@@ -345,6 +378,15 @@ class ViewPenaltiesControllerTest {
     private void configurePaidPenalty(String penaltyRef) throws ServiceException {
         List<FinancialPenalty> paidLFP = new ArrayList<>();
         paidLFP.add(PPSTestUtility.paidFinancialPenalty(penaltyRef));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(
+                ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
+                .thenReturn(paidLFP);
+    }
+
+    private void configurePartialPaidPenalty(String penaltyRef) throws ServiceException {
+        List<FinancialPenalty> paidLFP = new ArrayList<>();
+        paidLFP.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
                 ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
