@@ -397,12 +397,12 @@ class ViewPenaltiesControllerTest {
 
     private void configureValidPenalty(String penaltyRef) throws ServiceException {
 
-        List<FinancialPenalty> validLFPs = new ArrayList<>();
-        validLFPs.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
+        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
                 ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
-                .thenReturn(validLFPs);
+                .thenReturn(validFinancialPenalties);
     }
 
     private void configureValidPenaltyCreation(String penaltyRef,
