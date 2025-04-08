@@ -104,7 +104,8 @@ public class ViewPenaltiesController extends BaseController {
 
         // If this screen is accessed directly for an invalid penalty return an error view.
         if (payablePenalties.size() != 1) {
-            LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+            LOGGER.info(String.format("Online payment unavailable as there is not a single payable penalty. There are %s payable penalties for company number: %s, penalty reference: %s",
+                    payablePenalties.size(), companyNumber, penaltyRef));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
@@ -135,7 +136,8 @@ public class ViewPenaltiesController extends BaseController {
             List<FinancialPenalty> payablePenalties = getFinancialPenalties(companyNumber, penaltyRef);
 
             if (payablePenalties.size() != 1) {
-                LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+                LOGGER.info(String.format("Online payment unavailable as there is not a single payable penalty. There are %s payable penalties for company number: %s, penalty reference: %s",
+                        payablePenalties.size(), companyNumber, penaltyRef));
                 return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
 
