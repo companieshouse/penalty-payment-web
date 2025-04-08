@@ -385,14 +385,14 @@ class ViewPenaltiesControllerTest {
 
     private void configureMultiplePenalties() throws ServiceException {
 
-        List<FinancialPenalty> validLFPs = new ArrayList<>();
-        validLFPs.add(PPSTestUtility.validFinancialPenalty(LFP_PENALTY_NUMBER));
-        validLFPs.add(PPSTestUtility.validFinancialPenalty("A4444441"));
-        validLFPs.add(PPSTestUtility.validFinancialPenalty("A4444442"));
+        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(LFP_PENALTY_NUMBER));
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A4444441"));
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty("A4444442"));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
                 COMPANY_NUMBER, LFP_PENALTY_NUMBER))
-                .thenReturn(validLFPs);
+                .thenReturn(validFinancialPenalties);
     }
 
     private void configureValidPenalty(String penaltyRef) throws ServiceException {
@@ -416,21 +416,21 @@ class ViewPenaltiesControllerTest {
     }
 
     private void configurePaidFinancialPenalty(String penaltyRef) throws ServiceException {
-        List<FinancialPenalty> paidLFP = new ArrayList<>();
-        paidLFP.add(PPSTestUtility.paidFinancialPenalty(penaltyRef));
+        List<FinancialPenalty> paidFinancialPenalty = new ArrayList<>();
+        paidFinancialPenalty.add(PPSTestUtility.paidFinancialPenalty(penaltyRef));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
                 ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
-                .thenReturn(paidLFP);
+                .thenReturn(paidFinancialPenalty);
     }
 
     private void configurePartialPaidFinancialPenalty(String penaltyRef) throws ServiceException {
-        List<FinancialPenalty> paidLFP = new ArrayList<>();
-        paidLFP.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef));
+        List<FinancialPenalty> partialPaidFinancialPenalty = new ArrayList<>();
+        partialPaidFinancialPenalty.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef));
 
         when(mockPenaltyPaymentService.getFinancialPenalties(
                 ViewPenaltiesControllerTest.COMPANY_NUMBER, penaltyRef))
-                .thenReturn(paidLFP);
+                .thenReturn(partialPaidFinancialPenalty);
     }
 
     private void configureDCAFinancialPenalty(String penaltyRef) throws ServiceException {
