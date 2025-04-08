@@ -174,8 +174,9 @@ public class EnterDetailsController extends BaseController {
 
             if (CLOSED == payablePenalty.getPayableStatus()
                     || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-                LOGGER.info(String.format("Payable penalty %s payable status is %s, type is %s",
-                        payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType()));
+                LOGGER.info(String.format("Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
+                        payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType(),
+                        payablePenalty.getOriginalAmount().toString(), payablePenalty.getOutstanding().toString()));
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
