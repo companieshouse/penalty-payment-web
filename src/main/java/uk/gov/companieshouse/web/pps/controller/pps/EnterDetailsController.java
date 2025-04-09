@@ -155,8 +155,8 @@ public class EnterDetailsController extends BaseController {
 
             // If there is more than one payable penalty.
             if (payablePenalties.size() > 1) {
-                LOGGER.info("Online payment unavailable as there is more than one payable penalty. There are " + payablePenalties.size()
-                        + " payable penalties for company number: " + companyNumber);
+                LOGGER.info(String.format("Online payment unavailable as there is more than one payable penalty. There are %s payable penalties for company number: %s, penalty reference: %s",
+                        payablePenalties.size(), companyNumber, penaltyRef));
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
             }
 
