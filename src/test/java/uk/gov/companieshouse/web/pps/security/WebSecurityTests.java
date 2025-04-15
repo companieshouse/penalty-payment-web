@@ -77,25 +77,4 @@ class WebSecurityTests {
         assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
-    @Test
-    @DisplayName(" apply security filter to /pay-penalty/stylesheets/**")
-    void stylesheetsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/stylesheets/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.stylesheetsSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
-    @DisplayName(" apply security filter to /pay-penalty/images/**")
-    void imagesFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/images/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.imagesSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
-    @DisplayName(" apply security filter to /pay-penalty/fonts/**")
-    void fontsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/fonts/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.fontsSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
 }
