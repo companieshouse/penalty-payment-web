@@ -24,7 +24,7 @@ public class PPSTestUtility {
     public static final Integer VALID_AMOUNT = 750;
     public static final Integer PARTIAL_PAID_AMOUNT = 300;
     public static final String PENALTY_TYPE = "penalty";
-    public static final String LEGAL_FEES_TYPE = "legal-fees";
+    public static final String OTHER_TYPE = "other";
     public static final String DATE = "2018-12-12";
     public static final String PAYABLE_REF = "DD72961607";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
@@ -36,7 +36,7 @@ public class PPSTestUtility {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static FinancialPenalty validFinancialPenalty(String id) {
+    public static FinancialPenalty validFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(false);
@@ -44,9 +44,9 @@ public class PPSTestUtility {
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
         financialPenalty.setOutstanding(VALID_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
-        financialPenalty.setMadeUpDate(DATE);
         financialPenalty.setDueDate(DATE);
-        financialPenalty.setReason(VALID_LATE_FILING_REASON);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(OPEN);
 
         return financialPenalty;
@@ -85,7 +85,7 @@ public class PPSTestUtility {
         return companyProfileApi;
     }
 
-    public static FinancialPenalty dcaFinancialPenalty(String id) {
+    public static FinancialPenalty dcaFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(false);
@@ -93,12 +93,14 @@ public class PPSTestUtility {
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
         financialPenalty.setOutstanding(VALID_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(CLOSED);
 
         return financialPenalty;
     }
 
-    public static FinancialPenalty paidFinancialPenalty(String id) {
+    public static FinancialPenalty paidFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(true);
@@ -106,12 +108,14 @@ public class PPSTestUtility {
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
         financialPenalty.setOutstanding(VALID_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(CLOSED);
 
         return financialPenalty;
     }
 
-    public static FinancialPenalty negativeOustandingFinancialPenalty(String id) {
+    public static FinancialPenalty negativeOustandingFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(false);
@@ -119,12 +123,14 @@ public class PPSTestUtility {
         financialPenalty.setOriginalAmount(-VALID_AMOUNT);
         financialPenalty.setOutstanding(-VALID_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(CLOSED);
 
         return financialPenalty;
     }
 
-    public static FinancialPenalty partialPaidFinancialPenalty(String id) {
+    public static FinancialPenalty partialPaidFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(false);
@@ -132,20 +138,24 @@ public class PPSTestUtility {
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
         financialPenalty.setOutstanding(PARTIAL_PAID_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(OPEN);
 
         return financialPenalty;
     }
 
-    public static FinancialPenalty notPenaltyTypeFinancialPenalty(String id) {
+    public static FinancialPenalty notPenaltyTypeFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(false);
         financialPenalty.setDca(false);
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
         financialPenalty.setOutstanding(VALID_AMOUNT);
-        financialPenalty.setType(LEGAL_FEES_TYPE);
-        financialPenalty.setPayableStatus(OPEN);
+        financialPenalty.setType(OTHER_TYPE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
+        financialPenalty.setPayableStatus(CLOSED);
 
         return financialPenalty;
     }
