@@ -10,19 +10,19 @@
     <meta name="robots" content="noindex, nofollow">
     <meta
             property="og:image"
-            th:content="@{~/pay-penalty/images/govuk-frontend/v5.8.0/images/govuk-opengraph-image.png}">
+            th:content="@{{cdnUrl}/images/govuk-frontend/v5.9.0/govuk-opengraph-image.png(cdnUrl=${@environment.getProperty('cdn.url')})}">
     <link
             th:href="@{{cdnUrl}/stylesheets/chs-user-bar.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
-            th:href="@{~/pay-penalty/stylesheets/govuk-frontend/v5.8.0/govuk-frontend-5.8.0.min.css}"
+            th:href="@{{cdnUrl}/stylesheets/govuk-frontend/v5.9.0/govuk-frontend-5.9.0.min.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
             th:href="@{{cdnUrl}/stylesheets/govuk-link_override.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
             rel="icon"
-            th:href="@{~/pay-penalty/images/govuk-frontend/v5.8.0/images/favicon.ico}"
+            th:href="@{{cdnUrl}/images/govuk-frontend/v5.9.0/favicon.ico(cdnUrl=${@environment.getProperty('cdn.url')})}"
             type="image/x-icon" />
     <link
             th:href="@{{cdnUrl}/stylesheets/extensions/languages-nav.css(cdnUrl=${@environment.getProperty('cdn.url')})}"

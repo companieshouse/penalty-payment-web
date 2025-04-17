@@ -68,30 +68,6 @@ public class WebSecurity {
     }
 
     @Bean
-    @Order(7)
-    public SecurityFilterChain stylesheetsSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/stylesheets/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(8)
-    public SecurityFilterChain imagesSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/images/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(9)
-    public SecurityFilterChain fontsSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/fonts/**")
-        ).build();
-    }
-
-    @Bean
     @Order(10)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
