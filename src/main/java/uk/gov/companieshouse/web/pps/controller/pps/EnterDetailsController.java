@@ -139,7 +139,7 @@ public class EnterDetailsController extends BaseController {
 
         if (penaltyAndCosts.size() > 1) {
             LOGGER.info(String.format(
-                    "Online payment unavailable as there is more than one payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
+                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
                     penaltyAndCosts.size(), companyNumber, penaltyRef));
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
         }
