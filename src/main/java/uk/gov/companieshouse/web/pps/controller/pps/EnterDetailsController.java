@@ -35,7 +35,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.*;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
@@ -48,6 +48,7 @@ public class EnterDetailsController extends BaseController {
     private static final String PENALTY_PAID = "/penalty-paid";
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
+    private static final String PENALTY_PAYMENT_IN_PROGRESS = "/penalty-payment-in-progress";
 
     private static final String PENALTY_TYPE = "penalty";
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
@@ -146,6 +147,11 @@ public class EnterDetailsController extends BaseController {
 
             if (payablePenalties.size() == 1 && requestedPayablePenalty.isPresent()) { // Only one payable penalty: the requested penalty
                 FinancialPenalty payablePenalty = requestedPayablePenalty.get();
+
+                if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
+                    LOGGER.info("Payable penalty "  + payablePenalty.getId() + " is payment pending");
+                    return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
+                }
 
                 if (TRUE.equals(payablePenalty.getPaid())) {
                     LOGGER.info("Payable penalty " + payablePenalty.getId() + " is paid");
