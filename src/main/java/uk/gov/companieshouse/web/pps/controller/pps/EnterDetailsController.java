@@ -154,9 +154,9 @@ public class EnterDetailsController extends BaseController {
         var payablePenalty = payablePenalties.getFirst();
       
         if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
-                    LOGGER.info("Payable penalty "  + payablePenalty.getId() + " is payment pending");
-                    return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
-                }
+            LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is payment pending");
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
+        }
 
         if (TRUE.equals(payablePenalty.getPaid())) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is paid");
