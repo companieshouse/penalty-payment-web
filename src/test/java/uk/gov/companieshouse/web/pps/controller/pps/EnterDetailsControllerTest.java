@@ -97,6 +97,9 @@ class EnterDetailsControllerTest {
     private static final String PENALTY_IN_DCA_PATH =
             "redirect:/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-in-dca";
 
+    private static final String PENALTY_PAYMENT_IN_PROGRESS_PATH =
+            "redirect:/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/penalty-payment-in-progress";
+
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String START_PATH = "/pay-penalty";
@@ -398,6 +401,24 @@ class EnterDetailsControllerTest {
     }
 
     @Test
+    @DisplayName("Post Details failure path - penalty has payment pending")
+    void postRequestPenaltyWithPendingPayment() throws Exception {
+
+        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+        configurePenaltyPaymentPending(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(PENALTY_PAYMENT_IN_PROGRESS_PATH));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+    }
+
+    @Test
     @DisplayName("Post Details failure path - penalty is already paid")
     void postRequestPenaltyHasAlreadyBeenPaid() throws Exception {
 
@@ -548,6 +569,15 @@ class EnterDetailsControllerTest {
 
         when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
                 .thenReturn(dcaFinancialPenalty);
+    }
+
+    private void configurePenaltyPaymentPending(String companyNumber, String penaltyRef)
+            throws ServiceException {
+        List<FinancialPenalty> paymentPendingFinancialPenalty = new ArrayList<>();
+        paymentPendingFinancialPenalty.add(PPSTestUtility.paymentPendingFinancialPenalty(penaltyRef));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+                .thenReturn(paymentPendingFinancialPenalty);
     }
 
     private void configurePenaltyAlreadyPaid(String companyNumber, String penaltyRef)

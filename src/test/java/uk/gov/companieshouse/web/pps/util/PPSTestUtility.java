@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
 
 public class PPSTestUtility {
 
     public static final Integer VALID_AMOUNT = 750;
     public static final Integer PARTIAL_PAID_AMOUNT = 300;
+    public static final Integer ZERO_AMOUNT = 0;
     public static final String PENALTY_TYPE = "penalty";
     public static final String OTHER_TYPE = "other";
     public static final String DATE = "2018-12-12";
@@ -100,13 +102,26 @@ public class PPSTestUtility {
         return financialPenalty;
     }
 
+    public static FinancialPenalty paymentPendingFinancialPenalty(String id) {
+        FinancialPenalty financialPenalty = new FinancialPenalty();
+        financialPenalty.setId(id);
+        financialPenalty.setPaid(true);
+        financialPenalty.setDca(false);
+        financialPenalty.setOriginalAmount(VALID_AMOUNT);
+        financialPenalty.setOutstanding(ZERO_AMOUNT);
+        financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setPayableStatus(CLOSED_PENDING_ALLOCATION);
+
+        return financialPenalty;
+    }
+
     public static FinancialPenalty paidFinancialPenalty(String id, String madeUpDate) {
         FinancialPenalty financialPenalty = new FinancialPenalty();
         financialPenalty.setId(id);
         financialPenalty.setPaid(true);
         financialPenalty.setDca(false);
         financialPenalty.setOriginalAmount(VALID_AMOUNT);
-        financialPenalty.setOutstanding(VALID_AMOUNT);
+        financialPenalty.setOutstanding(ZERO_AMOUNT);
         financialPenalty.setType(PENALTY_TYPE);
         financialPenalty.setMadeUpDate(madeUpDate);
         financialPenalty.setReason("Test reason");
