@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.*;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
 
 public class PPSTestUtility {
 

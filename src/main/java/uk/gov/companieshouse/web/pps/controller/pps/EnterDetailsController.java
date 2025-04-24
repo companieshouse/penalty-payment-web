@@ -33,7 +33,8 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.*;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
