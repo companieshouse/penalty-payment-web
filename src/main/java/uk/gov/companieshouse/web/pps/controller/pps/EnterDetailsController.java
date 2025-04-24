@@ -155,7 +155,7 @@ public class EnterDetailsController extends BaseController {
         var payablePenalty = payablePenalties.getFirst();
       
         if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
-            LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is closed allocation pending");
+            LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is closed pending allocation");
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
         }
 
