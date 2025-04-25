@@ -186,18 +186,24 @@ class PenaltyPaymentServiceImplTest {
         assertSinglePenalty(penaltyAndCosts, 0, LATE_FILING_OF_ACCOUNTS_REASON, CLOSED);
 
         penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000001");
-        assertEquals(2, penaltyAndCosts.size());
+        assertEquals(3, penaltyAndCosts.size());
         final var penalty = penaltyAndCosts.getFirst();
         assertEquals(3000, penalty.getOutstanding());
         assertEquals(PENALTY_TYPE, penalty.getType());
         assertEquals(LATE_FILING_OF_ACCOUNTS_REASON, penalty.getReason());
-        assertEquals(OPEN, penalty.getPayableStatus());
+        assertEquals(CLOSED, penalty.getPayableStatus());
 
-        var other = penaltyAndCosts.get(1);
-        assertEquals(105, other.getOutstanding());
-        assertEquals(OTHER_TYPE, other.getType());
-        assertEquals(LATE_FILING_OF_ACCOUNTS_REASON, other.getReason());
-        assertEquals(CLOSED, other.getPayableStatus());
+        var cost1 = penaltyAndCosts.get(1);
+        assertEquals(105, cost1.getOutstanding());
+        assertEquals(OTHER_TYPE, cost1.getType());
+        assertEquals(LATE_FILING_OF_ACCOUNTS_REASON, cost1.getReason());
+        assertEquals(CLOSED, cost1.getPayableStatus());
+
+        var cost2 = penaltyAndCosts.get(2);
+        assertEquals(80, cost2.getOutstanding());
+        assertEquals(OTHER_TYPE, cost2.getType());
+        assertEquals(LATE_FILING_OF_ACCOUNTS_REASON, cost2.getReason());
+        assertEquals(CLOSED, cost2.getPayableStatus());
     }
 
     @Test
