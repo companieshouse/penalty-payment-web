@@ -1,18 +1,18 @@
 {
-    "etag": "ead333db379ece85ddd3a2145f0b71a1b1753dee1836548c574d787c",
+    "etag": "7be97f62a8f6b66e078570d184f3e731b2a2029cfd0ece7b2c6bf877",
     "items_per_page": 0,
     "start_index": 0,
     "total_results": 6,
     "items": [
         {
             "id": "P1234567",
-            "etag": "93048628790156b5c33057040cb1f9139f8ca83da69ce39a4c89d14c",
+            "etag": "327a7adea97046f6b8f133b4ddaedcd3bdb4a4611c7622f7d29dac81",
             "kind": "penalty#sanctions",
             "is_paid": false,
             "is_dca": false,
-            "due_date": "2025-05-16",
-            "made_up_date": "2025-04-02",
-            "transaction_date": "2025-04-15",
+            "due_date": "2025-05-24",
+            "made_up_date": "2025-04-10",
+            "transaction_date": "2025-04-23",
             "original_amount": 250,
             "outstanding": 250,
             "type": "penalty",
@@ -21,7 +21,7 @@
         },
         {
             "id": "P0000600",
-            "etag": "6998912340ea5a4042665e7f318f0c65af208edcfb6af0b192e37327",
+            "etag": "6460a21c6a244005de5b31377613306aa882a2bc2b162d7bb7051ca7",
             "kind": "penalty#sanctions",
             "is_paid": false,
             "is_dca": false,
@@ -36,7 +36,7 @@
         },
         {
             "id": "P0000601",
-            "etag": "4358a7765e4dbbb8ca27ed7e11d6db147f0254110eb01e05550cc56f",
+            "etag": "82de0f51bfac0228d47a5bb416c6b3002309e9136a72644ac3addf65",
             "kind": "penalty#sanctions",
             "is_paid": false,
             "is_dca": false,
@@ -51,7 +51,7 @@
         },
         {
             "id": "P0000602",
-            "etag": "67a459ec0c5266ced8e0503eefba6b28dfbc61181d49b9ec0f52edbb",
+            "etag": "7c5e67ddd3d75f6e9ca2879b40991d24afdfa4446e413dfadc9bc343",
             "kind": "penalty#sanctions",
             "is_paid": true,
             "is_dca": false,
@@ -66,7 +66,7 @@
         },
         {
             "id": "P0000603",
-            "etag": "7764da52a1f8b6ec5af53249378707dbc5de6560f69189f13a535a8c",
+            "etag": "873a3323d44becdca1129f6aa6d92b1b4ad55320fbf24952c11c342c",
             "kind": "penalty#sanctions",
             "is_paid": false,
             "is_dca": false,
@@ -81,7 +81,7 @@
         },
         {
             "id": "P0000603",
-            "etag": "bec0a4213399221fbc222f62f670d4282d8bd76ed264d091767cc0fe",
+            "etag": "c539200c20d270f2a180deb2161bb8d8668ef12c09022ed8b4df950f",
             "kind": "penalty#sanctions",
             "is_paid": false,
             "is_dca": false,
