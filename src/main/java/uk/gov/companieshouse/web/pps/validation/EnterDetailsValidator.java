@@ -3,7 +3,6 @@ package uk.gov.companieshouse.web.pps.validation;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import java.util.ResourceBundle;
 
@@ -23,28 +22,30 @@ public class EnterDetailsValidator {
     }
 
     public void isValid(final EnterDetails enterDetails, final BindingResult bindingResult) {
-        String penaltyRef = enterDetails.getPenaltyRef();
-        String penaltyRefErrorText = switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
-            case LATE_FILING -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.notEmpty.LATE_FILING",
-                    LATE_FILING_PENALTY_REF_REGEX, "enterDetails.penaltyRef.notValid.LATE_FILING");
-            case SANCTIONS -> getPenaltyRefErrorText(penaltyRef, "enterDetails.penaltyRef.notEmpty.SANCTIONS",
-                    SANCTIONS_PENALTY_REF_REGEX, "enterDetails.penaltyRef.notValid.SANCTIONS");
-        };
+        String penaltyRef = enterDetails.getPenaltyRef() != null ? enterDetails.getPenaltyRef() : "";
+        String companyNumber = enterDetails.getCompanyNumber() != null ? enterDetails.getCompanyNumber() : "";
 
-        if (penaltyRefErrorText != null) {
-            bindingResult.rejectValue("penaltyRef", "penaltyRef", penaltyRefErrorText);
-        }
-    }
+        boolean hasPenaltyRefSpaces = penaltyRef.contains(" ");
+        boolean hasCompanyNumberSpaces = companyNumber.contains(" ");
 
-    private String getPenaltyRefErrorText(String penaltyRef, String penaltyRefNotEmptyErrorMessageKey,
-            String penaltyRefRegex, String penaltyRefNotValidErrorMessageKey) {
-        String penaltyRefErrorText = null;
         if (penaltyRef.isEmpty()) {
-            penaltyRefErrorText = bundle.getString(penaltyRefNotEmptyErrorMessageKey);
-        } else if (!penaltyRef.matches(penaltyRefRegex)) {
-            penaltyRefErrorText = bundle.getString(penaltyRefNotValidErrorMessageKey);
+            String key = "enterDetails.penaltyRef.notEmpty." + enterDetails.getPenaltyReferenceName();
+            bindingResult.rejectValue("penaltyRef", "penaltyRef", bundle.getString(key));
+        } else if (hasPenaltyRefSpaces) {
+            String key = "enterDetails.penaltyRef.noSpaces." + enterDetails.getPenaltyReferenceName();
+            bindingResult.rejectValue("penaltyRef", "penaltyRef", bundle.getString(key));
+        } else {
+            String regex = enterDetails.getPenaltyReferenceName().equals("LATE_FILING")
+                    ? LATE_FILING_PENALTY_REF_REGEX
+                    : SANCTIONS_PENALTY_REF_REGEX;
+            if (!penaltyRef.matches(regex)) {
+                String key = "enterDetails.penaltyRef.notValid." + enterDetails.getPenaltyReferenceName();
+                bindingResult.rejectValue("penaltyRef", "penaltyRef", bundle.getString(key));
+            }
         }
-        return penaltyRefErrorText;
-    }
 
+        if (hasCompanyNumberSpaces) {
+            bindingResult.rejectValue("companyNumber", "companyNumber", bundle.getString("enterDetails.companyNumber.noSpaces"));
+        }
+    }
 }
