@@ -64,13 +64,6 @@ class WebSecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /pay-penalty/bank-transfer/**")
-    void bankTransferSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/bank-transfer/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
     @DisplayName(" apply security filter to /pay-penalty/unscheduled-service-down")
     void scheduledServiceDownSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/pay-penalty/unscheduled-service-down")).thenReturn(httpSecurity);

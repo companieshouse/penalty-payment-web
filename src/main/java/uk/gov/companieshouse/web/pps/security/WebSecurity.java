@@ -53,14 +53,6 @@ public class WebSecurity {
 
     @Bean
     @Order(5)
-    public SecurityFilterChain bankTransferSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/bank-transfer/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(6)
     public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty/unscheduled-service-down")
@@ -68,7 +60,7 @@ public class WebSecurity {
     }
 
     @Bean
-    @Order(10)
+    @Order(6)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty/**")
