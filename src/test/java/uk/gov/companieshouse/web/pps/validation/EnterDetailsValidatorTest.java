@@ -157,8 +157,8 @@ class EnterDetailsValidatorTest {
     @Test
     void isValidWhenCompanyNumberIsNull() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setPenaltyRef("A1234567"); // valid penaltyRef
-        enterDetails.setCompanyNumber(null); // null value
+        enterDetails.setPenaltyRef("A1234567");
+        enterDetails.setCompanyNumber(null);
 
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
