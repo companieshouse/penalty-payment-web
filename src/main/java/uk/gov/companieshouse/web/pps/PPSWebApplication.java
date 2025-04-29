@@ -33,7 +33,6 @@ public class PPSWebApplication implements WebMvcConfigurer {
                         "/late-filing-penalty",
                         "/pay-penalty",
                         "/pay-penalty/ref-starts-with",
-                        "/pay-penalty/bank-transfer/**",
                         "/pay-penalty/unscheduled-service-down"
                 );
     }
