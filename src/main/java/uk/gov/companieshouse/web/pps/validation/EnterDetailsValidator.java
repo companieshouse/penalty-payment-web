@@ -14,6 +14,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 @Component
 public class EnterDetailsValidator {
 
+    private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z0-9]{8}|\\d{1,8})$";
     private static final String LATE_FILING_PENALTY_REF_REGEX = "^[Aa]\\d{7}$";
     private static final String SANCTIONS_PENALTY_REF_REGEX = "^[Pp]\\d{7}$";
 
@@ -27,6 +28,15 @@ public class EnterDetailsValidator {
         String penaltyRef = enterDetails.getPenaltyRef();
         String penaltyRefString = "penaltyRef";
         String companyNumberString = "companyNumber";
+
+        if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
+            bindingResult.rejectValue(companyNumberString, companyNumberString, bundle.getString("enterDetails.companyNumber.notValid"));
+        } else if (StringUtils.contains(enterDetails.getCompanyNumber(), " ")) {
+            bindingResult.rejectValue(companyNumberString, companyNumberString, bundle.getString("enterDetails.companyNumber.noSpaces"));
+        } else if (!enterDetails.getCompanyNumber().matches(COMPANY_NUMBER_REGEX)) {
+            bindingResult.rejectValue(companyNumberString, companyNumberString, bundle.getString("enterDetails.companyNumber.notValid"));
+        }
+
         if (penaltyRef == null || penaltyRef.isEmpty()) {
             String key = "enterDetails.penaltyRef.notEmpty." + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(penaltyRefString, penaltyRefString, bundle.getString(key));
@@ -41,12 +51,6 @@ public class EnterDetailsValidator {
                 String key = "enterDetails.penaltyRef.notValid." + enterDetails.getPenaltyReferenceName();
                 bindingResult.rejectValue(penaltyRefString, penaltyRefString, bundle.getString(key));
             }
-        }
-
-        if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
-            bindingResult.rejectValue(companyNumberString, companyNumberString, bundle.getString("enterDetails.companyNumber.notValid"));
-        } else if (StringUtils.contains(enterDetails.getCompanyNumber(), " ")) {
-            bindingResult.rejectValue(companyNumberString, companyNumberString, bundle.getString("enterDetails.companyNumber.noSpaces"));
         }
     }
 }

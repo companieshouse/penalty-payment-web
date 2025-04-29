@@ -7,11 +7,6 @@ public class EnterDetails {
     @NotNull
     private String penaltyReferenceName;
 
-    /**
-     * Allows any length of number under 8. e.g "6400" is allowed.
-     * Only allows letters if the total length is 8.
-     * Doesn't allow spaces or empty strings
-     */
     @NotNull
     private String companyNumber;
 
