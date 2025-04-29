@@ -27,8 +27,8 @@
         <api-sdk-java.version>6.2.8</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.4.4</spring-boot-dependencies.version>
-        <spring-boot-maven-plugin.version>3.4.4</spring-boot-maven-plugin.version>
+        <spring-boot-dependencies.version>3.4.5</spring-boot-dependencies.version>
+        <spring-boot-maven-plugin.version>3.4.5</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
@@ -38,7 +38,7 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <hamcrest-version>3.0</hamcrest-version>
         <maven-plugin>3.5.2</maven-plugin>
-        <jib-maven-plugin>3.4.4</jib-maven-plugin>
+        <jib-maven-plugin>3.4.5</jib-maven-plugin>
         <system-stubs.version>2.1.7</system-stubs.version>
 
         <!-- sonar config -->
