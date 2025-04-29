@@ -109,7 +109,7 @@ class EnterDetailsValidatorTest {
     @Test
     void isValidWhenCompanyNumberContainsSpacesOnlyWhitespaceErrorShown() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setCompanyNumber("1234 5678");
+        enterDetails.setCompanyNumber("1234 567");
         enterDetails.setPenaltyRef("A1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
@@ -125,7 +125,7 @@ class EnterDetailsValidatorTest {
     void isValidWhenPenaltyRefContainsSpacesOnlyWhitespaceErrorShown() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setCompanyNumber("12345678");
-        enterDetails.setPenaltyRef("A123 4567");
+        enterDetails.setPenaltyRef("A123 456");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
