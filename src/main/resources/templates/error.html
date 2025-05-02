@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+    <head>
+        <title th:text="#{label.error.header.page.title}">Server error</title>
+    </head>
+    <body>
+        <div layout:fragment="content">
+
+            <div class="text">
+                <h1 class="govuk-heading-l" th:text="#{label.error.page.title}">Sorry we are experiencing technical difficulties</h1>
+            </div>
+
+            <p class="govuk-body" th:text="#{label.error.page.content.title}">Try again in a few moments.</p>
+            <p class="govuk-body">
+                <span th:text="#{label.error.page.content.main}">If this problem continues please</span>
+                <a class="govuk-link" data-event-id="email-us"
+                   th:href="@{{enquiries}(enquiries=${@environment.getProperty('enquiries')})}"
+                   data-th-text="#{label.error.page.content.email.link}">email us</a>
+            </p>
+            </div>
+    </body>
+</html>
