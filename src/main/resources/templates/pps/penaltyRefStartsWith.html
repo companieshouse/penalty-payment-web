@@ -39,6 +39,9 @@
                 <div class="govuk-form-group"
                      th:classappend="${#fields.hasErrors('selectedPenaltyReference')} ? 'govuk-form-group--error' : ''">
                     <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden">
+                            What does the penalty reference start with?
+                        </legend>
                         <span class="govuk-error-message"
                               id="selectedPenaltyReference-errorId"
                               th:if="${#fields.hasErrors('selectedPenaltyReference')}"
