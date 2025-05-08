@@ -31,39 +31,44 @@
 
 
         <div class="govuk-form-group" th:classappend="${errorMessage} ? govuk-form-group--error">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h1 class="govuk-fieldset__heading">
-                    Are you sure you want to sign out?
-                </h1>
-            </legend>
-            <div th:if="${errorMessage} == true">
-                <p id="sign-out-error" class="govuk-error-message">
-                    <span class="govuk-visually-hidden">Error:</span> Select yes if you want to sign out
-                </p>
-            </div>
-            <div id="sign-out-hint" class="govuk-hint">
-                Your answers will not be saved. You will need to start again if you want to pay a penalty
-                for filing your company accounts late.
-            </div>
-            <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="yes-sign-out" name="radio" type="radio" value="yes" data-event-id="yes-to-signout">
-                    <label class="govuk-label govuk-radios__label" for="yes-sign-out">
-                        Yes
-                    </label>
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        Are you sure you want to sign out?
+                    </h1>
+                </legend>
+
+                <div th:if="${errorMessage} == true">
+                    <p id="sign-out-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> Select yes if you want to sign out
+                    </p>
                 </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="no-sign-out" name="radio" type="radio" value="no" data-event-id="no-to-signout">
-                    <label class="govuk-label govuk-radios__label" for="no-sign-out">
-                        No
-                    </label>
+
+                <div id="sign-out-hint" class="govuk-hint">
+                    Your answers will not be saved. You will need to start again if you want to pay a penalty
+                    for filing your company accounts late.
                 </div>
-            </div>
+
+                <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="yes-sign-out" name="radio" type="radio" value="yes" data-event-id="yes-to-signout">
+                        <label class="govuk-label govuk-radios__label" for="yes-sign-out">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="no-sign-out" name="radio" type="radio" value="no" data-event-id="no-to-signout">
+                        <label class="govuk-label govuk-radios__label" for="no-sign-out">
+                            No
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
         </div>
-            <p class="govuk-body"></p>
-            <button class="govuk-button" data-module="govuk-button" data-event-id="continue-button" id="submit">
-                Continue
-            </button>
+        <p class="govuk-body"></p>
+        <button class="govuk-button" data-module="govuk-button" data-event-id="continue-button" id="submit">
+            Continue
+        </button>
     </form>
 </div>
 </html>
