@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout
+      (phaseBanner = 'Beta',
+      phaseBannerLink = ${@environment.getProperty('penalty.survey-link')},
+      userBar = '1',
+      hideYourDetails = '1',
+      hideRecentFilings = '1',
+      userEmail = ${chsSession.getData().get('signin_info').get('user_profile').get('email')},
+      userSignOutUrl = ${@environment.getProperty('penalty.sign-out-path')},
+      backLink = '1')}">
+
+<head>
+    <title>
+        This service is unavailable - Pay a penalty to Companies House - GOV.UK
+    </title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var goalId = document.getElementById('unscheduled-service-down-stop-screen-goal-id').value;
+
+          if (goalId) {
+            window._paq = window._paq || [];
+            _paq.push(['trackGoal', goalId]);
+          }
+        });
+    </script>
+</head>
+
+<div id="unscheduled-service-down-main-content" layout:fragment="content">
+
+    <form th:action="@{''}" method="post" class="form" id="unscheduled-service-down">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 id="page-title " class="govuk-heading-xl">
+                    <span id="page-title-heading">Sorry, there is a problem with the service</span>
+                </h1>
+                <p class="govuk-body">
+                    We have not saved your answers.
+                </p>
+                <p class="govuk-body">
+                    You can try again later, or choose another way to pay.
+                </p>
+                <h3 class="govuk-heading-m">Pay another way</h3>
+                <p class="govuk-body">
+                    You can pay your penalty by bank transfer. Some penalties can also be paid by cheque.
+                </p>
+                <h3 class="govuk-heading-s">If your penalty reference starts with A</h3>
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Use these details to pay your late filing penalty
+            </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">
+                            Check the details carefully, as they may be different from other transactions you've made with us.
+                        </p>
+                        <h3 class="govuk-heading-s">Bacs payments</h3>
+                        <ul class="govuk-list govuk-list--bullet" id="banking-details">
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Account name</span>:
+                                <span id="late-filing-account-name"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-name')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Sort code</span>:
+                                <span id="late-filing-sort-code"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.sort-code')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Account number</span>:
+                                <span id="late-filing-account-number"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-number')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
+                                that we know which penalty you've paid.
+                                Your payment may be delayed if you use the wrong reference.
+                            </li>
+                        </ul>
+                        <h3 class="govuk-heading-s">Overseas payments</h3>
+                        <ul class="govuk-list govuk-list--bullet" id="overseas-banking-details">
+                            <li>
+                                <span class="govuk-!-font-weight-bold">IBAN</span>:
+                                <span id="late-filing-iban"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.iban')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
+                                <span id="late-filing-swift-code"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.swift-code')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
+                                that we know which penalty you've paid.
+                                Your payment may be delayed if you use the wrong reference.
+                            </li>
+                        </ul>
+                        <h3 class="govuk-heading-s">Payments by cheque</h3>
+                        <p class="govuk-body">You can pay by cheque through the post.
+                            Make the cheque payable to ‘Companies House only’ and send it to Companies House,
+                            with the slip on your penalty notice (‘remittance advice’).</p>
+                        <div class="govuk-inset-text">
+                            Companies House
+                            <br>PO Box 710
+                            <br>Crown Way
+                            <br>CF14 3UZ
+                        </div>
+                        <p class="govuk-body">Write the company name and number on the back of the cheque.
+                            You’ll find the company number on your penalty notice.</p>
+                    </div>
+                </details>
+                <h3 class="govuk-heading-s">If your penalty reference starts with P</h3>
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              Use these details to pay your penalty
+            </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">
+                            Check the details carefully, as they may be different from other transactions you've made with us.
+                        </p>
+                        <h3 class="govuk-heading-s">Bacs payments</h3>
+                        <ul class="govuk-list govuk-list--bullet" id="sanctions-banking-details">
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Account name</span>:
+                                <span id="sanctions-account-name"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-name')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Sort code</span>:
+                                <span id="sanctions-sort-code"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.sort-code')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Account number</span>:
+                                <span id="sanctions-account-number"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-number')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
+                                that we know which penalty you've paid.
+                                Your payment may be delayed if you use the wrong reference.
+                            </li>
+                        </ul>
+                        <h3 class="govuk-heading-s">Overseas payments</h3>
+                        <ul class="govuk-list govuk-list--bullet" id="sanctions-overseas-banking-details">
+                            <li>
+                                <span class="govuk-!-font-weight-bold">IBAN</span>:
+                                <span id="sanctions-iban"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.iban')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
+                                <span id="sanctions-swift-code"
+                                      th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.swift-code')}"></span>
+                            </li>
+                            <li>
+                                <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty reference, so
+                                that we know which penalty you've paid.
+                                Your payment may be delayed if you use the wrong reference.
+                            </li>
+                        </ul>
+                        <h3 class="govuk-heading-s">What happens next</h3>
+                        <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
+                    </div>
+                </details>
+                <p class="govuk-body">If you have any questions, you can
+                    <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
+            </div>
+        </div>
+        <input type="hidden" th:value="${@environment.getProperty('matomo.unscheduled-service-down-stop-screen-goal-id')}"
+               id="unscheduled-service-down-stop-screen-goal-id">
+    </form>
+</div>
+</html>
