@@ -1,0 +1,53 @@
+package uk.gov.companieshouse.web.pps.controller.pps;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+
+@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class CustomErrorControllerTest {
+
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
+    private static final String REDIRECT_PATH = "redirect:";
+
+    private static final String PAGE_NOT_FOUND_PATH = "/pay-penalty/page-not-found";
+
+    private static final String UNSCHEDULE_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
+
+    @Test
+    @DisplayName("Test Error - 404 Not Found")
+    void getNotFoundError() {
+        CustomErrorController controller = new CustomErrorController(mockPenaltyConfigurationProperties);
+
+        when(mockPenaltyConfigurationProperties.getPageNotFoundPath()).thenReturn(PAGE_NOT_FOUND_PATH);
+        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(404);
+
+        assertEquals(REDIRECT_PATH + PAGE_NOT_FOUND_PATH, controller.handleError(httpServletRequest));
+    }
+
+    @Test
+    @DisplayName("Test Error - Other Unexpected error")
+    void getUnexpectedError() {
+        CustomErrorController controller = new CustomErrorController(mockPenaltyConfigurationProperties);
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULE_SERVICE_DOWN_PATH);
+        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(503);
+
+        assertEquals(REDIRECT_PATH + UNSCHEDULE_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
+    }
+}
