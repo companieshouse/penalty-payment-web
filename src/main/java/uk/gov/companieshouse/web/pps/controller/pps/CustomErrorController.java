@@ -14,6 +14,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 
 @Controller
 public class CustomErrorController implements ErrorController {
+    private static final int ERROR_CODE_NOT_FOUND = 404;
     private static final Logger LOG = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
@@ -27,7 +28,7 @@ public class CustomErrorController implements ErrorController {
         int httpErrorCode = getErrorCode(request);
         LOG.errorRequest(request, request.getRequestURI());
 
-        if (httpErrorCode == 404) {
+        if (httpErrorCode == ERROR_CODE_NOT_FOUND) {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getPageNotFoundPath();
         } else {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
