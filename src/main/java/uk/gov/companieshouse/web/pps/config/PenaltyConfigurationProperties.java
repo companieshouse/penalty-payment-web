@@ -24,6 +24,7 @@ public class PenaltyConfigurationProperties {
     private String startPath;
     private String signedOutUrl;
     private String govUkPayPenaltyUrl;
+    private String pageNotFoundPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -130,4 +131,11 @@ public class PenaltyConfigurationProperties {
         this.govUkPayPenaltyUrl = govUkPayPenaltyUrl;
     }
 
+    public String getPageNotFoundPath() {
+        return pageNotFoundPath;
+    }
+
+    public void setPageNotFoundPath(String pageNotFoundPath) {
+        this.pageNotFoundPath = pageNotFoundPath;
+    }
 }
