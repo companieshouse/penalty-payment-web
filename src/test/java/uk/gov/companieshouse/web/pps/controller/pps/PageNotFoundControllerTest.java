@@ -56,7 +56,7 @@ class PageNotFoundControllerTest {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(
                 Map.of("signin_info",
                         Map.of("user_profile",
-                                Map.of("email", "test@gmail.com"))));
+                                Map.of("email", "test@example.com"))));
 
         this.mockMvc.perform(get(PAGE_NOT_FOUND_PATH))
                 .andExpect(status().isOk())
