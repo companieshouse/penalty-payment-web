@@ -24,10 +24,11 @@ class CustomErrorControllerTest {
     private HttpServletRequest httpServletRequest;
 
     private static final String REDIRECT_PATH = "redirect:";
-
     private static final String PAGE_NOT_FOUND_PATH = "/pay-penalty/page-not-found";
-
     private static final String UNSCHEDULE_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
+
+    private static final int ERROR_CODE_NOT_FOUND = 404;
+    private static final int ERROR_CODE_SERVICE_UNAVAILABLE = 503;
 
     @Test
     @DisplayName("Test Error - 404 Not Found")
@@ -35,7 +36,7 @@ class CustomErrorControllerTest {
         CustomErrorController controller = new CustomErrorController(mockPenaltyConfigurationProperties);
 
         when(mockPenaltyConfigurationProperties.getPageNotFoundPath()).thenReturn(PAGE_NOT_FOUND_PATH);
-        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(404);
+        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(ERROR_CODE_NOT_FOUND);
 
         assertEquals(REDIRECT_PATH + PAGE_NOT_FOUND_PATH, controller.handleError(httpServletRequest));
     }
@@ -46,7 +47,7 @@ class CustomErrorControllerTest {
         CustomErrorController controller = new CustomErrorController(mockPenaltyConfigurationProperties);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULE_SERVICE_DOWN_PATH);
-        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(503);
+        when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(ERROR_CODE_SERVICE_UNAVAILABLE);
 
         assertEquals(REDIRECT_PATH + UNSCHEDULE_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
     }
