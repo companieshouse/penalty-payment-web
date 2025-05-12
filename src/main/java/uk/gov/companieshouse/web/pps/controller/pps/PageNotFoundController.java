@@ -28,7 +28,7 @@ public class PageNotFoundController extends BaseController {
     }
 
     @GetMapping
-    public String getUnscheduledServiceDown(Model model) {
+    public String getPageNotFound(Model model) {
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getStartPath(),
                 penaltyConfigurationProperties.getSignOutPath());
