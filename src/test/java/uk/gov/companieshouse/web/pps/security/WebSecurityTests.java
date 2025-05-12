@@ -70,4 +70,17 @@ class WebSecurityTests {
         assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /pay-penalty/page-not-found")
+    void pageNotFoundSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/pay-penalty/page-not-found")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.pageNotFoundSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /error")
+    void errorPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/error")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.errorPageSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
 }
