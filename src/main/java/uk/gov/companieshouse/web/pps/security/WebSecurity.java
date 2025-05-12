@@ -61,6 +61,22 @@ public class WebSecurity {
 
     @Bean
     @Order(6)
+    public SecurityFilterChain pageNotFoundSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/pay-penalty/page-not-found")
+        ).build();
+    }
+
+    @Bean
+    @Order(7)
+    public SecurityFilterChain errorPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/error")
+        ).build();
+    }
+
+    @Bean
+    @Order(8)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty/**")
