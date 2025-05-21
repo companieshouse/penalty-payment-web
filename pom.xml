@@ -19,7 +19,7 @@
         <structured-logging.version>3.0.24</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>3.0.33</common-web-java.version>
-        <java-session-handler.version>4.1.7s</java-session-handler.version>
+        <java-session-handler.version>4.1.7</java-session-handler.version>
         <web-security-java.version>3.1.2</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
