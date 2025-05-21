@@ -1,18 +1,17 @@
 package uk.gov.companieshouse.web.pps.validation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import uk.gov.companieshouse.web.pps.models.EnterDetails;
-
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import uk.gov.companieshouse.web.pps.models.EnterDetails;
 
 class EnterDetailsValidatorTest {
 
@@ -32,7 +31,6 @@ class EnterDetailsValidatorTest {
     void isValidWhenRefStartsWithLateFiling() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setPenaltyRef("A1234567");
-        enterDetails.setCompanyNumber("12345678");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
@@ -50,7 +48,7 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter the penalty reference",
+        assertEquals("Enter the reference number",
                 Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
@@ -64,7 +62,7 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter your penalty reference exactly as shown on your penalty letter",
+        assertEquals("Enter your reference number exactly as shown on your penalty letter",
                 Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 
@@ -72,7 +70,6 @@ class EnterDetailsValidatorTest {
     void isValidWhenRefStartsWithSanctions() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
         enterDetails.setPenaltyRef("P1234567");
-        enterDetails.setCompanyNumber("12345678");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
@@ -107,36 +104,5 @@ class EnterDetailsValidatorTest {
         assertEquals("Enter your penalty reference exactly as shown on your penalty letter",
                 Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
-
-    @Test
-    void isValidWhenCompanyNumberContainsSpacesOnlyWhitespaceErrorShown() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setCompanyNumber("1234 567");
-        enterDetails.setPenaltyRef("A1234567");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount("companyNumber"));
-        assertEquals("Company number must not include spaces",
-                Objects.requireNonNull(bindingResult.getFieldError("companyNumber")).getDefaultMessage());
-    }
-
-    @Test
-    void isValidWhenPenaltyRefContainsSpacesOnlyWhitespaceErrorShown() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setCompanyNumber("12345678");
-        enterDetails.setPenaltyRef("A123 456");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Penalty reference must not include spaces",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
-    }
-
 
 }

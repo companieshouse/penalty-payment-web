@@ -1,11 +1,10 @@
 package uk.gov.companieshouse.web.pps.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @ConfigurationProperties("penalty")
@@ -14,14 +13,13 @@ public class PenaltyConfigurationProperties {
     private List<PenaltyReference> allowedRefStartsWith = new ArrayList<>();
     private String refStartsWithPath;
     private String enterDetailsPath;
+    private String bankTransferPath;
+    private String bankTransferLateFilingDetailsPath;
+    private String bankTransferSanctionsPath;
     private String unscheduledServiceDownPath;
     private String signOutPath;
     private String surveyLink;
-    private String serviceBannerLink;
     private String startPath;
-    private String signedOutUrl;
-    private String govUkPayPenaltyUrl;
-    private String pageNotFoundPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -48,6 +46,30 @@ public class PenaltyConfigurationProperties {
         this.enterDetailsPath = enterDetailsPath;
     }
 
+    public String getBankTransferPath() {
+        return bankTransferPath;
+    }
+
+    public void setBankTransferPath(String bankTransferPath) {
+        this.bankTransferPath = bankTransferPath;
+    }
+
+    public String getBankTransferLateFilingDetailsPath() {
+        return bankTransferLateFilingDetailsPath;
+    }
+
+    public void setBankTransferLateFilingDetailsPath(String bankTransferLateFilingDetailsPath) {
+        this.bankTransferLateFilingDetailsPath = bankTransferLateFilingDetailsPath;
+    }
+
+    public String getBankTransferSanctionsPath() {
+        return bankTransferSanctionsPath;
+    }
+
+    public void setBankTransferSanctionsPath(String bankTransferSanctionsPath) {
+        this.bankTransferSanctionsPath = bankTransferSanctionsPath;
+    }
+
     public String getUnscheduledServiceDownPath() {
         return unscheduledServiceDownPath;
     }
@@ -72,43 +94,11 @@ public class PenaltyConfigurationProperties {
         this.surveyLink = surveyLink;
     }
 
-    public String getServiceBannerLink() {
-        return serviceBannerLink;
-    }
-
-    public void setServiceBannerLink(String serviceBannerLink) {
-        this.serviceBannerLink = serviceBannerLink;
-    }
-
     public String getStartPath() {
         return startPath;
     }
 
     public void setStartPath(String startPath) {
         this.startPath = startPath;
-    }
-
-    public String getSignedOutUrl() {
-        return signedOutUrl;
-    }
-
-    public void setSignedOutUrl (String signedOutUrl) {
-        this.signedOutUrl = signedOutUrl;
-    }
-
-    public String getGovUkPayPenaltyUrl() {
-        return govUkPayPenaltyUrl;
-    }
-
-    public void setGovUkPayPenaltyUrl(String govUkPayPenaltyUrl) {
-        this.govUkPayPenaltyUrl = govUkPayPenaltyUrl;
-    }
-
-    public String getPageNotFoundPath() {
-        return pageNotFoundPath;
-    }
-
-    public void setPageNotFoundPath(String pageNotFoundPath) {
-        this.pageNotFoundPath = pageNotFoundPath;
     }
 }

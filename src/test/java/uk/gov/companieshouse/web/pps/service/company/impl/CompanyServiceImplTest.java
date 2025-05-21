@@ -1,10 +1,10 @@
 package uk.gov.companieshouse.web.pps.service.company.impl;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.ApiClient;
@@ -44,7 +44,8 @@ class CompanyServiceImplTest {
     @Mock
     private CompanyProfileApi companyProfile;
 
-    private CompanyService companyService;
+    @InjectMocks
+    private CompanyService mockCompanyService = new CompanyServiceImpl();
 
     private static final String COMPANY_NUMBER_WITH_LETTERS = "SE123456";
 
@@ -56,16 +57,11 @@ class CompanyServiceImplTest {
 
     private static final String APPENDED_SIX_DIGIT_COMPANY_NUMBER = "00123456";
 
-    @BeforeEach
-    void setUp() {
-        companyService = new CompanyServiceImpl(apiClientService);
-    }
-
     @Test
     @DisplayName("Append - Do not append to company number with letters")
     void validateCompanyNumberWithLettersNotAppended() {
 
-        String companyNumber = companyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_LETTERS);
+        String companyNumber = mockCompanyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_LETTERS);
         assertEquals(COMPANY_NUMBER_WITH_LETTERS, companyNumber);
     }
 
@@ -73,7 +69,7 @@ class CompanyServiceImplTest {
     @DisplayName("Append - Eight Digit company number returned the same")
     void validationEightDigitCompanyNumberReturnedTheSame() {
 
-        String companyNumber = companyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_EIGHT_DIGITS);
+        String companyNumber = mockCompanyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_EIGHT_DIGITS);
         assertEquals(COMPANY_NUMBER_WITH_EIGHT_DIGITS, companyNumber);
     }
 
@@ -81,7 +77,7 @@ class CompanyServiceImplTest {
     @DisplayName("Append - Six Digit company number should have 0's appended to beginning")
     void validationSixDigitCompanyNumberReturnedWithAppendedZeros() {
 
-        String companyNumber = companyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_SIX_DIGITS);
+        String companyNumber = mockCompanyService.appendToCompanyNumber(COMPANY_NUMBER_WITH_SIX_DIGITS);
         assertEquals(APPENDED_SIX_DIGIT_COMPANY_NUMBER, companyNumber);
     }
 
@@ -104,7 +100,7 @@ class CompanyServiceImplTest {
 
         when(responseWithData.getData()).thenReturn(companyProfile);
 
-        CompanyProfileApi returnedCompanyProfile = companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS);
+        CompanyProfileApi returnedCompanyProfile = mockCompanyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS);
 
         assertEquals(companyProfile, returnedCompanyProfile);
     }
@@ -118,7 +114,7 @@ class CompanyServiceImplTest {
         when(companyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));
+                mockCompanyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));
     }
 
     @Test
@@ -130,7 +126,6 @@ class CompanyServiceImplTest {
         when(companyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));
+                mockCompanyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));
     }
-
 }

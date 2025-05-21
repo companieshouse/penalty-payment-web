@@ -1,11 +1,10 @@
 package uk.gov.companieshouse.web.pps.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import static java.util.Collections.emptyMap;
 
 import java.util.Map;
-
-import static java.util.Collections.emptyMap;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties("feature-flag")
