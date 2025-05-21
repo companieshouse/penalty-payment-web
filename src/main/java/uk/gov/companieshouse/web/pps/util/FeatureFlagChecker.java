@@ -1,9 +1,9 @@
 package uk.gov.companieshouse.web.pps.util;
 
-import static java.lang.Boolean.TRUE;
-
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
+
+import static java.lang.Boolean.TRUE;
 
 @Component
 public class FeatureFlagChecker {

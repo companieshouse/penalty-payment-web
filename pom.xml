@@ -5,7 +5,7 @@
     <artifactId>penalty-payment-web</artifactId>
     <version>unversioned</version>
     <name>penalty-payment-web</name>
-    <description>Companies House Service for paying LFP penalties and associated fees</description>
+    <description>Companies House Service for paying financial penalties</description>
     <parent>
         <groupId>uk.gov.companieshouse</groupId>
 
@@ -20,15 +20,15 @@
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>3.0.33</common-web-java.version>
         <java-session-handler.version>4.1.7</java-session-handler.version>
-        <web-security-java.version>3.1.2</web-security-java.version>
+        <web-security-java.version>3.1.5</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
-        <api-sdk-java.version>6.0.32</api-sdk-java.version>
+        <api-sdk-java.version>6.2.8</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.4.1</spring-boot-dependencies.version>
-        <spring-boot-maven-plugin.version>3.4.1</spring-boot-maven-plugin.version>
+        <spring-boot-dependencies.version>3.4.5</spring-boot-dependencies.version>
+        <spring-boot-maven-plugin.version>3.4.5</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
@@ -38,10 +38,16 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <hamcrest-version>3.0</hamcrest-version>
         <maven-plugin>3.5.2</maven-plugin>
-        <jib-maven-plugin>3.4.4</jib-maven-plugin>
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <jib-maven-plugin>3.4.5</jib-maven-plugin>
         <system-stubs.version>2.1.7</system-stubs.version>
 
+        <!-- sonar config -->
+        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
+        <sonar.login></sonar.login>
+        <sonar.password></sonar.password>
+        <sonar.projectKey>uk.gov.companieshouse:penalty-payment-web</sonar.projectKey>
+        <sonar.projectName>penalty-payment-web</sonar.projectName>
     </properties>
 
     <dependencyManagement>
@@ -67,15 +73,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <!-- transitive dependency issue with logback-core GHSA-pr98-23f8-jwxv -->
-            <!-- creates conflict with project's slf4j provider if updated as a dependency to 1.5.16
-            instead of excluding the library -->
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
