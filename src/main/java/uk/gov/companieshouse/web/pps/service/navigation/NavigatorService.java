@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.navigation;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,10 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 @Service
 public class NavigatorService {
 
-    private final ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private static final int EXPECTED_PATH_VAR_COUNT = 3;
-
-    public NavigatorService(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     /**
      * Searches the controller chain for the next or previous controller in the
@@ -119,7 +117,7 @@ public class NavigatorService {
         }
 
         String companyNumber = pathVars[0];
-        String penaltyRef = pathVars[1];
+        String transactionId = pathVars[1];
         String companyAccountsId = pathVars[2];
 
         boolean foundController = false;
@@ -130,7 +128,7 @@ public class NavigatorService {
                 ConditionalController conditionalController = applicationContext.getBean(ConditionalController.class);
 
                 try {
-                    if (!conditionalController.willRender(companyNumber, penaltyRef, companyAccountsId)) {
+                    if (!conditionalController.willRender(companyNumber, transactionId, companyAccountsId)) {
                         controllerClass = getControllerClass(controllerClass, direction);
                         continue;
                     }

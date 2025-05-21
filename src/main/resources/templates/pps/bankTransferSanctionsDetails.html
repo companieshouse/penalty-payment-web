@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+<head>
+    <title>
+        Pay by bank transfer
+    </title>
+</head>
+
+<div id="bank-transfer-sanctions-details-main-content" layout:fragment="content">
+    <form th:action="@{''}" method="post" class="form" id="bank-transfer-sanctions-details-form">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 id="page-title" class="govuk-heading-xl">
+                    <span id="page-title-heading">Pay by bank transfer</span>
+                </h1>
+                <p class="govuk-body">
+                    You've told us that <span class="govuk-!-font-weight-bold">your penalty reference starts with P</span>.
+                </p>
+                <div class="govuk-inset-text">
+                    Use these account details to pay this penalty. Check the details carefully, as
+                    they may be different from other transactions you've made with us.
+                </div>
+                <h3 class="govuk-heading-s">Bacs payments</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account name</span>:
+                        <span id="sanctions-account-name"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-name')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Sort code</span>:
+                        <span id="sanctions-sort-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.sort-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Account number</span>:
+                        <span id="sanctions-account-number"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-number')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
+                        penalty reference, so that we know which penalty you've paid. Your payment
+                        may be delayed if you use the wrong reference.
+                    </li>
+                </ul>
+
+                <h3 class="govuk-heading-s">Overseas payments</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>
+                        <span class="govuk-!-font-weight-bold">IBAN</span>:
+                        <span id="sanctions-iban"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.iban')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">SWIFT code (BIC)</span>:
+                        <span id="sanctions-swift-code"
+                              th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.swift-code')}"></span>
+                    </li>
+                    <li>
+                        <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
+                        penalty reference, so that we know which penalty you've paid. Your payment
+                        may be delayed if you use the wrong reference.
+                    </li>
+                </ul>
+
+                <h3 class="govuk-heading-s">What happens next</h3>
+                <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
+                <p class="govuk-body">If you have any questions, you can <a
+                        href="https://www.gov.uk/contact-companies-house" class="govuk-link">
+                    contact us</a>.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+</html>

@@ -1,33 +1,34 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.companieshouse.api.ApiClient;
-import uk.gov.companieshouse.api.error.ApiErrorResponseException;
-import uk.gov.companieshouse.api.handler.exception.URIValidationException;
-import uk.gov.companieshouse.api.handler.financialpenalty.payable.PayableFinancialPenaltyResourceHandler;
-import uk.gov.companieshouse.api.handler.financialpenalty.payable.request.PayableFinancialPenaltiesGet;
-import uk.gov.companieshouse.api.handler.financialpenalty.payable.request.PayableFinancialPenaltyCreate;
-import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenaltySession;
-import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
-import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
-import uk.gov.companieshouse.web.pps.api.ApiClientService;
-import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
-import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.companieshouse.api.ApiClient;
+import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.api.handler.latefilingpenalty.payablelatefilingpenalty.PayableLateFilingPenaltyResourceHandler;
+import uk.gov.companieshouse.api.handler.latefilingpenalty.payablelatefilingpenalty.request.PayableLateFilingPenaltyCreate;
+import uk.gov.companieshouse.api.handler.latefilingpenalty.payablelatefilingpenalty.request.PayableLateFilingPenaltyGet;
+import uk.gov.companieshouse.api.model.ApiResponse;
+import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenaltySession;
+import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
+import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.web.pps.api.ApiClientService;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,127 +41,126 @@ class PayablePenaltyServiceImplTest {
     private ApiClientService apiClientService;
 
     @Mock
-    private PayableFinancialPenaltyResourceHandler payableFinancialPenaltyResourceHandler;
+    private PayableLateFilingPenaltyResourceHandler payableLateFilingPenaltyResourceHandler;
 
     @Mock
-    private PayableFinancialPenaltyCreate payableFinancialPenaltyCreate;
+    private PayableLateFilingPenaltyCreate payableLateFilingPenaltyCreate;
 
     @Mock
-    private PayableFinancialPenaltiesGet payableFinancialPenaltiesGet;
+    private PayableLateFilingPenaltyGet payableLateFilingPenaltyGet;
 
     @Mock
-    private ApiResponse<PayableFinancialPenaltySession> payableFinancialPenaltySessionApiResponse;
+    private ApiResponse<PayableLateFilingPenaltySession> sessionResponseWithData;
 
     @Mock
-    private ApiResponse<PayableFinancialPenalties> payableFinancialPenaltiesApiResponse;
+    private ApiResponse<PayableLateFilingPenalty> payableLateFilingPenaltyApiResponse;
 
-    private PayablePenaltyService payablePenaltyService;
+    @InjectMocks
+    private PayablePenaltyService mockPayablePenaltyService = new PayablePenaltyServiceImpl();
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_REF = "A1234567";
+    private static final String PENALTY_NUMBER = "98765432";
 
     private static final String PAYABLE_REF = "EXAMPLE1234";
 
     private static final Integer AMOUNT = 750;
 
-    private static final String POST_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/penalties/payable";
+    private static final String POST_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable";
 
-    private static final String GET_PAYABLE_URI = "/company/" + COMPANY_NUMBER + "/penalties/payable/" + PAYABLE_REF;
+    private static final String GET_PAYABLE_LFP_URI = "/company/" + COMPANY_NUMBER + "/penalties/late-filing/payable/" + PAYABLE_REF;
 
     @BeforeEach
     void init() {
-        payablePenaltyService = new PayablePenaltyServiceImpl(apiClientService);
 
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
 
-        when(apiClient.payableFinancialPenalty()).thenReturn(payableFinancialPenaltyResourceHandler);
+        when(apiClient.payableLateFilingPenalty()).thenReturn(payableLateFilingPenaltyResourceHandler);
     }
 
     /**
-     * Get payable financial penalties session tests.
+     * Get Payable Late Filing Penalty Session Tests.
      */
     @Test
-    @DisplayName("Get payable financial penalties - Success Path")
-    void getPayableFinancialPenaltiesSuccess() throws ServiceException, ApiErrorResponseException, URIValidationException {
+    @DisplayName("Get Payable Late Filing Penalties - Success Path")
+    void getPayableLateFilingPenaltiesSuccess() throws ServiceException, ApiErrorResponseException, URIValidationException {
 
-        PayableFinancialPenalties validPayableFinancialPenalties = PPSTestUtility.validPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF,
-                VALID_LATE_FILING_REASON);
+        PayableLateFilingPenalty validLateFilingPenalty = PPSTestUtility.validPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF, VALID_LATE_FILING_REASON);
 
-        when(payableFinancialPenaltyResourceHandler.get(GET_PAYABLE_URI)).thenReturn(payableFinancialPenaltiesGet);
-        when(payableFinancialPenaltiesGet.execute()).thenReturn(payableFinancialPenaltiesApiResponse);
+        when(payableLateFilingPenaltyResourceHandler.get(GET_PAYABLE_LFP_URI)).thenReturn(payableLateFilingPenaltyGet);
+        when(payableLateFilingPenaltyGet.execute()).thenReturn(payableLateFilingPenaltyApiResponse);
 
-        when(payableFinancialPenaltiesApiResponse.getData()).thenReturn(validPayableFinancialPenalties);
+        when(payableLateFilingPenaltyApiResponse.getData()).thenReturn(validLateFilingPenalty);
 
-        PayableFinancialPenalties payableLateFilingPenalty =
-                payablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF);
+        PayableLateFilingPenalty payableLateFilingPenalty =
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF);
 
-        assertEquals(validPayableFinancialPenalties, payableLateFilingPenalty);
+        assertEquals(payableLateFilingPenalty, validLateFilingPenalty);
     }
 
     @Test
-    @DisplayName("Get payable financial penalties - Throws ApiErrorResponseException")
-    void getPayableFinancialPenaltiesThrowsApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
+    @DisplayName("Get Payable Late Filing Penalties - Throws ApiErrorResponseException")
+    void getPayableLateFilingPenaltiesThrowsApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
 
-        when(payableFinancialPenaltyResourceHandler.get(GET_PAYABLE_URI)).thenReturn(payableFinancialPenaltiesGet);
-        when(payableFinancialPenaltiesGet.execute()).thenThrow(ApiErrorResponseException.class);
+        when(payableLateFilingPenaltyResourceHandler.get(GET_PAYABLE_LFP_URI)).thenReturn(payableLateFilingPenaltyGet);
+        when(payableLateFilingPenaltyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                payablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF));
     }
 
     @Test
-    @DisplayName("Get payable financial penalties - Throws URIValidationException")
-    void getPayableFinancialPenaltiesThrowsURIValidationException() throws ApiErrorResponseException, URIValidationException {
+    @DisplayName("Get Payable Late Filing Penalties - Throws ApiErrorResponseException")
+    void getPayableLateFilingPenaltiesThrowsURIValidationException() throws ApiErrorResponseException, URIValidationException {
 
-        when(payableFinancialPenaltyResourceHandler.get(GET_PAYABLE_URI)).thenReturn(payableFinancialPenaltiesGet);
-        when(payableFinancialPenaltiesGet.execute()).thenThrow(URIValidationException.class);
+        when(payableLateFilingPenaltyResourceHandler.get(GET_PAYABLE_LFP_URI)).thenReturn(payableLateFilingPenaltyGet);
+        when(payableLateFilingPenaltyGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                payablePenaltyService.getPayableFinancialPenalties(COMPANY_NUMBER, PAYABLE_REF));
+                mockPayablePenaltyService.getPayableLateFilingPenalty(COMPANY_NUMBER, PAYABLE_REF));
     }
 
     /**
-     * Create Get payable financial penalties Session Tests.
+     * Create Payable Late Filing Penalty Session Tests.
      */
     @Test
-    @DisplayName("Create payable financial penalties session - Success Path")
-    void createPayableFinancialPenaltySessionSuccess() throws ServiceException, ApiErrorResponseException, URIValidationException {
+    @DisplayName("Create Payable Late Filing Penalty Session - Success Path")
+    void createLateFilingPenaltySessionSuccess() throws ServiceException, ApiErrorResponseException, URIValidationException {
 
-        PayableFinancialPenaltySession payableFinancialPenaltySession = PPSTestUtility.payableFinancialPenaltySession(COMPANY_NUMBER);
-        when(payableFinancialPenaltyResourceHandler.create(eq(POST_PAYABLE_URI), any(FinancialPenaltySession.class)))
-                .thenReturn(payableFinancialPenaltyCreate);
-        when(payableFinancialPenaltyCreate.execute()).thenReturn(payableFinancialPenaltySessionApiResponse);
+        PayableLateFilingPenaltySession payableLateFilingPenaltySession = PPSTestUtility.payableLateFilingPenaltySession(COMPANY_NUMBER);
+        when(payableLateFilingPenaltyResourceHandler.create(eq(POST_PAYABLE_LFP_URI), any(LateFilingPenaltySession.class)))
+                .thenReturn(payableLateFilingPenaltyCreate);
+        when(payableLateFilingPenaltyCreate.execute()).thenReturn(sessionResponseWithData);
 
-        when(payableFinancialPenaltySessionApiResponse.getData()).thenReturn(payableFinancialPenaltySession);
+        when(sessionResponseWithData.getData()).thenReturn(payableLateFilingPenaltySession);
 
-        PayableFinancialPenaltySession createdLateFilingPenaltySession =
-                payablePenaltyService.createPayableFinancialPenaltySession(COMPANY_NUMBER, PENALTY_REF, AMOUNT);
+        PayableLateFilingPenaltySession createdLateFilingPenaltySession =
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT);
 
-        assertEquals(createdLateFilingPenaltySession, payableFinancialPenaltySession);
+        assertEquals(createdLateFilingPenaltySession, payableLateFilingPenaltySession);
     }
 
     @Test
-    @DisplayName("Create payable financial penalties session - Throws ApiErrorResponseException")
-    void createPayableFinancialPenaltySessionThrowsApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
+    @DisplayName("Create Payable Late Filing Penalty Session - Throws ApiErrorResponseException")
+    void createLateFilingPenaltySessionThrowsApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
 
-        when(payableFinancialPenaltyResourceHandler.create(eq(POST_PAYABLE_URI), any(FinancialPenaltySession.class)))
-                .thenReturn(payableFinancialPenaltyCreate);
-        when(payableFinancialPenaltyCreate.execute()).thenThrow(ApiErrorResponseException.class);
+        when(payableLateFilingPenaltyResourceHandler.create(eq(POST_PAYABLE_LFP_URI), any(LateFilingPenaltySession.class)))
+                .thenReturn(payableLateFilingPenaltyCreate);
+        when(payableLateFilingPenaltyCreate.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                payablePenaltyService.createPayableFinancialPenaltySession(COMPANY_NUMBER, PENALTY_REF, AMOUNT));
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
     }
 
     @Test
-    @DisplayName("Create payable financial penalties session - Throws URIValidationException")
-    void createPayableFinancialPenaltySessionThrowsURIValidationException() throws ApiErrorResponseException, URIValidationException {
+    @DisplayName("Create Payable Late Filing Penalty Session - Throws URIValidationException")
+    void createLateFilingPenaltySessionThrowsURIValidationException() throws ApiErrorResponseException, URIValidationException {
 
-        when(payableFinancialPenaltyResourceHandler.create(eq(POST_PAYABLE_URI), any(FinancialPenaltySession.class)))
-                .thenReturn(payableFinancialPenaltyCreate);
-        when(payableFinancialPenaltyCreate.execute()).thenThrow(URIValidationException.class);
+        when(payableLateFilingPenaltyResourceHandler.create(eq(POST_PAYABLE_LFP_URI), any(LateFilingPenaltySession.class)))
+                .thenReturn(payableLateFilingPenaltyCreate);
+        when(payableLateFilingPenaltyCreate.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                payablePenaltyService.createPayableFinancialPenaltySession(COMPANY_NUMBER, PENALTY_REF, AMOUNT));
+                mockPayablePenaltyService.createLateFilingPenaltySession(COMPANY_NUMBER, PENALTY_NUMBER, AMOUNT));
     }
 }

@@ -22,7 +22,7 @@ public interface ConditionalController {
      * user agent.
      *
      * @param companyNumber     the company number
-     * @param penaltyRef        the penalty ref
+     * @param transactionId     the transaction identifier
      * @param companyAccountsId the company accounts identifier
      *
      * @see uk.gov.companieshouse.web.pps.service.navigation.NavigatorService
@@ -30,5 +30,5 @@ public interface ConditionalController {
      *
      * @return true if the template for a controller will be rendered
      */
-    boolean willRender(String companyNumber, String penaltyRef, String companyAccountsId) throws ServiceException;
+    boolean willRender(String companyNumber, String transactionId, String companyAccountsId) throws ServiceException;
 }

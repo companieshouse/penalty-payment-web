@@ -1,6 +1,9 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,35 +14,26 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
-import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 @Controller
-@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
+@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
 public class PenaltyPaidController extends BaseController {
 
-    static final String PENALTY_PAID_TEMPLATE_NAME = "pps/penaltyPaid";
+    private static final String PPS_PENALTY_PAID = "pps/penaltyPaid";
 
     @Override protected String getTemplateName() {
-        return PENALTY_PAID_TEMPLATE_NAME;
+        return PPS_PENALTY_PAID;
     }
 
-    private final CompanyService companyService;
+    @Autowired
+    private CompanyService companyService;
 
-    public PenaltyPaidController(
-            NavigatorService navigatorService,
-            SessionService sessionService,
-            CompanyService companyService,
-            PenaltyConfigurationProperties penaltyConfigurationProperties) {
-        super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.companyService = companyService;
-    }
+    @Autowired
+    private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     @GetMapping
-    public String getPenaltyPaid(@PathVariable String companyNumber,
+    public String getPpsNoPenaltyFound(@PathVariable String companyNumber,
                                        @PathVariable String penaltyRef,
                                        Model model,
                                        HttpServletRequest request) {
@@ -54,12 +48,13 @@ public class PenaltyPaidController extends BaseController {
         }
 
         model.addAttribute("companyName", companyProfileApi.getCompanyName());
-        model.addAttribute("penaltyRef", penaltyRef);
+        model.addAttribute("penaltyNumber", penaltyRef);
 
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath());
+                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).name(),
+                penaltyConfigurationProperties.getSignOutPath(),
+                penaltyConfigurationProperties.getSurveyLink());
 
         return getTemplateName();
     }

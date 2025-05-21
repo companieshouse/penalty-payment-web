@@ -1,5 +1,4 @@
 package uk.gov.companieshouse.web.pps.security;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -21,7 +20,7 @@ public class WebSecurity {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain legacyStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty")
         ).build();
@@ -29,17 +28,17 @@ public class WebSecurity {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty")
+                http.securityMatcher("/late-filing-penalty/ref-starts-with")
         ).build();
     }
 
     @Bean
     @Order(3)
-    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain accessibilityStatementPageSecurityConfig(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/ref-starts-with")
+                http.securityMatcher("/late-filing-penalty/accessibility-statement")
         ).build();
     }
 
@@ -47,39 +46,31 @@ public class WebSecurity {
     @Order(4)
     public SecurityFilterChain healthcheckSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureApiCsrfMitigations(
-                http.securityMatcher("/pay-penalty/healthcheck")
+                http.securityMatcher("/late-filing-penalty/healthcheck")
         ).build();
     }
 
     @Bean
     @Order(5)
-    public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain bankTransferSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/unscheduled-service-down")
+                http.securityMatcher("/late-filing-penalty/bank-transfer/**")
         ).build();
     }
 
     @Bean
     @Order(6)
-    public SecurityFilterChain pageNotFoundSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/page-not-found")
+                http.securityMatcher("/late-filing-penalty/unscheduled-service-down")
         ).build();
     }
 
     @Bean
     @Order(7)
-    public SecurityFilterChain errorPageSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/error")
-        ).build();
-    }
-
-    @Bean
-    @Order(8)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/**")
+                http.securityMatcher("/late-filing-penalty/**")
                         .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
                         .addFilterBefore(new UserAuthFilter(), BasicAuthenticationFilter.class)
         ).build();
