@@ -25,7 +25,7 @@
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
-        <api-sdk-java.version>6.2.6</api-sdk-java.version>
+        <api-sdk-java.version>6.2.8</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.5.0</spring-boot-dependencies.version>

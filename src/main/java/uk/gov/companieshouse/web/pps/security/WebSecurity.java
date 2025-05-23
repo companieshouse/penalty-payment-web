@@ -53,14 +53,6 @@ public class WebSecurity {
 
     @Bean
     @Order(5)
-    public SecurityFilterChain bankTransferSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/bank-transfer/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(6)
     public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty/unscheduled-service-down")
@@ -68,31 +60,23 @@ public class WebSecurity {
     }
 
     @Bean
-    @Order(7)
-    public SecurityFilterChain stylesheetsSecurityFilterChain(final HttpSecurity http) throws Exception {
+    @Order(6)
+    public SecurityFilterChain pageNotFoundSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/stylesheets/**")
+                http.securityMatcher("/pay-penalty/page-not-found")
+        ).build();
+    }
+
+    @Bean
+    @Order(7)
+    public SecurityFilterChain errorPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/error")
         ).build();
     }
 
     @Bean
     @Order(8)
-    public SecurityFilterChain imagesSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/images/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(9)
-    public SecurityFilterChain fontsSecurityFilterChain(final HttpSecurity http) throws Exception {
-        return configureWebCsrfMitigations(
-                http.securityMatcher("/pay-penalty/fonts/**")
-        ).build();
-    }
-
-    @Bean
-    @Order(10)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/pay-penalty/**")

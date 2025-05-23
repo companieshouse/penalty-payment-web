@@ -10,28 +10,28 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @Controller
-@RequestMapping("/pay-penalty/bank-transfer/P")
-public class BankTransferSanctionsDetailsController extends BaseController {
+@RequestMapping("/pay-penalty/page-not-found")
+public class PageNotFoundController extends BaseController {
 
-    static final String BANK_TRANSFER_SANCTIONS_DETAILS_TEMPLATE_NAME = "pps/bankTransferSanctionsDetails";
+    static final String PAGE_NOT_FOUND_TEMPLATE_NAME = "pps/pageNotFound";
 
-    public BankTransferSanctionsDetailsController(
+    public PageNotFoundController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
-    @Override protected String getTemplateName() {
-        return BANK_TRANSFER_SANCTIONS_DETAILS_TEMPLATE_NAME;
+    @Override
+    protected String getTemplateName() {
+        return PAGE_NOT_FOUND_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getBankTransferSanctionsDetails(Model model) {
+    public String getPageNotFound(Model model) {
         addBaseAttributesToModel(model,
-                penaltyConfigurationProperties.getBankTransferPath(),
+                penaltyConfigurationProperties.getStartPath(),
                 penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }
-
 }
