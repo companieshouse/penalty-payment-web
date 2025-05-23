@@ -1,13 +1,14 @@
 package uk.gov.companieshouse.web.pps.validation;
 
-import static java.util.Locale.UK;
-import static java.util.ResourceBundle.getBundle;
-
-import java.util.ResourceBundle;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+
+import java.util.ResourceBundle;
+
+import static java.util.Locale.UK;
+import static java.util.ResourceBundle.getBundle;
 
 @Component
 public class EnterDetailsValidator {
