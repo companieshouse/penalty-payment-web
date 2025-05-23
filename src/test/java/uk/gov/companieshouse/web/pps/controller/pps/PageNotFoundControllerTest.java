@@ -1,18 +1,21 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.PageNotFoundController.PAGE_NOT_FOUND_TEMPLATE_NAME;
 
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
@@ -21,9 +24,11 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AccessibilityStatementControllerTest {
+class PageNotFoundControllerTest {
 
     private MockMvc mockMvc;
+
+    private static final String PAGE_NOT_FOUND_PATH = "/pay-penalty/page-not-found";
 
     @Mock
     private NavigatorService mockNavigatorService;
@@ -34,26 +39,28 @@ class AccessibilityStatementControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    @InjectMocks
-    private AccessibilityStatementController controller;
-
-    private static final String ACCESSIBILITY_STATEMENT_REQUIRED_PATH = "/late-filing-penalty/accessibility-statement";
-    private static final String PPS_ACCESSIBILITY_STATEMENT = "pps/accessibilityStatement";
-
     @BeforeEach
     void setup() {
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
+        PageNotFoundController controller = new PageNotFoundController(
+                mockNavigatorService,
+                mockSessionService,
+                mockPenaltyConfigurationProperties
+        );
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
-    @DisplayName("Get Accessibility Statement - success path")
+    @DisplayName("Get Page Not Found - success path")
     void getRequestSuccess() throws Exception {
 
-        this.mockMvc.perform(get(ACCESSIBILITY_STATEMENT_REQUIRED_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(PPS_ACCESSIBILITY_STATEMENT));
-    }
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(
+                Map.of("signin_info",
+                        Map.of("user_profile",
+                                Map.of("email", "test@example.com"))));
 
+        this.mockMvc.perform(get(PAGE_NOT_FOUND_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(PAGE_NOT_FOUND_TEMPLATE_NAME))
+                .andExpect(model().attributeExists(USER_BAR_ATTR));
+    }
 }

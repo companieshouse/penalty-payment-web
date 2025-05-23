@@ -1,6 +1,22 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.mockito.Mockito.mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,23 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.env.Environment;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
-import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
+import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIGN_OUT_TEMPLATE_NAME;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,73 +35,75 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
     private MockMvc mockMvc;
 
     @Mock
-    private SessionService sessionService;
+    private NavigatorService mockNavigatorService;
+
+    @Mock
+    private SessionService mockSessionService;
 
     @Mock
     private Map<String, Object> sessionData;
 
     @Mock
-    private AllowlistChecker allowlistChecker;
+    private AllowlistChecker mockAllowlistChecker;
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    @Mock
-    final Environment env = mock(Environment.class);
-
-    @InjectMocks
-    private SignOutController controller;
-    private static final String SIGN_OUT_PATH = "/late-filing-penalty/sign-out";
-    private static final String SIGN_OUT_VIEW = "pps/signOut";
+    private static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
     private static final String SIGN_IN_KEY = "signin_info";
     private static final String RADIO = "radio";
-    private static final String PREVIOUS_PATH = "/late-filing-penalty/enter-details";
+    private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String SIGN_OUT = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/late-filing-penalty/unscheduled-service-down";
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @BeforeEach
     void setup() {
+        SignOutController controller = new SignOutController(
+                mockNavigatorService,
+                mockSessionService,
+                mockAllowlistChecker,
+                mockPenaltyConfigurationProperties);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
     @DisplayName("Get Sign out page- success path with no referer")
     void getRequestSuccess() throws Exception {
-        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(SIGN_IN_KEY)).thenReturn(true);
 
         this.mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
-                .andExpect(view().name(SIGN_OUT_VIEW));
+                .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
 
     }
 
     @Test
     @DisplayName("Check if Referer is populated to return a previous page")
     void getPreviousReferer() throws Exception {
-        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(SIGN_IN_KEY)).thenReturn(true);
-        when(allowlistChecker.checkURL(PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
+        when(mockAllowlistChecker.checkURL(PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
         this.mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
-                .andExpect(view().name(SIGN_OUT_VIEW));
+                .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
 
     }
 
     @Test
     @DisplayName("Check Sign out set referer then keep alternative path set")
     void getCheckSignOutIsReferer() throws Exception {
-        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(sessionData.containsKey(SIGN_IN_KEY)).thenReturn(true);
-        when(allowlistChecker.checkSignOutIsReferer(SIGN_OUT)).thenReturn(true);
+        when(mockAllowlistChecker.checkSignOutIsReferer(SIGN_OUT)).thenReturn(true);
 
         this.mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
-                .andExpect(view().name(SIGN_OUT_VIEW));
+                .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
 
     }
 
@@ -141,6 +143,8 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
       @Test
     @DisplayName("Post Sign Out - error message - a radio button has not been selected")
     void postRequestRadioNull() throws Exception {
+          when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+
         this.mockMvc.perform(post(SIGN_OUT_PATH))
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attribute("errorMessage",true));

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+<head>
+  <title>Payment already in progress - Pay a penalty to Companies House - GOV.UK</title>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var goalId = document.getElementById('penalty-payment-in-progress-goal-id').value;
+
+      if (goalId) {
+        window._paq = window._paq || [];
+        _paq.push(['trackGoal', goalId]);
+      }
+    });
+  </script>
+</head>
+
+<div id="penalty-payment-in-progress-main-content" layout:fragment="content">
+  <form th:action="@{''}" method="post" class="form" id="penalty-payment-in-progress">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+          Payment already in progress
+        </h1>
+        <p class="govuk-body-l">Someone has already used this service to pay this penalty within the last 24 hours.
+          We are processing the payment.</p>
+        <p class="govuk-body-l">If you have any questions,
+          you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
+      </div>
+      <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-payment-in-progress-stop-screen-goal-id')}"
+             id="penalty-payment-in-progress-goal-id">
+    </div>
+  </form>
+</div>
+</html>
