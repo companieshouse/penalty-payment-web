@@ -1,11 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,35 +12,40 @@ import org.springframework.web.servlet.view.RedirectView;
 import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
+
+import java.util.Map;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 
 @Controller
 @NextController(StartController.class)
-@RequestMapping("/late-filing-penalty/sign-out")
+@RequestMapping("/pay-penalty/sign-out")
 public class SignOutController extends BaseController {
 
-    @Autowired
-    private SessionService sessionService;
+    private final AllowlistChecker allowlistChecker;
 
-    @Autowired
-    private AllowlistChecker allowlistChecker;
-
-    @Autowired
-    private PenaltyConfigurationProperties penaltyConfigurationProperties;
-
-    private static final String PPS_SIGN_OUT = "pps/signOut";
+    static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
     private static final String SIGN_IN_KEY = "signin_info";
-    private static final String ACCOUNT_URL = System.getenv("ACCOUNT_URL");
-    private static final String SIGN_OUT_URL = "/late-filing-penalty/sign-out";
-    private static final String HOME = "/late-filing-penalty/";
+    private static final String HOME = "/pay-penalty/";
     private static final String BACK_LINK = "backLink";
+
+    public SignOutController(
+            NavigatorService navigatorService,
+            SessionService sessionService,
+            AllowlistChecker allowlistChecker,
+            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
+        this.allowlistChecker = allowlistChecker;
+    }
 
 
     @Override
     protected String getTemplateName() {
-        return PPS_SIGN_OUT;
+        return SIGN_OUT_TEMPLATE_NAME;
     }
 
 
@@ -86,10 +87,11 @@ public class SignOutController extends BaseController {
         if (StringUtils.isEmpty(valueGet)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);
             redirectAttributes.addFlashAttribute(BACK_LINK, url);
-            return new RedirectView(SIGN_OUT_URL, true, false);
+            return new RedirectView(penaltyConfigurationProperties.getSignOutPath(),
+                    true, false);
         }
         if (valueGet.equals("yes")) {
-            return new RedirectView(ACCOUNT_URL + "/signout");
+            return new RedirectView(penaltyConfigurationProperties.getSignedOutUrl() + "/signout");
         }
         if (valueGet.equals("no")) {
             return new RedirectView(url);

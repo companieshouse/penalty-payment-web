@@ -24,30 +24,40 @@ In order to run this Web App locally you will need to install:
 
 ### Configuration
 
- Key                                                  | Description
-------------------------------------------------------|---------------------------------------------------------
- `PPS_PAY_WEB_PORT`                                   | The port of the penalty-payment-web application
- `HUMAN_LOG`                                          | For human readable logs
- `CH_BANK_ACC_NAME`                                   | Bacs payments - Account name (late filing penalty: A)
- `CH_BANK_SORT_CODE`                                  | Bacs payments - Sort code (late filing penalty: A)
- `CH_BANK_ACC_NUM`                                    | Bacs payments - Account number (late filing penalty: A)
- `CH_BANK_IBAN`                                       | Overseas payments - IBAN (late filing penalty: A)
- `CH_BANK_SWIFT_CODE`                                 | Overseas payments - SWIFT code (late filing penalty: A)
- `CH_SANCTIONS_BANK_ACC_NAME`                         | Bacs payments - Account name (sanction: P)
- `CH_SANCTIONS_BANK_SORT_CODE`                        | Bacs payments - Sort code (sanction: P)
- `CH_SANCTIONS_BANK_ACC_NUM`                          | Bacs payments - Account number (sanction: P)
- `CH_SANCTIONS_BANK_IBAN`                             | Overseas payments - IBAN (sanction: P)
- `CH_SANCTIONS_BANK_SWIFT_CODE`                       | Overseas payments - SWIFT code (sanction: P)
- `FEATURE_FLAG_PENALTY_REF_ENABLED_SANCTIONS_191224`  | Feature flag to enable Penalty Payment for Sanctions
- `PENALTY_PAYMENT_MATOMO_START_NOW_BUTTON_GOAL_ID`    | Matomo Goal Id: PAY A PENALTY - Start Now Button
- `PENALTY_PAYMENT_MATOMO_PAY_ANOTHER_PENALTY_GOAL_ID` | Matomo Goal Id: PAY A PENALTY - Pay another penalty
+ Key                                                                               | Description
+-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------
+ `PPS_PAY_WEB_PORT`                                                                | The port of the penalty-payment-web application
+ `HUMAN_LOG`                                                                       | For human readable logs
+ `CH_BANK_ACC_NAME`                                                                | Bacs payments - Account name (late filing penalty: A)
+ `CH_BANK_SORT_CODE`                                                               | Bacs payments - Sort code (late filing penalty: A)
+ `CH_BANK_ACC_NUM`                                                                 | Bacs payments - Account number (late filing penalty: A)
+ `CH_BANK_IBAN`                                                                    | Overseas payments - IBAN (late filing penalty: A)
+ `CH_BANK_SWIFT_CODE`                                                              | Overseas payments - SWIFT code (late filing penalty: A)
+ `CH_SANCTIONS_BANK_ACC_NAME`                                                      | Bacs payments - Account name (sanction: P)
+ `CH_SANCTIONS_BANK_SORT_CODE`                                                     | Bacs payments - Sort code (sanction: P)
+ `CH_SANCTIONS_BANK_ACC_NUM`                                                       | Bacs payments - Account number (sanction: P)
+ `CH_SANCTIONS_BANK_IBAN`                                                          | Overseas payments - IBAN (sanction: P)
+ `CH_SANCTIONS_BANK_SWIFT_CODE`                                                    | Overseas payments - SWIFT code (sanction: P)
+ `FEATURE_FLAG_PENALTY_REF_ENABLED_SANCTIONS_191224`                               | Feature flag to enable Penalty Payment for Sanctions
+ `PENALTY_PAYMENT_MATOMO_START_NOW_BUTTON_GOAL_ID`                                 | Matomo Goal Id: PAY A PENALTY - Start Now Button
+ `PENALTY_PAYMENT_MATOMO_PAY_ANOTHER_PENALTY_GOAL_ID`                              | Matomo Goal Id: PAY A PENALTY - Pay another penalty
+ `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_LFP_GOAL_ID`                      | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with LFP A
+ `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_SANCTIONS_GOAL_ID`                | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with Sanctions P
+ `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_LFP_GOAL_ID`                     | Matomo Goal Id: PAY A PENALTY - Penalty details continue button A
+ `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_SANCTIONS_GOAL_ID`               | Matomo Goal Id: PAY A PENALTY - Penalty details continue button P
+ `PENALTY_PAYMENT_MATOMO_PENALTY_IN_DCA_STOP_SCREEN_GOAL_ID`                       | Matomo Goal Id: PAY A PENALTY - Penalty in DCA Stop Screen
+ `PENALTY_PAYMENT_MATOMO_UNSCHEDULED_SERVICE_DOWN_STOP_SCREEN_GOAL_ID`             | Matomo Goal Id: PAY A PENALTY - Unscheduled Service Down Stop Screen
+ `PENALTY_PAYMENT_MATOMO_SCHEDULED_SERVICE_DOWN_STOP_SCREEN_GOAL_ID`               | Matomo Goal Id: PAY A PENALTY - Scheduled Service Down Stop Screen
+ `PENALTY_PAYMENT_MATOMO_ONLINE_PAYMENT_UNAVAILABLE_LFP_STOP_SCREEN_GOAL_ID`       | Matomo Goal Id: PAY A PENALTY - Online Payment Unavailable LFP Stop Screen
+ `PENALTY_PAYMENT_MATOMO_ONLINE_PAYMENT_UNAVAILABLE_SANCTIONS_STOP_SCREEN_GOAL_ID` | Matomo Goal Id: PAY A PENALTY - Online Payment Unavailable Sanctions Stop Screen
+ `GOV_UK_PAY_PENALTY_URL`                                                          | GOV.UK service banner URL: Pay a penalty to Companies House
 
 ### Web Pages
 
- Page                                        | Address                                
----------------------------------------------|----------------------------------------
- Start page for Penalty Payment Service      | `/late-filing-penalty`
- What does the penalty reference start with? | `/late-filing-penalty/ref-starts-with`
+ Page                                        | Address
+---------------------------------------------|--------------------------------
+ Start page for Penalty Payment Service      | `/pay-penalty`
+ What does the penalty reference start with? | `/pay-penalty/ref-starts-with`
 
 ## Terraform ECS
 

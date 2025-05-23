@@ -1,14 +1,15 @@
 package uk.gov.companieshouse.web.pps.service.navigation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.ConditionalController;
 import uk.gov.companieshouse.web.pps.exception.MissingAnnotationException;
 import uk.gov.companieshouse.web.pps.exception.NavigationException;
@@ -22,6 +23,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerTw
 import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourneyControllerOne;
 import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourneyControllerThree;
 import uk.gov.companieshouse.web.pps.service.navigation.success.MockSuccessJourneyControllerTwo;
+import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,19 +34,29 @@ import static org.mockito.Mockito.when;
 class NavigatorServiceTests {
 
     @Mock
-    private ApplicationContext applicationContext;
+    private ApplicationContext mockApplicationContext;
 
-    @InjectMocks
     private NavigatorService navigatorService;
 
+    @Mock
+    private SessionService mockSessionService;
+
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+
     private static final String COMPANY_NUMBER = "companyNumber";
-    private static final String TRANSACTION_ID = "transactionId";
-    private static final String COMPANY_lfp_ID = "companylfpId";
+    private static final String PENALTY_REF = "penaltyRef";
+    private static final String COMPANY_LFP_ID = "companyLfpId";
+
+    @BeforeEach
+    void setUp() {
+        navigatorService = new NavigatorService(mockApplicationContext);
+    }
 
     @Test
     void missingNextControllerAnnotation() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getNextControllerRedirect(MockControllerThree.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getNextControllerRedirect(MockControllerThree.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @NextController annotation on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerThree", exception.getMessage());
     }
@@ -52,7 +64,7 @@ class NavigatorServiceTests {
     @Test
     void missingPreviousControllerAnnotation() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getPreviousControllerPath(MockControllerThree.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getPreviousControllerPath(MockControllerThree.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @PreviousController annotation on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerThree", exception.getMessage());
     }
@@ -60,7 +72,7 @@ class NavigatorServiceTests {
     @Test
     void missingRequestMappingAnnotationOnNextController() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getNextControllerRedirect(MockControllerOne.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getNextControllerRedirect(MockControllerOne.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @RequestMapping annotation on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerTwo", exception.getMessage());
     }
@@ -68,7 +80,7 @@ class NavigatorServiceTests {
     @Test
     void missingRequestMappingAnnotationOnPreviousController() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getPreviousControllerPath(MockControllerTwo.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getPreviousControllerPath(MockControllerTwo.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @RequestMapping annotation on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerOne", exception.getMessage());
     }
@@ -76,7 +88,7 @@ class NavigatorServiceTests {
     @Test
     void missingRequestMappingValueOnNextController() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getNextControllerRedirect(MockControllerFive.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getNextControllerRedirect(MockControllerFive.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @RequestMapping value on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerSix", exception.getMessage());
     }
@@ -84,7 +96,7 @@ class NavigatorServiceTests {
     @Test
     void missingRequestMappingValueOnPreviousController() {
         Throwable exception = assertThrows(MissingAnnotationException.class, () ->
-                navigatorService.getPreviousControllerPath(MockControllerSeven.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+                navigatorService.getPreviousControllerPath(MockControllerSeven.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
         assertEquals("Missing @RequestMapping value on class uk.gov.companieshouse.web.pps.service.navigation.failure.MockControllerSix", exception.getMessage());
     }
@@ -100,48 +112,51 @@ class NavigatorServiceTests {
 
     @Test
     void successfulRedirectStartingFromMandatoryControllerWithExpectedNumberOfPathVariables() {
-        when(applicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo())
-                .thenReturn(new MockSuccessJourneyControllerThree());
+        when(mockApplicationContext.getBean(ConditionalController.class))
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
-        String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerOne.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID);
+        String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerOne.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID);
 
         assertEquals(UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/mock-success-journey-controller-three/"
-                + COMPANY_NUMBER + "/" + TRANSACTION_ID + "/" + COMPANY_lfp_ID, redirect);
+                + COMPANY_NUMBER + "/" + PENALTY_REF + "/" + COMPANY_LFP_ID, redirect);
     }
 
     @Test
     void successfulRedirectStartingFromConditionalControllerWithExpectedNumberOfPathVariables() {
-        when(applicationContext.getBean(ConditionalController.class)).thenReturn(new MockSuccessJourneyControllerThree());
+        when(mockApplicationContext.getBean(ConditionalController.class)).thenReturn(
+                new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
-        String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerTwo.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID);
+        String redirect = navigatorService.getNextControllerRedirect(MockSuccessJourneyControllerTwo.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID);
 
         assertEquals(UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/mock-success-journey-controller-three/"
-                + COMPANY_NUMBER + "/" + TRANSACTION_ID + "/" + COMPANY_lfp_ID, redirect);
+                + COMPANY_NUMBER + "/" + PENALTY_REF + "/" + COMPANY_LFP_ID, redirect);
     }
 
     @Test
     void successfulPathReturnedWithSingleConditionalControllerInChain() {
-        when(applicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo())
-                .thenReturn(new MockSuccessJourneyControllerThree());
+        when(mockApplicationContext.getBean(ConditionalController.class))
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
-        String redirect = navigatorService.getPreviousControllerPath(MockSuccessJourneyControllerThree.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID);
+        String redirect = navigatorService.getPreviousControllerPath(MockSuccessJourneyControllerThree.class, COMPANY_NUMBER, PENALTY_REF,
+                COMPANY_LFP_ID);
 
         assertEquals("/mock-success-journey-controller-one/"
-                + COMPANY_NUMBER + "/" + TRANSACTION_ID + "/" + COMPANY_lfp_ID, redirect);
+                + COMPANY_NUMBER + "/" + PENALTY_REF + "/" + COMPANY_LFP_ID, redirect);
     }
 
     @Test
     void navigationExceptionThrownWhenWillRenderThrowsServiceException() {
-        when(applicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockSuccessJourneyControllerTwo())
-                .thenReturn(new MockSuccessJourneyControllerThree());
-        when(applicationContext.getBean(ConditionalController.class))
-                .thenReturn(new MockControllerSeven())
-                .thenReturn(new MockControllerEight());
+        when(mockApplicationContext.getBean(ConditionalController.class))
+                .thenReturn(new MockSuccessJourneyControllerTwo(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockSuccessJourneyControllerThree(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
+        when(mockApplicationContext.getBean(ConditionalController.class))
+                .thenReturn(new MockControllerSeven(navigatorService, mockSessionService, mockPenaltyConfigurationProperties))
+                .thenReturn(new MockControllerEight(navigatorService, mockSessionService, mockPenaltyConfigurationProperties));
 
-        assertThrows(NavigationException.class, () -> navigatorService.getNextControllerRedirect(MockControllerSeven.class, COMPANY_NUMBER, TRANSACTION_ID, COMPANY_lfp_ID));
+        assertThrows(NavigationException.class,
+                () -> navigatorService.getNextControllerRedirect(MockControllerSeven.class, COMPANY_NUMBER, PENALTY_REF, COMPANY_LFP_ID));
 
     }
 }
