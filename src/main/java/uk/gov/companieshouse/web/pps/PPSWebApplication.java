@@ -32,8 +32,9 @@ public class PPSWebApplication implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/late-filing-penalty",
                         "/pay-penalty",
+                        "/error",
                         "/pay-penalty/ref-starts-with",
-                        "/pay-penalty/bank-transfer/**",
+                        "/pay-penalty/page-not-found",
                         "/pay-penalty/unscheduled-service-down"
                 );
     }

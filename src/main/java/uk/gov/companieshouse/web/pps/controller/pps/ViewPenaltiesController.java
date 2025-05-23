@@ -29,7 +29,8 @@ import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
+import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 
 @Controller
 @RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/view-penalties")
@@ -40,8 +41,6 @@ public class ViewPenaltiesController extends BaseController {
     static final String PENALTY_REF_ATTR = "penaltyRef";
     static final String REASON_ATTR = "reasonForPenalty";
     static final String AMOUNT_ATTR = "outstanding";
-
-    private static final String PENALTY_TYPE = "penalty";
 
     private final FeatureFlagChecker featureFlagChecker;
     private final CompanyService companyService;
@@ -94,39 +93,33 @@ public class ViewPenaltiesController extends BaseController {
                 penaltyConfigurationProperties.getSignOutPath());
 
         CompanyProfileApi companyProfileApi;
-        List<FinancialPenalty> payablePenalties;
+        List<FinancialPenalty> penaltyAndCosts;
         try {
             companyProfileApi = companyService.getCompanyProfile(companyNumber);
-            payablePenalties = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        // Return an error view when account has multiple unpaid penalties.
-        // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (payablePenalties.size() > 1) {
-            LOGGER.info("Multiple unpaid penalties found for company number " + companyNumber);
+        // User can only pay for a penalty with no associated legal costs
+        if (penaltyAndCosts.size() > 1) {
+            LOGGER.info(String.format(
+                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
+                    penaltyAndCosts.size(), companyNumber, penaltyRef));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        Optional<FinancialPenalty> requestedPayablePenalty = payablePenalties.stream()
-                .filter(payablePenalty -> penaltyRef.equals(payablePenalty.getId()))
-                .filter(payablePenalty -> PENALTY_TYPE.equals(payablePenalty.getType()))
-                .findFirst();
-
-        // Return an error view when requested penalty is not found
-        // This is possible at this stage if this screen is accessed directly for an invalid penalty.
-        if (requestedPayablePenalty.isEmpty()) {
-            LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
+        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts, penaltyRef);
+        if (payablePenaltyOptional.isEmpty()) {
+            LOGGER.info(String.format("Online payment unavailable as there is no open penalty for company number: %s, penalty reference: %s",
+                    companyNumber, penaltyRef));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        FinancialPenalty payablePenalty = requestedPayablePenalty.get();
-
-        if (CLOSED == payablePenalty.getPayableStatus()
-                || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-            LOGGER.info("Penalty " + payablePenalty + " is invalid, cannot access 'view penalty' screen");
+        FinancialPenalty payablePenalty = payablePenaltyOptional.get();
+        if (!payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
+            LOGGER.info("Penalty " + payablePenalty.getId() + " is invalid, cannot access 'view penalty' screen");
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
@@ -141,21 +134,33 @@ public class ViewPenaltiesController extends BaseController {
     @PostMapping
     public String postViewPenalties(@PathVariable String companyNumber,
             @PathVariable String penaltyRef,
-                                    HttpServletRequest request) {
+            HttpServletRequest request) {
 
         PayableFinancialPenaltySession payableFinancialPenaltySession;
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
         try {
-            // Call penalty details for create request
-            FinancialPenalty financialPenalty = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef).getFirst();
+            List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
 
-            // Create payable session
+            if (penaltyAndCosts.size() > 1) {
+                LOGGER.info(String.format(
+                        "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
+                        penaltyAndCosts.size(), companyNumber, penaltyRef));
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+
+            Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts, penaltyRef);
+            if (payablePenaltyOptional.isEmpty()) {
+                LOGGER.info(String.format("Online payment unavailable as there is not an open penalty for company number: %s, penalty reference: %s",
+                        companyNumber, penaltyRef));
+                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            }
+
             payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                     companyNumber,
                     penaltyRef,
-                    financialPenalty.getOutstanding());
+                    payablePenaltyOptional.get().getOutstanding());
 
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
@@ -170,6 +175,14 @@ public class ViewPenaltiesController extends BaseController {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return redirectPathUnscheduledServiceDown;
         }
+    }
+
+    private Optional<FinancialPenalty> getOpenPenalty(List<FinancialPenalty> penaltyAndCosts, String penaltyRef) {
+        return penaltyAndCosts.stream()
+                .filter(penalty -> penaltyRef.equals(penalty.getId()))
+                .filter(penalty -> OPEN == penalty.getPayableStatus())
+                .filter(penalty -> PENALTY_TYPE.equals(penalty.getType()))
+                .findFirst();
     }
 
 }

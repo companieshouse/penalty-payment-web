@@ -3,19 +3,21 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 @Controller
-@RequestMapping("/pay-penalty/bank-transfer/A")
-public class BankTransferLateFilingDetailsController extends BaseController {
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-payment-in-progress")
+public class PenaltyPaymentInProgressController extends BaseController {
 
-    static final String BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME = "pps/bankTransferLateFilingDetails";
+    static final String PENALTY_PAYMENT_IN_PROGRESS_TEMPLATE_NAME = "pps/penaltyPaymentInProgress";
 
-    public BankTransferLateFilingDetailsController(
+    public PenaltyPaymentInProgressController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
@@ -23,13 +25,18 @@ public class BankTransferLateFilingDetailsController extends BaseController {
     }
 
     @Override protected String getTemplateName() {
-        return BANK_TRANSFER_LATE_FILING_DETAILS_TEMPLATE_NAME;
+        return PENALTY_PAYMENT_IN_PROGRESS_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getBankTransferLateFilingDetails(Model model) {
+    public String getPenaltyPaymentInProgress(@PathVariable String companyNumber,
+                                              @PathVariable String penaltyRef,
+                                              Model model) {
+
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
         addBaseAttributesToModel(model,
-                penaltyConfigurationProperties.getBankTransferPath(),
+                penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + penaltyReference.getStartsWith(),
                 penaltyConfigurationProperties.getSignOutPath());
         return getTemplateName();
     }

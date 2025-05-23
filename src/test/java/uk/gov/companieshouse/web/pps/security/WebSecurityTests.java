@@ -64,13 +64,6 @@ class WebSecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /pay-penalty/bank-transfer/**")
-    void bankTransferSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/bank-transfer/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
     @DisplayName(" apply security filter to /pay-penalty/unscheduled-service-down")
     void scheduledServiceDownSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/pay-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
@@ -78,24 +71,16 @@ class WebSecurityTests {
     }
 
     @Test
-    @DisplayName(" apply security filter to /pay-penalty/stylesheets/**")
-    void stylesheetsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/stylesheets/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.stylesheetsSecurityFilterChain(httpSecurity), httpSecurity.build());
+    @DisplayName(" apply security filter to /pay-penalty/page-not-found")
+    void pageNotFoundSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/pay-penalty/page-not-found")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.pageNotFoundSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /pay-penalty/images/**")
-    void imagesFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/images/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.imagesSecurityFilterChain(httpSecurity), httpSecurity.build());
+    @DisplayName(" apply security filter to /error")
+    void errorPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/error")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.errorPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
-
-    @Test
-    @DisplayName(" apply security filter to /pay-penalty/fonts/**")
-    void fontsFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/pay-penalty/fonts/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.fontsSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
 }

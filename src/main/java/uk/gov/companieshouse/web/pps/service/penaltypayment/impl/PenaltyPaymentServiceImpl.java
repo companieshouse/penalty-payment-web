@@ -18,7 +18,11 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
@@ -29,12 +33,10 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/penalty-payment-api/healthcheck/finance-system");
 
-    private static final String PENALTY_TYPE = "penalty";
+    public static final String PENALTY_TYPE = "penalty";
+    public static final String OTHER_TYPE = "other";
 
-    private static final String LOG_MESSAGE_RETURNING_DETAILS = "API has responded. Returning financial penalties for company number %s and penalty ref %s";
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private final ApiClientService apiClientService;
 
@@ -59,26 +61,41 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             throw new ServiceException("Invalid URI for financial penalties", ex);
         }
 
-        List<FinancialPenalty> payablePenalties = new ArrayList<>();
-
-        // If no Financial Penalties for company return an empty list.
         if (financialPenalties.getTotalResults() == 0) {
-            LOGGER.debug(String.format(LOG_MESSAGE_RETURNING_DETAILS,
+            LOGGER.debug(String.format("No financial penalties results for company number %s and penalty ref %s",
                     companyNumber, penaltyRef));
-            return payablePenalties;
+            return Collections.emptyList();
         }
 
-        // Compile all payable penalties into one List to be returned.
-        // Always include penalty with the ID provided so the correct error page can be displayed.
-        for (FinancialPenalty financialPenalty : financialPenalties.getItems()) {
-            if ((!financialPenalty.getPaid() && financialPenalty.getType().equals(PENALTY_TYPE))
-                    || financialPenalty.getId().equals(penaltyRef)) {
-                payablePenalties.add(financialPenalty);
-            }
+        var penaltyOrUnpaidItems = financialPenalties.getItems().stream()
+                .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
+                        || FALSE.equals(financialPenalty.getPaid()))
+                .toList();
+        LOGGER.debug(String.format("%d Penalty or unpaid items for company number %s and penalty ref %s",
+                penaltyOrUnpaidItems.size(), companyNumber, penaltyRef));
+
+        Optional<FinancialPenalty> penaltyOptional = penaltyOrUnpaidItems.stream()
+                .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
+                .filter(financialPenalty -> PENALTY_TYPE.equals(financialPenalty.getType()))
+                .findFirst();
+
+        if (penaltyOptional.isPresent()) {
+            FinancialPenalty penalty = penaltyOptional.get();
+            var unpaidLegalCosts = penaltyOrUnpaidItems.stream()
+                    .filter(financialPenalty -> OTHER_TYPE.equals(financialPenalty.getType()))
+                    .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
+                            || penalty.getMadeUpDate().equals(financialPenalty.getMadeUpDate()))
+                    .toList();
+
+            var penaltyAndCosts = new ArrayList<FinancialPenalty>();
+            penaltyAndCosts.add(penalty);
+            penaltyAndCosts.addAll(unpaidLegalCosts);
+
+            LOGGER.debug(String.format("%d Penalty and costs for company number %s and penalty ref %s",
+                    penaltyAndCosts.size(), companyNumber, penaltyRef));
+            return penaltyAndCosts;
         }
-        LOGGER.debug(String.format(LOG_MESSAGE_RETURNING_DETAILS,
-                companyNumber, penaltyRef));
-        return payablePenalties;
+        return Collections.emptyList();
     }
 
     @Override
