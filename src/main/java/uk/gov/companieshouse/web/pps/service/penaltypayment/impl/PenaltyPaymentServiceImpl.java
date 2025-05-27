@@ -1,17 +1,14 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
-import uk.gov.companieshouse.api.model.latefilingpenalty.FinanceHealthcheck;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalties;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheck;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalties;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
@@ -20,60 +17,85 @@ import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
-    private static final UriTemplate GET_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/{penaltyReferenceType}");
+    private static final UriTemplate GET_FINANCIAL_PENALTIES_URI =
+            new UriTemplate("/company/{companyNumber}/penalties/{penaltyReferenceType}");
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/penalty-payment-api/healthcheck/finance-system");
 
-    private static final String PENALTY_TYPE = "penalty";
+    public static final String PENALTY_TYPE = "penalty";
+    public static final String OTHER_TYPE = "other";
 
-    private static final String LOG_MESSAGE_RETURNING_DETAILS = "API has responded. Returning details for company number and penalty number: ";
+    private static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
+    private final ApiClientService apiClientService;
 
-    @Autowired
-    private ApiClientService apiClientService;
+    public PenaltyPaymentServiceImpl(ApiClientService apiClientService) {
+        this.apiClientService = apiClientService;
+    }
 
     @Override
-    public List<LateFilingPenalty> getLateFilingPenalties(String companyNumber, String penaltyRef) throws ServiceException {
+    public List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
-        LateFilingPenalties lateFilingPenalties;
+        FinancialPenalties financialPenalties;
 
         try {
             String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
-            String uri = GET_LFP_URI.expand(companyNumber, penaltyReferenceType).toString();
-            LOGGER.debug("Sending request to API to fetch late filing penalties for company number "
-                    + companyNumber + " and penalty " + penaltyRef);
-            lateFilingPenalties = apiClient.lateFilingPenalty().get(uri).execute().getData();
+            String uri = GET_FINANCIAL_PENALTIES_URI.expand(companyNumber, penaltyReferenceType).toString();
+            LOGGER.debug(String.format("Sending request to API to fetch financial penalties (%s) for company number %s and penalty ref %s",
+                    penaltyReferenceType, companyNumber, penaltyRef));
+            financialPenalties = apiClient.financialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
+            throw new ServiceException("Error retrieving financial penalties from API", ex);
         } catch (IllegalArgumentException|URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
+            throw new ServiceException("Invalid URI for financial penalties", ex);
         }
 
-        List<LateFilingPenalty> payableLateFilingPenalties = new ArrayList<>();
-
-        // If no Late Filing Penalties for company return an empty list.
-        if (lateFilingPenalties.getTotalResults() == 0) {
-            LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
-            return payableLateFilingPenalties;
+        if (financialPenalties.getTotalResults() == 0) {
+            LOGGER.debug(String.format("No financial penalties results for company number %s and penalty ref %s",
+                    companyNumber, penaltyRef));
+            return Collections.emptyList();
         }
 
-        // Compile all payable penalties into one List to be returned.
-        // Always include penalty with the ID provided so the correct error page can be displayed.
-        for (LateFilingPenalty lateFilingPenalty : lateFilingPenalties.getItems()) {
-            if ((!lateFilingPenalty.getPaid() && lateFilingPenalty.getType().equals(PENALTY_TYPE))
-                    || lateFilingPenalty.getId().equals(penaltyRef)) {
-                payableLateFilingPenalties.add(lateFilingPenalty);
-            }
+        var penaltyOrUnpaidItems = financialPenalties.getItems().stream()
+                .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
+                        || FALSE.equals(financialPenalty.getPaid()))
+                .toList();
+        LOGGER.debug(String.format("%d Penalty or unpaid items for company number %s and penalty ref %s",
+                penaltyOrUnpaidItems.size(), companyNumber, penaltyRef));
+
+        Optional<FinancialPenalty> penaltyOptional = penaltyOrUnpaidItems.stream()
+                .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
+                .filter(financialPenalty -> PENALTY_TYPE.equals(financialPenalty.getType()))
+                .findFirst();
+
+        if (penaltyOptional.isPresent()) {
+            FinancialPenalty penalty = penaltyOptional.get();
+            var unpaidLegalCosts = penaltyOrUnpaidItems.stream()
+                    .filter(financialPenalty -> OTHER_TYPE.equals(financialPenalty.getType()))
+                    .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
+                            || penalty.getMadeUpDate().equals(financialPenalty.getMadeUpDate()))
+                    .toList();
+
+            var penaltyAndCosts = new ArrayList<FinancialPenalty>();
+            penaltyAndCosts.add(penalty);
+            penaltyAndCosts.addAll(unpaidLegalCosts);
+
+            LOGGER.debug(String.format("%d Penalty and costs for company number %s and penalty ref %s",
+                    penaltyAndCosts.size(), companyNumber, penaltyRef));
+            return penaltyAndCosts;
         }
-        LOGGER.debug(LOG_MESSAGE_RETURNING_DETAILS + companyNumber + "  " + penaltyRef);
-        return payableLateFilingPenalties;
+        return Collections.emptyList();
     }
 
     @Override
