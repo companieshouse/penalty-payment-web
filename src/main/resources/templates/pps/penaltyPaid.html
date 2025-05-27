@@ -5,18 +5,18 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title th:text="'Penalties for ' + ${companyName}"></title>
+    <title>This Penalty has already been paid - Pay a penalty to Companies House - GOV.UK</title>
 </head>
 
-<div id="no-payment-found-main-content" layout:fragment="content">
-    <form th:action="@{''}" method="post" class="form" id="no-payment-found">
+<div id="penalty-paid-main-content" layout:fragment="content">
+    <form th:action="@{''}" method="post" class="form" id="penalty-paid">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
                     This penalty has already been paid
                 </h1>
                 <p class="govuk-body-l"> Penalty
-                    <span class="govuk-!-font-weight-bold" th:text="${penaltyNumber}"></span> has already been paid.</p>
+                    <span class="govuk-!-font-weight-bold" th:text="${penaltyRef}"></span> has already been paid.</p>
                 <p class="govuk-body-l">If you have any questions, you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
             </div>
         </div>

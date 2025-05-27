@@ -1,4 +1,5 @@
 package uk.gov.companieshouse.web.pps.security;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -20,7 +21,7 @@ public class WebSecurity {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain legacyStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
                 http.securityMatcher("/late-filing-penalty")
         ).build();
@@ -28,17 +29,17 @@ public class WebSecurity {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain temporaryStartPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/ref-starts-with")
+                http.securityMatcher("/pay-penalty")
         ).build();
     }
 
     @Bean
     @Order(3)
-    public SecurityFilterChain accessibilityStatementPageSecurityConfig(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain penaltyRefStartsWithPageSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/accessibility-statement")
+                http.securityMatcher("/pay-penalty/ref-starts-with")
         ).build();
     }
 
@@ -46,7 +47,7 @@ public class WebSecurity {
     @Order(4)
     public SecurityFilterChain healthcheckSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureApiCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/healthcheck")
+                http.securityMatcher("/pay-penalty/healthcheck")
         ).build();
     }
 
@@ -54,7 +55,7 @@ public class WebSecurity {
     @Order(5)
     public SecurityFilterChain bankTransferSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/bank-transfer/**")
+                http.securityMatcher("/pay-penalty/bank-transfer/**")
         ).build();
     }
 
@@ -62,15 +63,39 @@ public class WebSecurity {
     @Order(6)
     public SecurityFilterChain scheduledServiceDownSecurityFilterChain(final HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/unscheduled-service-down")
+                http.securityMatcher("/pay-penalty/unscheduled-service-down")
         ).build();
     }
 
     @Bean
     @Order(7)
+    public SecurityFilterChain stylesheetsSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/pay-penalty/stylesheets/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(8)
+    public SecurityFilterChain imagesSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/pay-penalty/images/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(9)
+    public SecurityFilterChain fontsSecurityFilterChain(final HttpSecurity http) throws Exception {
+        return configureWebCsrfMitigations(
+                http.securityMatcher("/pay-penalty/fonts/**")
+        ).build();
+    }
+
+    @Bean
+    @Order(10)
     public SecurityFilterChain ppsWebSecurityFilterConfig(HttpSecurity http) throws Exception {
         return configureWebCsrfMitigations(
-                http.securityMatcher("/late-filing-penalty/**")
+                http.securityMatcher("/pay-penalty/**")
                         .addFilterBefore(new HijackFilter(), BasicAuthenticationFilter.class)
                         .addFilterBefore(new UserAuthFilter(), BasicAuthenticationFilter.class)
         ).build();

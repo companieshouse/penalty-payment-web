@@ -1,11 +1,12 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 
 public final class PenaltyUtils {
 
