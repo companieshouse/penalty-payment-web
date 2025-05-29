@@ -4,7 +4,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title>What does the penalty reference start with? - Pay a penalty to Companies House - GOV.UK</title>
+    <title th:text="#{penaltyRefStartsWith.title}"></title>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('penalty-ref-starts-with-form').addEventListener('submit', function (e) {
@@ -31,16 +31,17 @@
                 <div th:replace="~{fragments/ppsGlobalErrors :: globalErrors}"></div>
 
                 <h1 id="page-title" class="govuk-heading-xl">
-                    <span id="page-title-heading">What does the penalty reference start with?</span>
+                    <span id="page-title-heading" th:text="#{penaltyRefStartsWith.header}"></span>
                 </h1>
 
-                <p class="govuk-hint govuk-!-margin-top-3">For example, the penalty reference A1234567 starts with A.</p>
+                <p class="govuk-hint govuk-!-margin-top-3"
+                   th:text="#{penaltyRefStartsWith.hint}"></p>
 
                 <div class="govuk-form-group"
                      th:classappend="${#fields.hasErrors('selectedPenaltyReference')} ? 'govuk-form-group--error' : ''">
                     <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden">
-                            What does the penalty reference start with?
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
+                                th:text="#{penaltyRefStartsWith.label}">
                         </legend>
                         <span class="govuk-error-message"
                               id="selectedPenaltyReference-errorId"
