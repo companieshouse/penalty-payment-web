@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.fromStartsWith;
 
@@ -21,6 +22,11 @@ class PenaltyReferenceTest {
     }
 
     @Test
+    void getStartsWithWhenRoe() {
+        assertEquals("U", ROE.getStartsWith());
+    }
+
+    @Test
     void fromStartsWithWhenLateFiling() {
         assertEquals(LATE_FILING, fromStartsWith("A"));
     }
@@ -28,6 +34,11 @@ class PenaltyReferenceTest {
     @Test
     void fromStartsWithWhenSanction() {
         assertEquals(SANCTIONS, fromStartsWith("P"));
+    }
+
+    @Test
+    void fromStartsWithWhenRoe() {
+        assertEquals(ROE, fromStartsWith("U"));
     }
 
     @Test
