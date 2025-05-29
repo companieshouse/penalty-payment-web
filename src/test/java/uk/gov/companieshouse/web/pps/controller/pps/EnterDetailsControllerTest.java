@@ -273,7 +273,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
     }
 
     @Test
@@ -292,7 +292,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
     }
 
     @Test
@@ -313,7 +313,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
     }
 
     @Test
@@ -489,7 +489,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
     }
 
     @Test

@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title>Penalty details - Pay a penalty to Companies House - GOV.UK</title>
+    <title th:text="#{details.title}"></title>
 </head>
 
 <div id="enter-details" layout:fragment="content">
@@ -16,7 +16,7 @@
 
                 <div th:replace="~{fragments/ppsGlobalErrors :: globalErrors}"></div>
 
-                <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Penalty details</h1>
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-4" th:text="#{details.header}"></h1>
 
                 <span class="govuk-error-message"
                       id="penaltyNotFound-errorId"
@@ -27,8 +27,8 @@
                 <div>
                     <div class="govuk-form-group" th:classappend="${#fields.hasErrors('companyNumber')} ? 'govuk-form-group--error' : ''">
                         <h1 class="govuk-label-wrapper">
-                            <label class="govuk-label govuk-label--m" for="company-number">
-                                What is the company number?
+                            <label class="govuk-label govuk-label--m" for="company-number"
+                                   th:text="#{details.company-number-label}">
                             </label>
                         </h1>
 
@@ -38,8 +38,7 @@
                               th:each="e : ${#fields.errors('companyNumber')}" th:text="${e}">
                             </span>
 
-                        <div id="company-number-hint" class="govuk-hint">
-                            This is 8 characters. Enter it exactly as shown on the penalty notice. For example, 12345678 or AB123456.
+                        <div id="company-number-hint" class="govuk-hint" th:text="#{details.company-number-ref-hint}">
                         </div>
 
                         <input class="govuk-input govuk-input--width-10"
@@ -53,16 +52,9 @@
 
                     <div class="govuk-form-group" th:classappend="${#fields.hasErrors('penaltyRef')} ? 'govuk-form-group--error' : ''">
                         <h1 class="govuk-label-wrapper">
-                            <div th:switch="*{penaltyReferenceName}">
-                                <label class="govuk-label govuk-label--m" for="penalty-ref"
-                                       th:case="'LATE_FILING'" th:text="#{details.penalty-ref-label.LATE_FILING}">
-                                    What is the penalty reference?
-                                </label>
-                                <label class="govuk-label govuk-label--m" for="penalty-ref"
-                                       th:case="'SANCTIONS'" th:text="#{details.penalty-ref-label.SANCTIONS}">
-                                    What is the penalty reference?
-                                </label>
-                            </div>
+                            <label class="govuk-label govuk-label--m" for="penalty-ref"
+                                   th:text="#{details.penalty-ref-label}">
+                            </label>
                         </h1>
 
                         <span class="govuk-error-message"
@@ -73,12 +65,9 @@
 
                         <div id="penalty-ref-hint.LATE_FILING" class="govuk-hint" th:if="*{penaltyReferenceName == 'LATE_FILING'}"
                              th:text="#{details.penalty-ref-hint.LATE_FILING}">
-                            This starts with A, followed by 7 numbers. For example, A1234567. It is sometimes called a reference
-                            number on the penalty notice.
                         </div>
                         <div id="penalty-ref-hint.SANCTIONS" class="govuk-hint" th:if="*{penaltyReferenceName == 'SANCTIONS'}"
                              th:text="#{details.penalty-ref-hint.SANCTIONS}">
-                            This starts with P, followed by 7 numbers. For example, P1234567.
                         </div>
 
                         <input class="govuk-input govuk-input--width-10"
@@ -93,15 +82,12 @@
                     <div class="govuk-form-group">
                         <details class="govuk-details piwik-event" data-event-id="Details - Where can I find these details" data-module="govuk-details" aria-labelledby="details-summary">
                             <summary class="govuk-details__summary" id="details-summary">
-                                    <span class="govuk-details__summary-text">
-                                        Where to find the penalty details
+                                    <span class="govuk-details__summary-text"
+                                          th:text="#{details.details-info-label}">
                                     </span>
                             </summary>
                             <div class="govuk-details__text">
-                                <p th:if="*{penaltyReferenceName == 'LATE_FILING'}" th:text="#{details.penalty-notice-text.LATE_FILING}">
-                                    You'll find these numbers at the top of your penalty notice.</p>
-                                <p th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:text="#{details.penalty-notice-text.SANCTIONS}">
-                                    You'll find these numbers at the top of your penalty notice.</p>
+                                <p th:text="#{details.penalty-notice-text}"></p>
                                 <div id="penalty-notice-image">
                                     <img th:if="*{penaltyReferenceName == 'LATE_FILING'}" th:src="@{images/penalty-notice.png}" alt="penalty notice">
                                     <img th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:src="@{images/sanction-penalty-notice.png}" alt="penalty notice">
