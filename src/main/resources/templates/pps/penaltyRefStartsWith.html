@@ -62,7 +62,7 @@
                                        th:errorclass="govuk-error-message"/>
 
                                 <label class="govuk-label govuk-radios__label" th:for="${penaltyReference}"
-                                       th:text="${penaltyReference.startsWith}">PenaltyReference.startsWith</label>
+                                       th:text="${penaltyReference.startsWith}"></label>
                             </div>
                         </div>
                         <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-goal-id')}" id="lfp-goal-id">
