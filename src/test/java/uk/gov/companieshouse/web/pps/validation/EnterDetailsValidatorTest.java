@@ -1,18 +1,17 @@
 package uk.gov.companieshouse.web.pps.validation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import uk.gov.companieshouse.web.pps.models.EnterDetails;
-
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import uk.gov.companieshouse.web.pps.models.EnterDetails;
 
 class EnterDetailsValidatorTest {
 
@@ -41,7 +40,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithLateFilingAndMissing() {
+    void isNotValidWhenPenaltyRefIsMissingForLateFiling() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setPenaltyRef("");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -55,7 +54,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithLateFilingAndNotValid() {
+    void isNotValidWhenPenaltyRefIsNotValidForLateFiling() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setPenaltyRef("A123456");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -81,7 +80,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithSanctionsAndMissing() {
+    void isNotValidWhenPenaltyRefIsMissingForSanctions() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
         enterDetails.setPenaltyRef("");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -95,7 +94,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenRefStartsWithSanctionsAndNotValid() {
+    void isNotValidWhenPenaltyRefIsNotValidForSanctions() {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
         enterDetails.setPenaltyRef("PN1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -109,7 +108,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenCompanyNumberContainsSpacesOnlyWhitespaceErrorShown() {
+    void isNotValidWhenCompanyNumberContainsSpaces() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setCompanyNumber("1234 567");
         enterDetails.setPenaltyRef("A1234567");
@@ -124,7 +123,7 @@ class EnterDetailsValidatorTest {
     }
 
     @Test
-    void isValidWhenPenaltyRefContainsSpacesOnlyWhitespaceErrorShown() {
+    void isNotValidWhenPenaltyRefContainsSpaces() {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
         enterDetails.setCompanyNumber("12345678");
         enterDetails.setPenaltyRef("A123 456");
@@ -137,6 +136,4 @@ class EnterDetailsValidatorTest {
         assertEquals("Penalty reference must not include spaces",
                 Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
-
-
 }

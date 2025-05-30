@@ -1,5 +1,11 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
+import static java.lang.Boolean.FALSE;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
@@ -16,13 +22,6 @@ import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static java.lang.Boolean.FALSE;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {

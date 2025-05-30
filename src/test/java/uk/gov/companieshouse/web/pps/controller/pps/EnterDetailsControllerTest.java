@@ -46,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +81,13 @@ class EnterDetailsControllerTest {
 
     private static final String VALID_PENALTY_REF = "A1234567";
 
+    private static final String VALID_PENALTY_REF_SANCTIONS = "P1234567";
+
+    private static final String VALID_PENALTY_REF_ROE = "U1234567";
+
     private static final String VALID_COMPANY_NUMBER = "00987654";
+
+    private static final String VALID_OVERSEAS_ENTITY_ID = "OE987654";
 
     private static final String UPPER_CASE_LLP = "OC123456";
 
@@ -273,7 +280,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
     }
 
     @Test
@@ -285,14 +292,33 @@ class EnterDetailsControllerTest {
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_SANCTIONS)
                         .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
+    }
+
+    @Test
+    @DisplayName("Post Details failure path - no payable roe penalties found")
+    void postRequestNoPayableRoePenaltyFound() throws Exception {
+
+        configureStartPathProperty();
+        configureValidAppendCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
+
+        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, ROE.name())
+                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_ROE)
+                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_OVERSEAS_ENTITY_ID))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+
+        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+        verify(mockCompanyService).appendToCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.ROE", null, UK);
     }
 
     @Test
@@ -313,7 +339,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
     }
 
     @Test
@@ -489,7 +515,7 @@ class EnterDetailsControllerTest {
 
         verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
         verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error", null, UK);
+        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
     }
 
     @Test

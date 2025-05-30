@@ -1,7 +1,18 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.Locale.UK;
+import static java.util.ResourceBundle.getBundle;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.ResourceBundle;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,15 +38,6 @@ import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
-import java.util.List;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static java.util.Locale.UK;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
 @NextController(ViewPenaltiesController.class)
@@ -183,9 +185,11 @@ public class EnterDetailsController extends BaseController {
     private boolean checkPenaltyDetailsNotFoundError(EnterDetails enterDetails, BindingResult bindingResult, Model model,
             List<FinancialPenalty> payablePenalties,
             String companyNumber, String penaltyRef) {
+        String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
         if (payablePenalties.isEmpty()) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
-            bindingResult.reject("globalError", messageSource.getMessage("details.penalty-details-not-found-error", null, UK));
+            String code = "details.penalty-details-not-found-error." + penaltyReferenceName;
+            bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
             addBaseAttributesToModel(model,
                     setBackLink(),
                     penaltyConfigurationProperties.getSignOutPath());
