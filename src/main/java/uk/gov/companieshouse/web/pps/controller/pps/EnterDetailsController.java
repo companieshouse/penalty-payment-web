@@ -59,7 +59,8 @@ public class EnterDetailsController extends BaseController {
     private final PenaltyPaymentService penaltyPaymentService;
     private final MessageSource messageSource;
 
-    @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
+    @SuppressWarnings("java:S107")
+    // BaseController needs NavigatorService / SessionService for constructor injection
     public EnterDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,
@@ -77,12 +78,14 @@ public class EnterDetailsController extends BaseController {
         this.messageSource = messageSource;
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return ENTER_DETAILS_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
+    public String getEnterDetails(
+            @RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
             Model model,
             HttpServletRequest request) {
 
@@ -90,11 +93,13 @@ public class EnterDetailsController extends BaseController {
         try {
             penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
             if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
-                return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+                return REDIRECT_URL_PREFIX
+                        + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
         } catch (IllegalArgumentException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         var enterDetails = new EnterDetails();
@@ -109,7 +114,8 @@ public class EnterDetailsController extends BaseController {
     }
 
     @PostMapping
-    public String postEnterDetails(@ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
+    public String postEnterDetails(
+            @ModelAttribute(ENTER_DETAILS_MODEL_ATTR) @Valid EnterDetails enterDetails,
             BindingResult bindingResult,
             HttpServletRequest request,
             Model model) {
@@ -128,64 +134,81 @@ public class EnterDetailsController extends BaseController {
             return getTemplateName();
         }
 
-        String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
+        String companyNumber = companyService.appendToCompanyNumber(
+                enterDetails.getCompanyNumber().toUpperCase());
         String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
 
         List<FinancialPenalty> penaltyAndCosts;
         try {
-            penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber,
+                    penaltyRef);
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         if (penaltyAndCosts.size() > 1) {
             LOGGER.info(String.format(
                     "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
                     penaltyAndCosts.size(), companyNumber, penaltyRef));
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                    penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
         }
 
         var payablePenalties = penaltyAndCosts.stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
                 .toList();
-        if (checkPenaltyDetailsNotFoundError(enterDetails, bindingResult, model, payablePenalties, companyNumber, penaltyRef)) {
+        if (checkPenaltyDetailsNotFoundError(enterDetails, bindingResult, model, payablePenalties,
+                companyNumber, penaltyRef)) {
             return getTemplateName();
         }
         var payablePenalty = payablePenalties.getFirst();
-      
+
         if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is closed pending allocation");
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                    penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
         }
 
         if (TRUE.equals(payablePenalty.getPaid())) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is paid");
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAID;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                    penaltyRef) + PENALTY_PAID;
         }
 
         if (TRUE.equals(payablePenalty.getDca())) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is with DCA");
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_IN_DCA;
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                    penaltyRef) + PENALTY_IN_DCA;
         }
 
         if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-            LOGGER.info(String.format("Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
-                    payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType(),
-                    payablePenalty.getOriginalAmount().toString(), payablePenalty.getOutstanding().toString()));
-            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
+            LOGGER.info(String.format(
+                    "Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
+                    payablePenalty.getId(), payablePenalty.getPayableStatus(),
+                    payablePenalty.getType(),
+                    payablePenalty.getOriginalAmount().toString(),
+                    payablePenalty.getOutstanding().toString()));
+            return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                    penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
         }
 
-        return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyRef);
+        return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber,
+                penaltyRef);
     }
 
-    private boolean checkPenaltyDetailsNotFoundError(EnterDetails enterDetails, BindingResult bindingResult, Model model,
+    private boolean checkPenaltyDetailsNotFoundError(EnterDetails enterDetails,
+            BindingResult bindingResult, Model model,
             List<FinancialPenalty> payablePenalties,
             String companyNumber, String penaltyRef) {
+        String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
         if (payablePenalties.isEmpty()) {
-            LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
-            bindingResult.reject("globalError", messageSource.getMessage("details.penalty-details-not-found-error", null, UK));
+            LOGGER.info("No payable penalties for company number " + companyNumber
+                    + " and penalty ref: " + penaltyRef);
+            String code = "details.penalty-details-not-found-error." + penaltyReferenceName;
+            bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
             addBaseAttributesToModel(model,
                     setBackLink(),
                     penaltyConfigurationProperties.getSignOutPath());
