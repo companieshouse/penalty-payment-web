@@ -13,7 +13,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.handler.payment.PaymentResourceHandler;
 import uk.gov.companieshouse.api.handler.payment.request.PaymentCreate;
 import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.payment.PaymentApi;
 import uk.gov.companieshouse.api.model.payment.PaymentSessionApi;
 import uk.gov.companieshouse.environment.EnvironmentReader;
@@ -62,7 +62,7 @@ class PaymentServiceImplTest {
     private ApiResponse<PaymentApi> apiResponse;
 
     @Mock
-    private PayableLateFilingPenaltySession payableLateFilingPenaltySession;
+    private PayableFinancialPenaltySession payableFinancialPenaltySession;
 
     @Mock
     private PaymentApi paymentApi;
@@ -83,7 +83,9 @@ class PaymentServiceImplTest {
 
     private static final String COMPANY_NUMBER = "12345678";
 
-    private static final String PENALTY_REF = "00531369";
+    private static final String PENALTY_REF = "A0531369";
+
+    private static final String PENALTY_REF_SANCTIONS = "P0531369";
 
     @BeforeEach
     void setUp() {
@@ -114,7 +116,30 @@ class PaymentServiceImplTest {
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
         String journeyUrl = mockPaymentService.createPaymentSession(
-                payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF);
+                payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF);
+
+        assertEquals(JOURNEY_URL, journeyUrl);
+
+        verify(sessionData).put(eq(PAYMENT_STATE), anyString());
+    }
+
+    @Test
+    @DisplayName("Create payment session sanctions penalty - success")
+    void createPaymentSessionSanctionsPenaltySuccess()
+            throws ApiErrorResponseException, URIValidationException, ServiceException {
+
+        when(paymentCreate.execute()).thenReturn(apiResponse);
+
+        when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
+
+        when(apiResponse.getData()).thenReturn(paymentApi);
+
+        when(paymentApi.getLinks()).thenReturn(links);
+
+        when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
+
+        String journeyUrl = mockPaymentService.createPaymentSession(
+                payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF_SANCTIONS);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 
@@ -130,7 +155,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
+                        payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }
@@ -144,7 +169,7 @@ class PaymentServiceImplTest {
 
         assertThrows(ServiceException.class, () ->
                 mockPaymentService.createPaymentSession(
-                        payableLateFilingPenaltySession, COMPANY_NUMBER, PENALTY_REF));
+                        payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF));
 
         verify(sessionData, never()).put(eq(PAYMENT_STATE), anyString());
     }

@@ -1,10 +1,11 @@
 package uk.gov.companieshouse.web.pps.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @ConfigurationProperties("penalty")
@@ -19,7 +20,10 @@ public class PenaltyConfigurationProperties {
     private String unscheduledServiceDownPath;
     private String signOutPath;
     private String surveyLink;
+    private String serviceBannerLink;
     private String startPath;
+    private String signedOutUrl;
+    private String govUkPayPenaltyUrl;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -94,6 +98,14 @@ public class PenaltyConfigurationProperties {
         this.surveyLink = surveyLink;
     }
 
+    public String getServiceBannerLink() {
+        return serviceBannerLink;
+    }
+
+    public void setServiceBannerLink(String serviceBannerLink) {
+        this.serviceBannerLink = serviceBannerLink;
+    }
+
     public String getStartPath() {
         return startPath;
     }
@@ -101,4 +113,21 @@ public class PenaltyConfigurationProperties {
     public void setStartPath(String startPath) {
         this.startPath = startPath;
     }
+
+    public String getSignedOutUrl() {
+        return signedOutUrl;
+    }
+
+    public void setSignedOutUrl (String signedOutUrl) {
+        this.signedOutUrl = signedOutUrl;
+    }
+
+    public String getGovUkPayPenaltyUrl() {
+        return govUkPayPenaltyUrl;
+    }
+
+    public void setGovUkPayPenaltyUrl(String govUkPayPenaltyUrl) {
+        this.govUkPayPenaltyUrl = govUkPayPenaltyUrl;
+    }
+
 }

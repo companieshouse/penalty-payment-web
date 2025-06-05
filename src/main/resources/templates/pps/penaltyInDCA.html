@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+<head>
+  <title>This penalty is with a debt collection agency - Pay a penalty to Companies House - GOV.UK</title>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var goalId = document.getElementById('penalty-in-dca-goal-id').value;
+
+      if (goalId) {
+        window._paq = window._paq || [];
+        _paq.push(['trackGoal', goalId]);
+      }
+    });
+  </script>
+</head>
+
+<div id="penalty-in-dca-main-content" layout:fragment="content">
+  <form th:action="@{''}" method="post" class="form" id="penalty-in-dca">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+          This penalty is with a debt collection agency
+        </h1>
+        <p class="govuk-body-l">You cannot use this service to pay this penalty. This is because it has been
+          passed on to a debt collection agency.</p>
+        <p class="govuk-body-l">Check the information on your letter from the debt collection agency to find
+          out how to pay.</p>
+        <p class="govuk-body-l">If you have any questions,
+          you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.</p>
+      </div>
+      <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-in-dca-stop-screen-goal-id')}" id="penalty-in-dca-goal-id">
+    </div>
+  </form>
+</div>
+</html>

@@ -1,10 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,21 +9,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
-import uk.gov.companieshouse.api.model.latefilingpenalty.TransactionPayableLateFilingPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
+import uk.gov.companieshouse.api.model.financialpenalty.TransactionPayableFinancialPenalty;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
+import java.util.Map;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 @Controller
-@RequestMapping("/late-filing-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
+@RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
 public class ConfirmationController extends BaseController {
 
-    private static final String CONFIRMATION_PAGE = "pps/confirmationPage";
+    static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";
 
     private static final String PAYMENT_STATE = "payment_state";
 
@@ -39,27 +40,23 @@ public class ConfirmationController extends BaseController {
     static final String PAYMENT_DATE_ATTR = "paymentDate";
     static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
-    @Override protected String getTemplateName() {
-        return CONFIRMATION_PAGE;
-    }
-
     private final CompanyService companyService;
-
     private final PayablePenaltyService payablePenaltyService;
 
-    private final SessionService sessionService;
-
-    private final PenaltyConfigurationProperties  penaltyConfigurationProperties;
-
-    @Autowired
-    public ConfirmationController(CompanyService companyService,
-            PayablePenaltyService payablePenaltyService,
+    public ConfirmationController(
+            NavigatorService navigatorService,
             SessionService sessionService,
+            CompanyService companyService,
+            PayablePenaltyService payablePenaltyService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
+        super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.payablePenaltyService = payablePenaltyService;
-        this.sessionService = sessionService;
-        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+    }
+
+    @Override
+    protected String getTemplateName() {
+        return CONFIRMATION_PAGE_TEMPLATE_NAME;
     }
 
     @GetMapping
@@ -90,8 +87,8 @@ public class ConfirmationController extends BaseController {
         }
 
         try {
-            PayableLateFilingPenalty payableResource = payablePenaltyService.getPayableLateFilingPenalty(companyNumber, payableRef);
-            TransactionPayableLateFilingPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
+            PayableFinancialPenalties payableResource = payablePenaltyService.getPayableFinancialPenalties(companyNumber, payableRef);
+            TransactionPayableFinancialPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
 
             // If the payment is anything but paid return user to beginning of journey
             if (!paymentStatus.equals("paid")) {
@@ -110,7 +107,7 @@ public class ConfirmationController extends BaseController {
             model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payableResourceTransaction.getAmount()));
 
             addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
-                    penaltyConfigurationProperties.getSignOutPath(), penaltyConfigurationProperties.getSurveyLink());
+                    penaltyConfigurationProperties.getSignOutPath());
 
             return getTemplateName();
         } catch (ServiceException ex) {

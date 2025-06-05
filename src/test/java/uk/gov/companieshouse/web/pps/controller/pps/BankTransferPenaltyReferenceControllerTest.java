@@ -1,5 +1,23 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,28 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.AVAILABLE_PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.BankTransferPenaltyReferenceController.PPS_BANK_TRANSFER_PENALTY_REFERENCE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.ModelAndView;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
-import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.session.SessionService;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -54,17 +54,16 @@ class BankTransferPenaltyReferenceControllerTest {
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
                 LATE_FILING, SANCTIONS));
         penaltyConfigurationProperties.setBankTransferPath(
-                "/late-filing-penalty/bank-transfer");
+                "/pay-penalty/bank-transfer");
         penaltyConfigurationProperties.setBankTransferLateFilingDetailsPath(
-                "/late-filing-penalty/bank-transfer/late-filing-details");
+                "/pay-penalty/bank-transfer/A");
         penaltyConfigurationProperties.setBankTransferSanctionsPath(
-                "/late-filing-penalty/bank-transfer/sanctions-details");
+                "/pay-penalty/bank-transfer/P");
 
         BankTransferPenaltyReferenceController controller = new BankTransferPenaltyReferenceController(
                 mockNavigatorService,
+                mockSessionService,
                 penaltyConfigurationProperties);
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -74,7 +73,7 @@ class BankTransferPenaltyReferenceControllerTest {
 
         MvcResult mvcResult = this.mockMvc.perform(get(penaltyConfigurationProperties.getBankTransferPath()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_BANK_TRANSFER_PENALTY_REFERENCE))
+                .andExpect(view().name(BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REFERENCE_CHOICE_ATTR))
                 .andReturn();
@@ -90,7 +89,7 @@ class BankTransferPenaltyReferenceControllerTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post(penaltyConfigurationProperties.getBankTransferPath()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_BANK_TRANSFER_PENALTY_REFERENCE))
+                .andExpect(view().name(BANK_TRANSFER_PENALTY_REFERENCE_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
                 .andExpect(model().attributeHasFieldErrors(PENALTY_REFERENCE_CHOICE_ATTR))
                 .andExpect(model().attributeErrorCount(PENALTY_REFERENCE_CHOICE_ATTR, 1))

@@ -1,5 +1,26 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
+import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
+import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+
+import java.util.List;
+import java.util.Map;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,30 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.ModelAndView;
-import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
-import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
-import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -60,9 +60,9 @@ class PenaltyRefStartsWithControllerTest {
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
                 LATE_FILING, SANCTIONS));
         penaltyConfigurationProperties.setRefStartsWithPath(
-                "/late-filing-penalty/ref-starts-with");
+                "/pay-penalty/ref-starts-with");
         penaltyConfigurationProperties.setEnterDetailsPath(
-                "/late-filing-penalty/enter-details");
+                "/pay-penalty/enter-details");
 
         featureFlagConfigurationProperties = new FeatureFlagConfigurationProperties();
     }
@@ -72,10 +72,9 @@ class PenaltyRefStartsWithControllerTest {
 
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
+                mockSessionService,
                 penaltyConfigurationProperties,
                 featureFlagChecker);
-        // As this bean is autowired in the base class, we need to use reflection to set it
-        ReflectionTestUtils.setField(controller, "sessionService", mockSessionService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -91,7 +90,7 @@ class PenaltyRefStartsWithControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals("redirect:/late-filing-penalty/enter-details?ref-starts-with=LATE_FILING", modelAndView.getViewName());
+        assertEquals("redirect:/pay-penalty/enter-details?ref-starts-with=A", modelAndView.getViewName());
     }
 
     @Test
@@ -102,7 +101,7 @@ class PenaltyRefStartsWithControllerTest {
         setupMockMvc();
         MvcResult mvcResult = mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
+                .andExpect(view().name(PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REFERENCE_CHOICE_ATTR))
                 .andReturn();
@@ -120,7 +119,7 @@ class PenaltyRefStartsWithControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().isOk())
-                .andExpect(view().name(PPS_PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
+                .andExpect(view().name(PENALTY_REF_STARTS_WITH_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(AVAILABLE_PENALTY_REF_ATTR))
                 .andExpect(model().attributeHasFieldErrors(PENALTY_REFERENCE_CHOICE_ATTR))
                 .andExpect(model().attributeErrorCount(PENALTY_REFERENCE_CHOICE_ATTR, 1))
@@ -143,7 +142,7 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=LATE_FILING"))
+                                + "?ref-starts-with=A"))
                 .andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -163,7 +162,7 @@ class PenaltyRefStartsWithControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
                         "redirect:" + penaltyConfigurationProperties.getEnterDetailsPath()
-                                + "?ref-starts-with=SANCTIONS"))
+                                + "?ref-starts-with=P"))
                 .andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
