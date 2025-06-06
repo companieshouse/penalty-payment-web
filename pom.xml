@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>penalty-payment-web</artifactId>
     <version>unversioned</version>
     <name>penalty-payment-web</name>
-    <description>Companies House Service for paying LFP penalties and associated fees</description>
+    <description>Companies House Service for paying financial penalties</description>
     <parent>
         <groupId>uk.gov.companieshouse</groupId>
 
@@ -20,11 +20,12 @@
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>3.0.33</common-web-java.version>
         <java-session-handler.version>4.1.7</java-session-handler.version>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <web-security-java.version>3.1.5</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
-        <api-sdk-java.version>6.0.32</api-sdk-java.version>
+        <api-sdk-java.version>6.2.8</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.5.0</spring-boot-dependencies.version>
@@ -70,6 +71,14 @@
     </dependencyManagement>
 
     <dependencies>
+        <!--the following transitive dependencies are added specifically to avoid vulnerabilities-->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${commons-beanutils.version}</version>
+        </dependency>
+        <!--end transitive dependencies-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>

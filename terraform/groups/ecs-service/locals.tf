@@ -9,8 +9,8 @@ locals {
   docker_repo                = "penalty-payment-web"
   kms_alias                  = "alias/${var.aws_profile}/environment-services-kms"
   lb_listener_rule_priority  = 87
-  lb_listener_paths          = ["/late-filing-penalty/*","/late-filing-penalty"]
-  healthcheck_path           = "/late-filing-penalty/healthcheck" # healthcheck path for penalty-payment-web
+  lb_listener_paths          = ["/pay-penalty/*","/pay-penalty", "/late-filing-penalty"]
+  healthcheck_path           = "/pay-penalty/healthcheck" # healthcheck path for penalty-payment-web
   healthcheck_matcher        = "200"
   vpc_name                   = local.stack_secrets["vpc_name"]
   s3_config_bucket           = data.vault_generic_secret.shared_s3.data["config_bucket_name"]

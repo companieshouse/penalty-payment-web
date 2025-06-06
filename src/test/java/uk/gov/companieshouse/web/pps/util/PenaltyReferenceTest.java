@@ -1,12 +1,12 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.fromStartsWith;
-
-import org.junit.jupiter.api.Test;
 
 class PenaltyReferenceTest {
 

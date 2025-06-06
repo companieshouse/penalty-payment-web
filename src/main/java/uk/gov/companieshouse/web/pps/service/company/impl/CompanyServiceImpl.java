@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.company.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
@@ -17,14 +16,17 @@ public class CompanyServiceImpl implements CompanyService {
     private static final UriTemplate GET_COMPANY_URI =
             new UriTemplate("/company/{companyNumber}");
 
-    @Autowired
-    private ApiClientService apiClientService;
+    private final ApiClientService apiClientService;
+
+    public CompanyServiceImpl(ApiClientService apiClientService) {
+        this.apiClientService = apiClientService;
+    }
 
     @Override
     public String appendToCompanyNumber(String companyNumber) {
 
         //If the Company Number contains any letters don't append 0's to the beginning of the Company Number.
-        if(!companyNumber.matches("^[0-9]*$")) {
+        if (!companyNumber.matches("^\\d*$")) {
             return companyNumber;
         }
 

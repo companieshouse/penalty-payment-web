@@ -1,16 +1,15 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.api.model.latefilingpenalty.LateFilingPenaltySession;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenalty;
-import uk.gov.companieshouse.api.model.latefilingpenalty.PayableLateFilingPenaltySession;
-import uk.gov.companieshouse.api.model.latefilingpenalty.Transaction;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
+import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
+import uk.gov.companieshouse.api.model.financialpenalty.Transaction;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -20,61 +19,63 @@ import java.util.Collections;
 @Service
 public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
-    private static final UriTemplate GET_PAYABLE_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable/{payableRef}");
+    private static final UriTemplate GET_PAYABLE_URI =
+            new UriTemplate("/company/{companyNumber}/penalties/payable/{payableRef}");
 
-    private static final UriTemplate POST_LFP_URI =
-            new UriTemplate("/company/{companyNumber}/penalties/late-filing/payable");
+    private static final UriTemplate POST_PAYABLE_URI =
+            new UriTemplate("/company/{companyNumber}/penalties/payable");
 
-    @Autowired
-    private ApiClientService apiClientService;
+    private final ApiClientService apiClientService;
 
-    @Override
-    public PayableLateFilingPenalty getPayableLateFilingPenalty(String companyNumber, String payableRef) throws ServiceException {
-        ApiClient apiClient = apiClientService.getPublicApiClient();
-        PayableLateFilingPenalty payableLateFilingPenalty;
-
-        try {
-            String uri = GET_PAYABLE_LFP_URI.expand(companyNumber, payableRef).toString();
-            payableLateFilingPenalty = apiClient.payableLateFilingPenalty().get(uri).execute().getData();
-        } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving Payable Late Filing Penalty from API", ex);
-        } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Payable Late Filing Penalty", ex);
-        }
-
-        return payableLateFilingPenalty;
-
+    public PayablePenaltyServiceImpl(ApiClientService apiClientService) {
+        this.apiClientService = apiClientService;
     }
 
     @Override
-    public PayableLateFilingPenaltySession createLateFilingPenaltySession(String companyNumber, String penaltyRef, Integer amount) throws ServiceException {
+    public PayableFinancialPenalties getPayableFinancialPenalties(String companyNumber, String payableRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
-        ApiResponse<PayableLateFilingPenaltySession> apiResponse;
+        PayableFinancialPenalties payableFinancialPenalties;
 
         try {
-            String uri = POST_LFP_URI.expand(companyNumber, penaltyRef).toString();
-            LateFilingPenaltySession lateFilingPenaltySession = generateLateFilingPenaltySessionData(penaltyRef, amount);
-            apiResponse = apiClient.payableLateFilingPenalty().create(uri, lateFilingPenaltySession).execute();
+            String uri = GET_PAYABLE_URI.expand(companyNumber, payableRef).toString();
+            payableFinancialPenalties = apiClient.payableFinancialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving Late Filing Penalty from API", ex);
+            throw new ServiceException("Error retrieving payable financial penalties from API", ex);
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Late Filing Penalty", ex);
+            throw new ServiceException("Invalid URI for payable financial penalties", ex);
+        }
+
+        return payableFinancialPenalties;
+    }
+
+    @Override
+    public PayableFinancialPenaltySession createPayableFinancialPenaltySession(String companyNumber, String penaltyRef, Integer amount)
+            throws ServiceException {
+        ApiClient apiClient = apiClientService.getPublicApiClient();
+        ApiResponse<PayableFinancialPenaltySession> apiResponse;
+
+        try {
+            String uri = POST_PAYABLE_URI.expand(companyNumber, penaltyRef).toString();
+            FinancialPenaltySession financialPenaltySession = generateFinancialPenaltySessionData(penaltyRef, amount);
+            apiResponse = apiClient.payableFinancialPenalty().create(uri, financialPenaltySession).execute();
+        } catch (ApiErrorResponseException ex) {
+            throw new ServiceException("Error creating payable financial penalty session", ex);
+        } catch (URIValidationException ex) {
+            throw new ServiceException("Invalid URI for payable financial penalty", ex);
         }
 
         return apiResponse.getData();
-
     }
 
-    private LateFilingPenaltySession generateLateFilingPenaltySessionData(String penaltyRef, Integer amount) {
+    private FinancialPenaltySession generateFinancialPenaltySessionData(String penaltyRef, Integer amount) {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(penaltyRef);
+        transaction.setPenaltyRef(penaltyRef);
         transaction.setAmount(amount);
 
-        LateFilingPenaltySession lateFilingPenaltySession = new LateFilingPenaltySession();
-        lateFilingPenaltySession.setTransactions(Collections.singletonList(transaction));
+        FinancialPenaltySession financialPenaltySession = new FinancialPenaltySession();
+        financialPenaltySession.setTransactions(Collections.singletonList(transaction));
 
-        return lateFilingPenaltySession;
+        return financialPenaltySession;
     }
 
 }

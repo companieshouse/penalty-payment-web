@@ -17,65 +17,70 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SystemStubsExtension.class)
 @ExtendWith(MockitoExtension.class)
-class WebsecurityTests {
+class WebSecurityTests {
 
     @Mock
     private HttpSecurity httpSecurity;
 
     @InjectMocks
     private WebSecurity webSecurity;
-
     @SystemStub
     private EnvironmentVariables environmentVariables;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         environmentVariables.set("COOKIE_NAME", "__SID");
         environmentVariables.set("COOKIE_DOMAIN", "chs.local");
     }
 
     @Test
     @DisplayName(" apply security filter to /late-filing-penalty")
-    void temporaryStartPageSecurityFilterChainTest() throws Exception {
+    void legacyStartPageSecurityFilterChainTest() throws Exception {
         when(httpSecurity.securityMatcher("/late-filing-penalty")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.legacyStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /pay-penalty")
+    void temporaryStartPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/pay-penalty")).thenReturn(httpSecurity);
         assertEquals(webSecurity.temporaryStartPageSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/ref-starts-with")
+    @DisplayName(" apply security filter to /pay-penalty/ref-starts-with")
     void penaltyRefStartsWithPageSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/ref-starts-with"))
+        when(httpSecurity.securityMatcher("/pay-penalty/ref-starts-with"))
                 .thenReturn(httpSecurity);
         assertEquals(webSecurity.penaltyRefStartsWithPageSecurityFilterChain(httpSecurity),
                 httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/accessibility-statement")
-    void accessibilityStatementPageSecurityConfigTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/accessibility-statement")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.accessibilityStatementPageSecurityConfig(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/healthcheck")
+    @DisplayName(" apply security filter to /pay-penalty/healthcheck")
     void healthcheckSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/healthcheck")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/healthcheck")).thenReturn(httpSecurity);
         assertEquals(webSecurity.healthcheckSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
     @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/bank-transfer/**")
-    void bankTransferSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/bank-transfer/**")).thenReturn(httpSecurity);
-        assertEquals(webSecurity.bankTransferSecurityFilterChain(httpSecurity), httpSecurity.build());
-    }
-
-    @Test
-    @DisplayName(" apply security filter to /late-filing-penalty/unscheduled-service-down")
+    @DisplayName(" apply security filter to /pay-penalty/unscheduled-service-down")
     void scheduledServiceDownSecurityFilterChainTest() throws Exception {
-        when(httpSecurity.securityMatcher("/late-filing-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
+        when(httpSecurity.securityMatcher("/pay-penalty/unscheduled-service-down")).thenReturn(httpSecurity);
         assertEquals(webSecurity.scheduledServiceDownSecurityFilterChain(httpSecurity), httpSecurity.build());
     }
 
+    @Test
+    @DisplayName(" apply security filter to /pay-penalty/page-not-found")
+    void pageNotFoundSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/pay-penalty/page-not-found")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.pageNotFoundSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
+
+    @Test
+    @DisplayName(" apply security filter to /error")
+    void errorPageSecurityFilterChainTest() throws Exception {
+        when(httpSecurity.securityMatcher("/error")).thenReturn(httpSecurity);
+        assertEquals(webSecurity.errorPageSecurityFilterChain(httpSecurity), httpSecurity.build());
+    }
 }
