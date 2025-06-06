@@ -185,20 +185,13 @@ public class EnterDetailsController extends BaseController {
             String companyNumber, String penaltyRef) {
         if (payablePenalties.isEmpty()) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
-            bindingResult.reject("globalError", getPenaltyDetailsNotFoundError(enterDetails));
+            bindingResult.reject("globalError", messageSource.getMessage("details.penalty-details-not-found-error", null, UK));
             addBaseAttributesToModel(model,
                     setBackLink(),
                     penaltyConfigurationProperties.getSignOutPath());
             return true;
         }
         return false;
-    }
-
-    private String getPenaltyDetailsNotFoundError(EnterDetails enterDetails) {
-        return switch (PenaltyReference.valueOf(enterDetails.getPenaltyReferenceName())) {
-            case LATE_FILING -> messageSource.getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
-            case SANCTIONS -> messageSource.getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
-        };
     }
 
     private String urlGenerator(String companyNumber, String penaltyRef) {
