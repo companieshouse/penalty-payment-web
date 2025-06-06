@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/baseLayout}">
+
+<head>
+    <title th:text="#{error.header.page.title}">Page not found - Pay a penalty to Companies House - GOV.UK</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="text">
+        <h1 class="govuk-heading-l" th:text="#{error.page.title}">This page cannot be found</h1>
+    </div>
+
+    <p class="govuk-body" th:text="#{error.page.content.title}">Check that you have entered the correct web address or try using the search.</p>
+    <p class="govuk-body">
+        <span th:text="#{error.page.content.main}">If you still can't find what you're looking for email</span>
+    </p>
+    <p class="govuk-body">
+        <a class="govuk-link" data-event-id="email-us"
+           th:href="@{{enquiries}(enquiries=${@environment.getProperty('enquiries')})}"
+           data-th-text="#{error.page.content.email}"></a>
+    </p>
+</div>
+</body>
+</html>

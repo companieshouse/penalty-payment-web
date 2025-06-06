@@ -46,6 +46,7 @@ In order to run this Web App locally you will need to install:
  `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_LFP_GOAL_ID`                     | Matomo Goal Id: PAY A PENALTY - Penalty details continue button A
  `PENALTY_PAYMENT_MATOMO_PENALTY_DETAILS_CONTINUE_SANCTIONS_GOAL_ID`               | Matomo Goal Id: PAY A PENALTY - Penalty details continue button P
  `PENALTY_PAYMENT_MATOMO_PENALTY_IN_DCA_STOP_SCREEN_GOAL_ID`                       | Matomo Goal Id: PAY A PENALTY - Penalty in DCA Stop Screen
+ `PENALTY_PAYMENT_MATOMO_PENALTY_PAYMENT_IN_PROGRESS_STOP_SCREEN_GOAL_ID`          | Matomo Goal Id: PAY A PENALTY - Penalty Payment in Progress Stop Screen
  `PENALTY_PAYMENT_MATOMO_UNSCHEDULED_SERVICE_DOWN_STOP_SCREEN_GOAL_ID`             | Matomo Goal Id: PAY A PENALTY - Unscheduled Service Down Stop Screen
  `PENALTY_PAYMENT_MATOMO_SCHEDULED_SERVICE_DOWN_STOP_SCREEN_GOAL_ID`               | Matomo Goal Id: PAY A PENALTY - Scheduled Service Down Stop Screen
  `PENALTY_PAYMENT_MATOMO_ONLINE_PAYMENT_UNAVAILABLE_LFP_STOP_SCREEN_GOAL_ID`       | Matomo Goal Id: PAY A PENALTY - Online Payment Unavailable LFP Stop Screen

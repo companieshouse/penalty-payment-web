@@ -14,9 +14,6 @@ public class PenaltyConfigurationProperties {
     private List<PenaltyReference> allowedRefStartsWith = new ArrayList<>();
     private String refStartsWithPath;
     private String enterDetailsPath;
-    private String bankTransferPath;
-    private String bankTransferLateFilingDetailsPath;
-    private String bankTransferSanctionsPath;
     private String unscheduledServiceDownPath;
     private String signOutPath;
     private String surveyLink;
@@ -24,6 +21,7 @@ public class PenaltyConfigurationProperties {
     private String startPath;
     private String signedOutUrl;
     private String govUkPayPenaltyUrl;
+    private String pageNotFoundPath;
 
     public List<PenaltyReference> getAllowedRefStartsWith() {
         return allowedRefStartsWith;
@@ -48,30 +46,6 @@ public class PenaltyConfigurationProperties {
 
     public void setEnterDetailsPath(String enterDetailsPath) {
         this.enterDetailsPath = enterDetailsPath;
-    }
-
-    public String getBankTransferPath() {
-        return bankTransferPath;
-    }
-
-    public void setBankTransferPath(String bankTransferPath) {
-        this.bankTransferPath = bankTransferPath;
-    }
-
-    public String getBankTransferLateFilingDetailsPath() {
-        return bankTransferLateFilingDetailsPath;
-    }
-
-    public void setBankTransferLateFilingDetailsPath(String bankTransferLateFilingDetailsPath) {
-        this.bankTransferLateFilingDetailsPath = bankTransferLateFilingDetailsPath;
-    }
-
-    public String getBankTransferSanctionsPath() {
-        return bankTransferSanctionsPath;
-    }
-
-    public void setBankTransferSanctionsPath(String bankTransferSanctionsPath) {
-        this.bankTransferSanctionsPath = bankTransferSanctionsPath;
     }
 
     public String getUnscheduledServiceDownPath() {
@@ -130,4 +104,11 @@ public class PenaltyConfigurationProperties {
         this.govUkPayPenaltyUrl = govUkPayPenaltyUrl;
     }
 
+    public String getPageNotFoundPath() {
+        return pageNotFoundPath;
+    }
+
+    public void setPageNotFoundPath(String pageNotFoundPath) {
+        this.pageNotFoundPath = pageNotFoundPath;
+    }
 }
