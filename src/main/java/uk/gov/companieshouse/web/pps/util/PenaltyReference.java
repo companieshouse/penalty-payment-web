@@ -3,7 +3,7 @@ package uk.gov.companieshouse.web.pps.util;
 public enum PenaltyReference {
     LATE_FILING("A"),
     SANCTIONS("P"),
-    ROE("U");
+    SANCTIONS_ROE("U");
 
     private final String startsWith;
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.ROE;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.fromStartsWith;
 
@@ -23,7 +23,7 @@ class PenaltyReferenceTest {
 
     @Test
     void getStartsWithWhenRoe() {
-        assertEquals("U", ROE.getStartsWith());
+        assertEquals("U", SANCTIONS_ROE.getStartsWith());
     }
 
     @Test
@@ -38,12 +38,13 @@ class PenaltyReferenceTest {
 
     @Test
     void fromStartsWithWhenRoe() {
-        assertEquals(ROE, fromStartsWith("U"));
+        assertEquals(SANCTIONS_ROE, fromStartsWith("U"));
     }
 
     @Test
     void fromStartsWithWhenInvalidThrowsException() {
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> fromStartsWith("X"));
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> fromStartsWith("X"));
         assertEquals("Penalty Reference Starts With 'X' is invalid", exception.getMessage());
     }
 

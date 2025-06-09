@@ -35,7 +35,7 @@ import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithC
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.ROE;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +59,7 @@ class PenaltyRefStartsWithControllerTest {
     void setup() {
         penaltyConfigurationProperties = new PenaltyConfigurationProperties();
         penaltyConfigurationProperties.setAllowedRefStartsWith(List.of(
-                LATE_FILING, SANCTIONS, ROE));
+                LATE_FILING, SANCTIONS, SANCTIONS_ROE));
         penaltyConfigurationProperties.setRefStartsWithPath(
                 "/pay-penalty/ref-starts-with");
         penaltyConfigurationProperties.setEnterDetailsPath(
@@ -84,7 +84,7 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - redirect late filing details")
     void getPenaltyRefStartsWithSanctionsDisabled() throws Exception {
         featureFlagConfigurationProperties
-                .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), FALSE, ROE.name(), FALSE));
+                .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), FALSE, SANCTIONS_ROE.name(), FALSE));
         setupMockMvc();
 
         MvcResult mvcResult = mockMvc.perform(
@@ -114,7 +114,7 @@ class PenaltyRefStartsWithControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals(List.of(LATE_FILING, SANCTIONS, ROE),
+        assertEquals(List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE),
                 modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
@@ -122,7 +122,7 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Post 'penaltyRefStartsWith' screen - error: none selected")
     void postPenaltyRefStartsWithWhenNoneSelected() throws Exception {
         featureFlagConfigurationProperties.setPenaltyRefEnabled(
-                Map.of(SANCTIONS.name(), TRUE, ROE.name(), TRUE));
+                Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         setupMockMvc();
 
         MvcResult mvcResult = mockMvc.perform(
@@ -136,7 +136,7 @@ class PenaltyRefStartsWithControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         assertNotNull(modelAndView);
-        assertEquals(List.of(LATE_FILING, SANCTIONS, ROE),
+        assertEquals(List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE),
                 modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
     }
 
@@ -185,12 +185,12 @@ class PenaltyRefStartsWithControllerTest {
     @Test
     @DisplayName("Post 'penaltyRefStartsWith' screen - success: roe selected")
     void postPenaltyRefStartsWithWhenRoeSelected() throws Exception {
-        featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(ROE.name(), TRUE));
+        featureFlagConfigurationProperties.setPenaltyRefEnabled(Map.of(SANCTIONS_ROE.name(), TRUE));
         setupMockMvc();
 
         MvcResult mvcResult = mockMvc.perform(
                         post(penaltyConfigurationProperties.getRefStartsWithPath())
-                                .param(SELECTED_PENALTY_REFERENCE, ROE.name()))
+                                .param(SELECTED_PENALTY_REFERENCE, SANCTIONS_ROE.name()))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(
