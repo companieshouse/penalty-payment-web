@@ -28,7 +28,12 @@
                     <div class="govuk-form-group" th:classappend="${#fields.hasErrors('companyNumber')} ? 'govuk-form-group--error' : ''">
                         <h1 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--m" for="company-number"
+                                   th:if="*{penaltyReferenceName != 'SANCTIONS_ROE'}"
                                    th:text="#{details.company-number-label}">
+                            </label>
+                            <label class="govuk-label govuk-label--m" for="company-number"
+                                   th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"
+                                   th:text="#{details.overseas-entity-id-label}">
                             </label>
                         </h1>
 
@@ -38,7 +43,13 @@
                               th:each="e : ${#fields.errors('companyNumber')}" th:text="${e}">
                             </span>
 
-                        <div id="company-number-hint" class="govuk-hint" th:text="#{details.company-number-ref-hint}">
+                        <div id="company-number-hint" class="govuk-hint"
+                             th:if="*{penaltyReferenceName != 'SANCTIONS_ROE'}"
+                             th:text="#{details.company-number-hint}">
+                        </div>
+                        <div id="overseas-entity-id-hint" class="govuk-hint"
+                             th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"
+                             th:text="#{details.overseas-entity-id-hint}">
                         </div>
 
                         <input class="govuk-input govuk-input--width-10"
@@ -69,6 +80,9 @@
                         <div id="penalty-ref-hint.SANCTIONS" class="govuk-hint" th:if="*{penaltyReferenceName == 'SANCTIONS'}"
                              th:text="#{details.penalty-ref-hint.SANCTIONS}">
                         </div>
+                        <div id="penalty-ref-hint.SANCTIONS_ROE" class="govuk-hint" th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"
+                             th:text="#{details.penalty-ref-hint.SANCTIONS_ROE}">
+                        </div>
 
                         <input class="govuk-input govuk-input--width-10"
                                id="penalty-ref"
@@ -91,6 +105,7 @@
                                 <div id="penalty-notice-image">
                                     <img th:if="*{penaltyReferenceName == 'LATE_FILING'}" th:src="@{images/penalty-notice.png}" alt="penalty notice">
                                     <img th:if="*{penaltyReferenceName == 'SANCTIONS'}" th:src="@{images/sanction-penalty-notice.png}" alt="penalty notice">
+                                    <img th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}" th:src="@{images/roe-penalty-notice.png}" alt="penalty notice">
                                 </div>
                             </div>
                         </details>
@@ -106,6 +121,10 @@
                                type="submit" role="button" value="Continue"
                                th:if="*{penaltyReferenceName == 'SANCTIONS'}"
                                th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-sanctions-goal-id')}]]]);"/>
+
+                        <input id="next-button-roe" class="govuk-button"
+                               type="submit" role="button" value="Continue"
+                               th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"/>
                     </div>
                 </div>
             </div>
