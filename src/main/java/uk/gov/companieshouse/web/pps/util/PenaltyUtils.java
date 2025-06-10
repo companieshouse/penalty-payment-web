@@ -21,9 +21,9 @@ public final class PenaltyUtils {
 
     public static String getLoginEmail(final Map<String, Object> sessionData) {
         Map<?, ?> signInInfo = (Map<?, ?>) sessionData.get("signin_info");
-        if (signInInfo != null) {
+        if (signInInfo!=null) {
             Map<?, ?> userProfile = (Map<?, ?>) signInInfo.get("user_profile");
-            if (userProfile != null && userProfile.get("email") != null) {
+            if (userProfile!=null && userProfile.get("email")!=null) {
                 return userProfile.get("email").toString();
             }
         }
