@@ -13,5 +13,5 @@ public interface PaymentService {
             String companyNumber,
             String penaltyRef
     )
-        throws ServiceException;
+            throws ServiceException;
 }

@@ -29,9 +29,9 @@ public class UserDetailsInterceptor implements AsyncHandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request,
-                           HttpServletResponse response,
-                           Object handler,
-                           @Nullable ModelAndView modelAndView) {
+            HttpServletResponse response,
+            Object handler,
+            @Nullable ModelAndView modelAndView) {
 
         if (modelAndView != null && modelAndView.getViewName() != null
                 && (request.getMethod().equalsIgnoreCase("GET")

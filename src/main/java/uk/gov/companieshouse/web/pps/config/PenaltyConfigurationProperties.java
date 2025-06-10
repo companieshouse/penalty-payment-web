@@ -92,7 +92,7 @@ public class PenaltyConfigurationProperties {
         return signedOutUrl;
     }
 
-    public void setSignedOutUrl (String signedOutUrl) {
+    public void setSignedOutUrl(String signedOutUrl) {
         this.signedOutUrl = signedOutUrl;
     }
 

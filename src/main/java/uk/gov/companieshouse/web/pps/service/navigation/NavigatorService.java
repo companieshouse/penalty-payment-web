@@ -108,7 +108,7 @@ public class NavigatorService {
      * The controller search begins at the controller {@code clazz}
      * in the chain and the scan will be performed in the direction specified.
      *
-     * @param  clazz the controller class in the chain to begin the scan at
+     * @param clazz the controller class in the chain to begin the scan at
      * @return the previous controller class in the chain
      */
     private Class<?> findControllerClass(Class<?> clazz, Direction direction, String... pathVars) {
@@ -153,10 +153,10 @@ public class NavigatorService {
      * {@link RequestMapping} path of the next controller after populating
      * with the path variables specified.
      *
-     * @param  clazz    the controller class in the chain to begin the scan at
-     * @param  pathVars a variable number of strings representing any path variables
+     * @param clazz    the controller class in the chain to begin the scan at
+     * @param pathVars a variable number of strings representing any path variables
      * @return a string comprising redirect prefix and {@link RequestMapping}
-     *         path of the next controller
+     * path of the next controller
      */
     public String getNextControllerRedirect(Class<?> clazz, String... pathVars) {
 
@@ -191,10 +191,10 @@ public class NavigatorService {
      * render, and returns a string comprising the {@link RequestMapping} path
      * of the previous controller populated with the path variables specified.
      *
-     * @param  clazz    the controller class in the chain to begin the scan at
-     * @param  pathVars a variable number of strings representing any path variables
+     * @param clazz    the controller class in the chain to begin the scan at
+     * @param pathVars a variable number of strings representing any path variables
      * @return a string comprising the {@link RequestMapping} path from the
-     *         previous controller
+     * previous controller
      */
     public String getPreviousControllerPath(Class<?> clazz, String... pathVars) {
 

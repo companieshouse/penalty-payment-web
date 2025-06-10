@@ -61,7 +61,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             throw new ServiceException("Invalid URI for financial penalties", ex);
         }
 
-        if (financialPenalties.getTotalResults()==0) {
+        if (financialPenalties.getTotalResults() == 0) {
             LOGGER.debug(String.format("No financial penalties results for company number %s and penalty ref %s",
                     companyNumber, penaltyRef));
             return Collections.emptyList();
@@ -107,7 +107,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             String uri = FINANCE_HEALTHCHECK_URI.toString();
             financeHealthcheck = apiClient.financeHealthcheckResourceHandler().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            if (ex.getStatusCode()==503) {
+            if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
                 financeHealthcheck = new FinanceHealthcheck();
                 financeHealthcheck.setMessage(new JSONObject(ex.getContent()).get("message").toString());

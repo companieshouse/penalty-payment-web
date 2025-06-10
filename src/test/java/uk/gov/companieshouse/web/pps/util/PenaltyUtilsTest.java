@@ -22,7 +22,7 @@ class PenaltyUtilsTest {
     }
 
     @Test
-    void testGetFormattedAmount(){
+    void testGetFormattedAmount() {
         String result = PenaltyUtils.getFormattedAmount(1000);
         assertEquals("1,000", result);
     }

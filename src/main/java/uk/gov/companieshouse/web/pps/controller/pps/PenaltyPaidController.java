@@ -23,7 +23,8 @@ public class PenaltyPaidController extends BaseController {
 
     static final String PENALTY_PAID_TEMPLATE_NAME = "pps/penaltyPaid";
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return PENALTY_PAID_TEMPLATE_NAME;
     }
 
@@ -40,9 +41,9 @@ public class PenaltyPaidController extends BaseController {
 
     @GetMapping
     public String getPenaltyPaid(@PathVariable String companyNumber,
-                                       @PathVariable String penaltyRef,
-                                       Model model,
-                                       HttpServletRequest request) {
+            @PathVariable String penaltyRef,
+            Model model,
+            HttpServletRequest request) {
 
         CompanyProfileApi companyProfileApi;
 

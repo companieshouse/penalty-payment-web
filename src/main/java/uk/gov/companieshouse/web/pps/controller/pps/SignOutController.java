@@ -82,7 +82,7 @@ public class SignOutController extends BaseController {
     public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         LOGGER.debug("Processing sign out POST");
         String valueGet = request.getParameter("radio");
-        String url =  (String) request.getSession().getAttribute("url_prior_signout");
+        String url = (String) request.getSession().getAttribute("url_prior_signout");
 
         if (StringUtils.isEmpty(valueGet)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);

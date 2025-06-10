@@ -57,7 +57,7 @@ class LoggingInterceptorTests {
         verify(session, times(1)).setAttribute(eq(LogContextProperties.START_TIME_KEY.value()), anyLong());
         String data = this.getOutputJson().toString();
         assertThat(data, containsString(LogContextProperties.START_OF_REQUEST_MSG.value()));
-        assertThat(data, containsString( "\"event\":\"info\""));
+        assertThat(data, containsString("\"event\":\"info\""));
     }
 
     @Test
@@ -71,9 +71,9 @@ class LoggingInterceptorTests {
         verify(session, times(1)).getAttribute(LogContextProperties.START_TIME_KEY.value());
         String data = this.getOutputJson().toString();
         assertThat(data, containsString(LogContextProperties.END_OF_REQUEST_MSG.value()));
-        assertThat(data, containsString( "\"event\":\"info\""));
-        assertThat(data, containsString( "duration"));
-        assertThat(data, containsString( "status\":200"));
+        assertThat(data, containsString("\"event\":\"info\""));
+        assertThat(data, containsString("duration"));
+        assertThat(data, containsString("status\":200"));
     }
 
     private JSONObject getOutputJson() throws JSONException {

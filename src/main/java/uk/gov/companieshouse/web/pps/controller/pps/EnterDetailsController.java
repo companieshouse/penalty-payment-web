@@ -157,7 +157,7 @@ public class EnterDetailsController extends BaseController {
         }
         var payablePenalty = payablePenalties.getFirst();
 
-        if (CLOSED_PENDING_ALLOCATION==payablePenalty.getPayableStatus()) {
+        if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is closed pending allocation");
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
         }
@@ -172,7 +172,7 @@ public class EnterDetailsController extends BaseController {
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_IN_DCA;
         }
 
-        if (CLOSED==payablePenalty.getPayableStatus()
+        if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
             LOGGER.info(String.format("Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
                     payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType(),

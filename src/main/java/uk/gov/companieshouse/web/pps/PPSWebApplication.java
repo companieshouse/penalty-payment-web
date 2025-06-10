@@ -16,7 +16,7 @@ public class PPSWebApplication implements WebMvcConfigurer {
     private final LoggingInterceptor loggingInterceptor;
 
     public PPSWebApplication(UserDetailsInterceptor userDetailsInterceptor,
-                                LoggingInterceptor loggingInterceptor) {
+            LoggingInterceptor loggingInterceptor) {
         this.userDetailsInterceptor = userDetailsInterceptor;
         this.loggingInterceptor = loggingInterceptor;
     }
