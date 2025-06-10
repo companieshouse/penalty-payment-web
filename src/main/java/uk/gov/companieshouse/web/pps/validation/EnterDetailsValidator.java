@@ -34,18 +34,18 @@ public class EnterDetailsValidator {
 
     public void isValidCompanyNumber(final EnterDetails enterDetails,
             final BindingResult bindingResult) {
-        String companyNumberString = "companyNumber";
+        String companyNumberField = "companyNumber";
         String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
 
         if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
             String key =
                     "enterDetails.companyNumber.notValid." + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberString, companyNumberString,
+            bindingResult.rejectValue(companyNumberField, companyNumberField,
                     bundle.getString(key));
         } else if (StringUtils.contains(enterDetails.getCompanyNumber(), " ")) {
             String key =
                     "enterDetails.companyNumber.noSpaces." + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberString, companyNumberString,
+            bindingResult.rejectValue(companyNumberField, companyNumberField,
                     bundle.getString(key));
         } else {
             String regex =
@@ -54,7 +54,7 @@ public class EnterDetailsValidator {
             if (!enterDetails.getCompanyNumber().matches(regex)) {
                 String key = "enterDetails.companyNumber.notValid."
                         + enterDetails.getPenaltyReferenceName();
-                bindingResult.rejectValue(companyNumberString, companyNumberString,
+                bindingResult.rejectValue(companyNumberField, companyNumberField,
                         bundle.getString(key));
             }
         }
@@ -63,14 +63,14 @@ public class EnterDetailsValidator {
     public void isValidPenaltyRef(final EnterDetails enterDetails,
             final BindingResult bindingResult) {
         String penaltyRef = enterDetails.getPenaltyRef();
-        String penaltyRefString = "penaltyRef";
+        String penaltyRefField = "penaltyRef";
         String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
 
         if (StringUtils.isBlank(penaltyRef)) {
-            bindingResult.rejectValue(penaltyRefString, penaltyRefString,
+            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
                     bundle.getString("enterDetails.penaltyRef.notEmpty"));
         } else if (StringUtils.contains(penaltyRef, " ")) {
-            bindingResult.rejectValue(penaltyRefString, penaltyRefString,
+            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
                     bundle.getString("enterDetails.penaltyRef.noSpaces"));
         } else {
             String regex = switch (PenaltyReference.valueOf(penaltyReferenceName)) {
@@ -79,7 +79,7 @@ public class EnterDetailsValidator {
                 case SANCTIONS_ROE -> SANCTIONS_ROE_PENALTY_REF_REGEX;
             };
             if (!penaltyRef.matches(regex)) {
-                bindingResult.rejectValue(penaltyRefString, penaltyRefString,
+                bindingResult.rejectValue(penaltyRefField, penaltyRefField,
                         bundle.getString("enterDetails.penaltyRef.notValid"));
             }
         }

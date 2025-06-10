@@ -21,6 +21,7 @@ class EnterDetailsValidatorTest {
 
     private static final String ENTER_DETAILS_MODEL = "enterDetails";
     private static final String PENALTY_REF_FIELD = "penaltyRef";
+    private static final String COMPANY_NUMBER_FIELD = "companyNumber";
 
     private EnterDetails enterDetails;
     private EnterDetailsValidator testValidator;
@@ -132,9 +133,9 @@ class EnterDetailsValidatorTest {
         testValidator.isValid(enterDetails, bindingResult);
 
         assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount("companyNumber"));
+        assertEquals(1, bindingResult.getFieldErrorCount(COMPANY_NUMBER_FIELD));
         assertEquals("Company number must not include spaces",
-                Objects.requireNonNull(bindingResult.getFieldError("companyNumber"))
+                Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD))
                         .getDefaultMessage());
     }
 
@@ -149,9 +150,9 @@ class EnterDetailsValidatorTest {
         testValidator.isValid(enterDetails, bindingResult);
 
         assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount("companyNumber"));
+        assertEquals(1, bindingResult.getFieldErrorCount(COMPANY_NUMBER_FIELD));
         assertEquals("Enter the company number",
-                Objects.requireNonNull(bindingResult.getFieldError("companyNumber"))
+                Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD))
                         .getDefaultMessage());
     }
 
@@ -171,9 +172,9 @@ class EnterDetailsValidatorTest {
         testValidator.isValid(enterDetails, bindingResult);
 
         assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount("companyNumber"));
+        assertEquals(1, bindingResult.getFieldErrorCount(COMPANY_NUMBER_FIELD));
         assertEquals(errorMessage,
-                Objects.requireNonNull(bindingResult.getFieldError("companyNumber"))
+                Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD))
                         .getDefaultMessage());
     }
 
