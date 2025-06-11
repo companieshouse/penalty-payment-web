@@ -24,14 +24,15 @@ public class PenaltyPaymentInProgressController extends BaseController {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return PENALTY_PAYMENT_IN_PROGRESS_TEMPLATE_NAME;
     }
 
     @GetMapping
     public String getPenaltyPaymentInProgress(@PathVariable String companyNumber,
-                                              @PathVariable String penaltyRef,
-                                              Model model) {
+            @PathVariable String penaltyRef,
+            Model model) {
 
         var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
         addBaseAttributesToModel(model,

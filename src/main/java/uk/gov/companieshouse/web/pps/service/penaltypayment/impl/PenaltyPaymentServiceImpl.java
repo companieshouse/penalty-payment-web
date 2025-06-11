@@ -57,7 +57,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             financialPenalties = apiClient.financialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving financial penalties from API", ex);
-        } catch (IllegalArgumentException|URIValidationException ex) {
+        } catch (IllegalArgumentException | URIValidationException ex) {
             throw new ServiceException("Invalid URI for financial penalties", ex);
         }
 

@@ -12,7 +12,8 @@ public final class PenaltyUtils {
 
     private static final DecimalFormat AMOUNT_FORMATTER = new DecimalFormat("#,###");
 
-    private PenaltyUtils(){}
+    private PenaltyUtils() {
+    }
 
     public static String getFormattedAmount(final Integer amount) {
         return AMOUNT_FORMATTER.format(amount);
@@ -40,7 +41,7 @@ public final class PenaltyUtils {
         }
 
         // Get the first character of the penalty reference
-        String refStartsWith = penaltyRef.toUpperCase().substring(0, 1);
+        String refStartsWith = penaltyRef.strip().substring(0, 1).toUpperCase();
         return PenaltyReference.fromStartsWith(refStartsWith);
     }
 }

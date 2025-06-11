@@ -15,7 +15,7 @@ public class NavigationException extends RuntimeException {
      * cause.
      *
      * @param message a custom message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public NavigationException(String message, Throwable cause) {
         super(message, cause);

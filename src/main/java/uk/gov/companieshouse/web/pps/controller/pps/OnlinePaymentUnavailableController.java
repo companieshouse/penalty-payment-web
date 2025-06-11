@@ -26,14 +26,15 @@ public class OnlinePaymentUnavailableController extends BaseController {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return ONLINE_PAYMENT_UNAVAILABLE_TEMPLATE_NAME;
     }
 
     @GetMapping
     public String getOnlinePaymentUnavailable(@PathVariable String companyNumber,
-                                              @PathVariable String penaltyRef,
-                                              Model model) {
+            @PathVariable String penaltyRef,
+            Model model) {
 
         var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
         model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());

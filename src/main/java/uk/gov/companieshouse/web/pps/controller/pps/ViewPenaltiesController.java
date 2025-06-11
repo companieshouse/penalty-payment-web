@@ -66,7 +66,8 @@ public class ViewPenaltiesController extends BaseController {
         this.paymentService = paymentService;
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return VIEW_PENALTIES_TEMPLATE_NAME;
     }
 

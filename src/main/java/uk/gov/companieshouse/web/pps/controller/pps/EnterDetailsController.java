@@ -59,7 +59,8 @@ public class EnterDetailsController extends BaseController {
     private final PenaltyPaymentService penaltyPaymentService;
     private final MessageSource messageSource;
 
-    @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
+    @SuppressWarnings("java:S107")
+    // BaseController needs NavigatorService / SessionService for constructor injection
     public EnterDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,
@@ -77,12 +78,14 @@ public class EnterDetailsController extends BaseController {
         this.messageSource = messageSource;
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return ENTER_DETAILS_TEMPLATE_NAME;
     }
 
     @GetMapping
-    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
+    public String getEnterDetails(
+            @RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
             Model model,
             HttpServletRequest request) {
 
@@ -153,7 +156,7 @@ public class EnterDetailsController extends BaseController {
             return getTemplateName();
         }
         var payablePenalty = payablePenalties.getFirst();
-      
+
         if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
             LOGGER.info(PAYABLE_PENALTY + payablePenalty.getId() + " is closed pending allocation");
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + PENALTY_PAYMENT_IN_PROGRESS;
@@ -183,9 +186,11 @@ public class EnterDetailsController extends BaseController {
     private boolean checkPenaltyDetailsNotFoundError(EnterDetails enterDetails, BindingResult bindingResult, Model model,
             List<FinancialPenalty> payablePenalties,
             String companyNumber, String penaltyRef) {
+        String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
         if (payablePenalties.isEmpty()) {
             LOGGER.info("No payable penalties for company number " + companyNumber + " and penalty ref: " + penaltyRef);
-            bindingResult.reject("globalError", messageSource.getMessage("details.penalty-details-not-found-error", null, UK));
+            String code = "details.penalty-details-not-found-error." + penaltyReferenceName;
+            bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
             addBaseAttributesToModel(model,
                     setBackLink(),
                     penaltyConfigurationProperties.getSignOutPath());

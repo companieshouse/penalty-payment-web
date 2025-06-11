@@ -337,7 +337,7 @@ class ViewPenaltiesControllerTest {
         verify(mockPayablePenaltyService).createPayableFinancialPenaltySession(COMPANY_NUMBER,
                 LFP_PENALTY_NUMBER, financialPenalty.getOutstanding());
         verify(mockPaymentService).createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
-                        LFP_PENALTY_NUMBER);
+                LFP_PENALTY_NUMBER);
 
     }
 
@@ -415,7 +415,7 @@ class ViewPenaltiesControllerTest {
         verify(mockPayablePenaltyService).createPayableFinancialPenaltySession(COMPANY_NUMBER,
                 LFP_PENALTY_NUMBER, financialPenalty.getOutstanding());
         verify(mockPaymentService).createPaymentSession(payableLateFilingPenaltySession, COMPANY_NUMBER,
-                        LFP_PENALTY_NUMBER);
+                LFP_PENALTY_NUMBER);
     }
 
     private void configureValidPenalty(String penaltyRef) throws ServiceException {

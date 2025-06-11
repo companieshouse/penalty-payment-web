@@ -24,14 +24,15 @@ public class PenaltyInDcaController extends BaseController {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
     }
 
-    @Override protected String getTemplateName() {
+    @Override
+    protected String getTemplateName() {
         return PENALTY_IN_DCA_TEMPLATE_NAME;
     }
 
     @GetMapping
     public String getPenaltyInDCA(@PathVariable String companyNumber,
-                                              @PathVariable String penaltyRef,
-                                              Model model) {
+            @PathVariable String penaltyRef,
+            Model model) {
 
         var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
         addBaseAttributesToModel(model,

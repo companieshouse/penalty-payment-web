@@ -241,12 +241,11 @@ class StartControllerTest {
     }
 
     private void configureNextController() {
-       when(mockNavigatorService.getNextControllerRedirect(any()))
-               .thenReturn(PENALTY_REF_STARTS_WITH_PATH);
+        when(mockNavigatorService.getNextControllerRedirect(any()))
+                .thenReturn(PENALTY_REF_STARTS_WITH_PATH);
     }
 
-    private ViewResolver viewResolver()
-    {
+    private ViewResolver viewResolver() {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
 
         viewResolver.setPrefix("classpath:templates/");

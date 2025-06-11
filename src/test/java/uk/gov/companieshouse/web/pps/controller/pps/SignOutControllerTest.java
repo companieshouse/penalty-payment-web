@@ -30,7 +30,7 @@ import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIG
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    class SignOutControllerTest {
+class SignOutControllerTest {
 
     private MockMvc mockMvc;
 
@@ -122,8 +122,8 @@ import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIG
     @DisplayName("Post Sign Out - yes radio button selected")
     void postRequestRadioYes() throws Exception {
         this.mockMvc.perform(post(SIGN_OUT_PATH)
-                .param(RADIO, "yes"))
-                .andExpect(redirectedUrl(SIGN_OUT+"/signout"));
+                        .param(RADIO, "yes"))
+                .andExpect(redirectedUrl(SIGN_OUT + "/signout"));
 
     }
 
@@ -134,20 +134,20 @@ import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIG
         sessionAttr.put("url_prior_signout", PREVIOUS_PATH);
 
         this.mockMvc.perform(post(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH)
-                .sessionAttrs(sessionAttr).param("url_prior_signout", PREVIOUS_PATH)
-                .param(RADIO, "no"))
+                        .sessionAttrs(sessionAttr).param("url_prior_signout", PREVIOUS_PATH)
+                        .param(RADIO, "no"))
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
 
     }
 
-      @Test
+    @Test
     @DisplayName("Post Sign Out - error message - a radio button has not been selected")
     void postRequestRadioNull() throws Exception {
-          when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
 
         this.mockMvc.perform(post(SIGN_OUT_PATH))
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
-                .andExpect(flash().attribute("errorMessage",true));
+                .andExpect(flash().attribute("errorMessage", true));
     }
 
 }

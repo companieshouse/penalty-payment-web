@@ -17,13 +17,13 @@ public class GlobalExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    private final PenaltyConfigurationProperties  penaltyConfigurationProperties;
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     public GlobalExceptionHandler(PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
-    @ExceptionHandler(value = { RuntimeException.class })
+    @ExceptionHandler(value = {RuntimeException.class})
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(HttpServletRequest request, Exception ex) {
 

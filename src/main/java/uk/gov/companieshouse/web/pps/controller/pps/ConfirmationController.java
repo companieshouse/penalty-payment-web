@@ -61,12 +61,12 @@ public class ConfirmationController extends BaseController {
 
     @GetMapping
     public String getConfirmation(@PathVariable String companyNumber,
-                                  @PathVariable String penaltyRef,
-                                  @PathVariable String payableRef,
-                                  @RequestParam("state") String paymentState,
-                                  @RequestParam("status") String paymentStatus,
-                                  HttpServletRequest request,
-                                  Model model) {
+            @PathVariable String penaltyRef,
+            @PathVariable String payableRef,
+            @RequestParam("state") String paymentState,
+            @RequestParam("status") String paymentStatus,
+            HttpServletRequest request,
+            Model model) {
 
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
 

@@ -12,7 +12,7 @@ public class ServiceException extends Exception {
      * cause.
      *
      * @param message a custom message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public ServiceException(String message, Throwable cause) {
         super(message, cause);
