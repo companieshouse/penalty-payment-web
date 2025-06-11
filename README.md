@@ -39,6 +39,7 @@ In order to run this Web App locally you will need to install:
 | `CH_SANCTIONS_BANK_IBAN`                                                          | Overseas payments - IBAN (sanction: P)                                           |
 | `CH_SANCTIONS_BANK_SWIFT_CODE`                                                    | Overseas payments - SWIFT code (sanction: P)                                     |
 | `FEATURE_FLAG_PENALTY_REF_ENABLED_SANCTIONS_191224`                               | Feature flag to enable Penalty Payment for Sanctions                             |
+| `FEATURE_FLAG_PENALTY_REF_ENABLED_SANCTIONS_ROE_290525`                           | Feature flag to enable Penalty Payment for Sanctions - ROE                       |
 | `PENALTY_PAYMENT_MATOMO_PAY_ANOTHER_PENALTY_GOAL_ID`                              | Matomo Goal Id: PAY A PENALTY - Pay another penalty                              |
 | `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_LFP_GOAL_ID`                      | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with LFP A                    |
 | `PENALTY_PAYMENT_MATOMO_PENALTY_REF_STARTS_WITH_SANCTIONS_GOAL_ID`                | Matomo Goal Id: PAY A PENALTY - Penalty ref starts with Sanctions P              |
