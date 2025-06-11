@@ -119,7 +119,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attributeExists("penaltyReferenceName"));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
@@ -144,7 +145,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attributeExists("penaltyReferenceName"));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
@@ -246,7 +248,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attributeExists("penaltyReferenceName"));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
