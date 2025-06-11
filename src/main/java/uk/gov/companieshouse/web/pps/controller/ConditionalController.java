@@ -24,7 +24,7 @@ public interface ConditionalController {
      * @param companyNumber     the company number
      * @param penaltyRef        the penalty ref
      * @param companyAccountsId the company accounts identifier
-     * @return true if the template for a controller will be rendered
+     * @return <code>true</code> if the template for a controller will be rendered
      * @see uk.gov.companieshouse.web.pps.service.navigation.NavigatorService
      * @see uk.gov.companieshouse.web.pps.exception.NavigationException
      */
