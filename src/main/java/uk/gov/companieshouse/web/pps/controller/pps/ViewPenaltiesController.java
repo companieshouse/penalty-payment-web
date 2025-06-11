@@ -123,6 +123,7 @@ public class ViewPenaltiesController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
+        model.addAttribute("penaltyReferenceName", penaltyReference.name());
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
         model.addAttribute(REASON_ATTR, payablePenalty.getReason());
