@@ -33,6 +33,7 @@ public class PPSTestUtility {
     public static final String VALID_PENALTY_REF = "A0000007";
     public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
     public static final String VALID_CS_REASON = "Failure to file a confirmation statement";
+    public static final String VALID_ROE_REASON = "Failure to update the Register of Overseas Entities";
 
     private PPSTestUtility() {
         throw new IllegalAccessError("Utility class");

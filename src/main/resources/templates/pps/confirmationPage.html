@@ -28,10 +28,10 @@
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key"
-                            th:if="*{penaltyRefStartsWith != 'U'}"
+                            th:if="*{penaltyReferenceName != 'SANCTIONS_ROE'}"
                             th:text="#{confirmationPage.company-number-label}"></dt>
                         <dt class="govuk-summary-list__key"
-                            th:if="*{penaltyRefStartsWith == 'U'}"
+                            th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"
                             th:text="#{confirmationPage.overseas-entity-id-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="${companyNumber}"></dd>
                     </div>
@@ -63,7 +63,7 @@
                     You do not need to contact us to tell us that you've paid.
                 </p>
                 <div class="govuk-cookie-banner">
-                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith} == 'A'">
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyReferenceName} == 'LATE_FILING'">
                         <h2 class="govuk-heading-m">
                             Sign up for email reminders
                         </h2>
@@ -71,7 +71,7 @@
                             <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminders</a>
                             to file your company accounts. This will help you file on time in future and avoid penalties.</p>
                     </div>
-                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith == 'P' OR penaltyRefStartsWith == 'U'}">
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyReferenceName == 'SANCTIONS' OR penaltyReferenceName == 'SANCTIONS_ROE'}">
                         <h2 class="govuk-heading-m">
                             Check if you need to take further action
                         </h2>
