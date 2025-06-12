@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/baseLayout}">
 
 <head>
-    <title>Penalty paid - Pay a penalty to Companies House - GOV.UK</title>
+    <title th:text="#{confirmationPage.title}"></title>
 </head>
 
 <div id="confirmation-main-content" layout:fragment="content">
@@ -14,35 +14,37 @@
             <div class="govuk-grid-column-two-thirds">
                 <div class="govuk-panel govuk-panel--confirmation" id="confirmation-details">
                     <div class="govuk-panel__body" id="confirmation-penalty-reference">
-                        <h1 class="govuk-panel__title">
-                            Penalty paid
-                        </h1>
-                        <div class="govuk-panel__body">
-                            Penalty reference:
-                            <span class="govuk-!-font-weight-bold" th:text="*{penaltyRef}"/>
+                        <h1 class="govuk-panel__title" th:text="#{confirmationPage.header}"></h1>
+                        <div class="govuk-panel__body" th:text="#{confirmationPage.penalty-ref-label}">
+                            <span class="govuk-!-font-weight-bold" th:text="${penaltyRef}"/>
                         </div>
                     </div>
                 </div>
                 <br>
                 <dl class="govuk-summary-list">
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Issued to</dt>
+                        <dt class="govuk-summary-list__key" th:text="#{confirmationPage.issued-to-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="${companyName}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Company number</dt>
+                        <dt class="govuk-summary-list__key"
+                            th:if="*{penaltyRefStartsWith != 'U'}"
+                            th:text="#{confirmationPage.company-number-label}"></dt>
+                        <dt class="govuk-summary-list__key"
+                            th:if="*{penaltyRefStartsWith == 'U'}"
+                            th:text="#{confirmationPage.overseas-entity-id-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="${companyNumber}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Reason for penalty</dt>
+                        <dt class="govuk-summary-list__key" th:text="#{confirmationPage.reason-for-penalty-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="${reasonForPenalty}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Paid on</dt>
+                        <dt class="govuk-summary-list__key" th:text="#{confirmationPage.paid-on-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="${paymentDate}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Amount</dt>
+                        <dt class="govuk-summary-list__key" th:text="#{confirmationPage.amount-label}"></dt>
                         <dd class="govuk-summary-list__value" th:text="'£' + ${penaltyAmount} + ' (no VAT is charged)'"></dd>
                     </div>
                 </dl>
@@ -69,7 +71,7 @@
                             <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminders</a>
                             to file your company accounts. This will help you file on time in future and avoid penalties.</p>
                     </div>
-                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith} == 'P'">
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyRefStartsWith == 'P' OR penaltyRefStartsWith == 'U'}">
                         <h2 class="govuk-heading-m">
                             Check if you need to take further action
                         </h2>
