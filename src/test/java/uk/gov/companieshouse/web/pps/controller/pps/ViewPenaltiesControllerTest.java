@@ -166,7 +166,7 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - sanctions ROE success path")
     void getRequestSanctionsRoeSuccess() throws Exception {
 
-        configureValidPenalty(SANCTIONS_ROE_PENALTY_REF);
+        configureValidPenaltyForRoe(SANCTIONS_ROE_PENALTY_REF);
         when(mockCompanyService.getCompanyProfile(OVERSEAS_ENTITY_ID))
                 .thenReturn(PPSTestUtility.validCompanyProfile(OVERSEAS_ENTITY_ID));
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
@@ -460,6 +460,16 @@ class ViewPenaltiesControllerTest {
 
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, penaltyRef))
                 .thenReturn(validFinancialPenalties);
+    }
+
+    private void configureValidPenaltyForRoe(String penaltyRef) throws ServiceException {
+
+        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(OVERSEAS_ENTITY_ID, penaltyRef))
+                .thenReturn(validFinancialPenalties);
+
     }
 
     private void configureValidPenaltyCreation(String penaltyRef,
