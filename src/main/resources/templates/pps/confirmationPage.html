@@ -15,8 +15,9 @@
                 <div class="govuk-panel govuk-panel--confirmation" id="confirmation-details">
                     <div class="govuk-panel__body" id="confirmation-penalty-reference">
                         <h1 class="govuk-panel__title" th:text="#{confirmationPage.header}"></h1>
-                        <div class="govuk-panel__body" th:text="#{confirmationPage.penalty-ref-label}">
-                            <span class="govuk-!-font-weight-bold" th:text="${penaltyRef}"/>
+                        <div class="govuk-panel__body">
+                            <span th:text="#{confirmationPage.penalty-ref-label}"></span>
+                            <span class="govuk-!-font-weight-bold" th:text="${penaltyRef}"></span>
                         </div>
                     </div>
                 </div>
