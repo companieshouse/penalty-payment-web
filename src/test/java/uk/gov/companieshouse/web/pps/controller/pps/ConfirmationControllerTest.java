@@ -38,12 +38,14 @@ import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationControlle
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PAYMENT_DATE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_STARTS_WITH_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.REASON_FOR_PENALTY_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_ROE_REASON;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -67,12 +69,15 @@ class ConfirmationControllerTest {
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     private static final String COMPANY_NUMBER = "12345678";
+    private static final String OVERSEAS_ENTITY_ID = "OE123456";
     private static final String LFP_PENALTY_REF = "A1234567";
     private static final String CS_PENALTY_REF = "P1234567";
+    private static final String ROE_PENALTY_REF = "U1234567";
     private static final String PAYABLE_REF = "PR_123456";
 
     private static final String VIEW_CONFIRMATION_PATH_LFP = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
     private static final String VIEW_CONFIRMATION_PATH_CS = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + CS_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
+    private static final String VIEW_CONFIRMATION_PATH_ROE = "/pay-penalty/company/" + OVERSEAS_ENTITY_ID + "/penalty/" + ROE_PENALTY_REF + "/payable/" + PAYABLE_REF + "/confirmation";
 
     private static final String RESUME_URL_PATH = "redirect:/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/view-penalties";
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
@@ -117,7 +122,7 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
                 .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, VALID_LATE_FILING_REASON))
-                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH_ATTR, LATE_FILING.getStartsWith()))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, LATE_FILING.name()))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
     }
 
@@ -143,7 +148,33 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
                 .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, VALID_CS_REASON))
-                .andExpect(model().attribute(PENALTY_REF_STARTS_WITH_ATTR, SANCTIONS.getStartsWith()))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS.name()))
+                .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
+    }
+
+    @Test
+    @DisplayName("Get View ROE Confirmation Screen - success path")
+    void getViewRoeRequestSuccess() throws Exception {
+        Map<String, Object> sessionData = new HashMap<>(Map.of(PAYMENT_STATE, STATE));
+
+        when(mockCompanyService.getCompanyProfile(OVERSEAS_ENTITY_ID))
+                .thenReturn(PPSTestUtility.validCompanyProfile(OVERSEAS_ENTITY_ID));
+        when(mockPayablePenaltyService.getPayableFinancialPenalties(OVERSEAS_ENTITY_ID, PAYABLE_REF))
+                .thenReturn(PPSTestUtility.validPayableFinancialPenalties(OVERSEAS_ENTITY_ID, ROE_PENALTY_REF, VALID_ROE_REASON));
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
+
+        this.mockMvc.perform(get(VIEW_CONFIRMATION_PATH_ROE)
+                        .param("ref", REF)
+                        .param("state", STATE)
+                        .param("status", PAYMENT_STATUS_PAID))
+                .andExpect(view().name(CONFIRMATION_PAGE_TEMPLATE_NAME))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists(COMPANY_NUMBER_ATTR))
+                .andExpect(model().attributeExists(PENALTY_REF_ATTR))
+                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
+                .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
+                .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR, VALID_ROE_REASON))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS_ROE.name()))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
     }
 

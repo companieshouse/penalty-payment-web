@@ -33,7 +33,7 @@ public class ConfirmationController extends BaseController {
     private static final String PAYMENT_STATE = "payment_state";
 
     static final String PENALTY_REF_ATTR = "penaltyRef";
-    static final String PENALTY_REF_STARTS_WITH_ATTR = "penaltyRefStartsWith";
+    static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
     static final String COMPANY_NAME_ATTR = "companyName";
     static final String COMPANY_NUMBER_ATTR = "companyNumber";
     static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
@@ -99,7 +99,7 @@ public class ConfirmationController extends BaseController {
             CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
 
             model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
-            model.addAttribute(PENALTY_REF_STARTS_WITH_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith());
+            model.addAttribute(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
             model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
             model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
             model.addAttribute(REASON_FOR_PENALTY_ATTR, payableResourceTransaction.getReason());
