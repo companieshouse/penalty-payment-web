@@ -43,10 +43,12 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -79,12 +81,15 @@ class ViewPenaltiesControllerTest {
     private SessionService mockSessionService;
 
     private static final String COMPANY_NUMBER = "12345678";
+    private static final String OVERSEAS_ENTITY_ID = "OE123456";
     private static final String LFP_PENALTY_NUMBER = "A4444444";
-    private static final String SANCTIONS_PENALTY_REF = "P1234567";
+    private static final String SANCTIONS_CS_PENALTY_REF = "P1234567";
+    private static final String SANCTIONS_ROE_PENALTY_REF = "U1234567";
 
     private static final String VIEW_PENALTIES_PATH = "/pay-penalty/company/%s/penalty/%s/view-penalties";
     private static final String LFP_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, LFP_PENALTY_NUMBER);
-    private static final String SANCTIONS_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, SANCTIONS_PENALTY_REF);
+    private static final String SANCTIONS_CS_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
+    private static final String SANCTIONS_ROE_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, OVERSEAS_ENTITY_ID, SANCTIONS_ROE_PENALTY_REF);
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String REDIRECT_PATH = "redirect:";
@@ -119,7 +124,8 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, LATE_FILING.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
@@ -131,24 +137,25 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - sanctions success path")
-    void getRequestSanctionsSuccess() throws Exception {
+    @DisplayName("Get View Penalties - sanctions confirmation statement success path")
+    void getRequestSanctionsCsSuccess() throws Exception {
 
-        configureValidPenalty(SANCTIONS_PENALTY_REF);
+        configureValidPenalty(SANCTIONS_CS_PENALTY_REF);
         configureValidCompanyProfile();
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
 
-        this.mockMvc.perform(get(SANCTIONS_VIEW_PENALTIES_PATH))
+        this.mockMvc.perform(get(SANCTIONS_CS_VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_PENALTY_REF);
+        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
         verify(mockPenaltyConfigurationProperties).getEnterDetailsPath();
         verify(mockPenaltyConfigurationProperties).getSignOutPath();
         verify(mockPenaltyConfigurationProperties).getSurveyLink();
@@ -156,14 +163,41 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - sanctions penalty ref is not enabled error")
-    void getRequestErrorSanctionsPenaltyRefIsNotEnabled() throws Exception {
+    @DisplayName("Get View Penalties - sanctions ROE success path")
+    void getRequestSanctionsRoeSuccess() throws Exception {
+
+        configureValidPenaltyForRoe(SANCTIONS_ROE_PENALTY_REF);
+        when(mockCompanyService.getCompanyProfile(OVERSEAS_ENTITY_ID))
+                .thenReturn(PPSTestUtility.validCompanyProfile(OVERSEAS_ENTITY_ID));
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
+
+        this.mockMvc.perform(get(SANCTIONS_ROE_VIEW_PENALTIES_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
+                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
+                .andExpect(model().attributeExists(PENALTY_REF_ATTR))
+                .andExpect(model().attributeExists(REASON_ATTR))
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS_ROE.name()));
+
+        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS_ROE);
+        verify(mockCompanyService).getCompanyProfile(OVERSEAS_ENTITY_ID);
+        verify(mockPenaltyPaymentService).getFinancialPenalties(OVERSEAS_ENTITY_ID, SANCTIONS_ROE_PENALTY_REF);
+        verify(mockPenaltyConfigurationProperties).getEnterDetailsPath();
+        verify(mockPenaltyConfigurationProperties).getSignOutPath();
+        verify(mockPenaltyConfigurationProperties).getSurveyLink();
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+    }
+
+    @Test
+    @DisplayName("Get View Penalties - sanctions confirmation statement penalty ref is not enabled error")
+    void getRequestErrorSanctionsCsPenaltyRefIsNotEnabled() throws Exception {
 
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(FALSE);
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
                 UNSCHEDULED_SERVICE_DOWN_PATH);
 
-        this.mockMvc.perform(get(SANCTIONS_VIEW_PENALTIES_PATH))
+        this.mockMvc.perform(get(SANCTIONS_CS_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
@@ -233,24 +267,25 @@ class ViewPenaltiesControllerTest {
         LocalDate madeUpDate = now();
 
         List<FinancialPenalty> financialPenalties = new ArrayList<>();
-        financialPenalties.add(PPSTestUtility.validFinancialPenalty(SANCTIONS_PENALTY_REF, madeUpDate.minusYears(1).toString()));
+        financialPenalties.add(PPSTestUtility.validFinancialPenalty(SANCTIONS_CS_PENALTY_REF, madeUpDate.minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF))
                 .thenReturn(financialPenalties);
         configureValidCompanyProfile();
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
 
-        this.mockMvc.perform(get(SANCTIONS_VIEW_PENALTIES_PATH))
+        this.mockMvc.perform(get(SANCTIONS_CS_VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR));
+                .andExpect(model().attributeExists(AMOUNT_ATTR))
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_PENALTY_REF);
+        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
 
     }
 
@@ -264,22 +299,22 @@ class ViewPenaltiesControllerTest {
         financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000600", madeUpDate.minusYears(4).toString()));
         financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000601", madeUpDate.minusYears(3).toString()));
         financialPenalties.add(PPSTestUtility.paidFinancialPenalty("P0000602", madeUpDate.minusYears(2).toString()));
-        financialPenalties.add(PPSTestUtility.validFinancialPenalty(SANCTIONS_PENALTY_REF, madeUpDate.minusYears(1).toString()));
-        financialPenalties.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(SANCTIONS_PENALTY_REF, madeUpDate.minusMonths(6).toString()));
+        financialPenalties.add(PPSTestUtility.validFinancialPenalty(SANCTIONS_CS_PENALTY_REF, madeUpDate.minusYears(1).toString()));
+        financialPenalties.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(SANCTIONS_CS_PENALTY_REF, madeUpDate.minusMonths(6).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF))
                 .thenReturn(financialPenalties);
         configureValidCompanyProfile();
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
-        this.mockMvc.perform(get(SANCTIONS_VIEW_PENALTIES_PATH))
+        this.mockMvc.perform(get(SANCTIONS_CS_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
-        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_PENALTY_REF);
+        verify(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
     }
 
     @Test
@@ -425,6 +460,16 @@ class ViewPenaltiesControllerTest {
 
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, penaltyRef))
                 .thenReturn(validFinancialPenalties);
+    }
+
+    private void configureValidPenaltyForRoe(String penaltyRef) throws ServiceException {
+
+        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(OVERSEAS_ENTITY_ID, penaltyRef))
+                .thenReturn(validFinancialPenalties);
+
     }
 
     private void configureValidPenaltyCreation(String penaltyRef,

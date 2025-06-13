@@ -39,6 +39,7 @@ public class ViewPenaltiesController extends BaseController {
     static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";
     static final String COMPANY_NAME_ATTR = "companyName";
     static final String PENALTY_REF_ATTR = "penaltyRef";
+    static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
     static final String REASON_ATTR = "reasonForPenalty";
     static final String AMOUNT_ATTR = "outstanding";
 
@@ -126,6 +127,7 @@ public class ViewPenaltiesController extends BaseController {
 
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
+        model.addAttribute(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
         model.addAttribute(REASON_ATTR, payablePenalty.getReason());
         model.addAttribute(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payablePenalty.getOutstanding()));
 
