@@ -43,6 +43,7 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
@@ -120,7 +121,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
-                .andExpect(model().attributeExists("penaltyReferenceName"));
+                .andExpect(model().attributeExists(PENALTY_REF_NAME_ATTR, LATE_FILING.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
@@ -146,7 +147,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
-                .andExpect(model().attributeExists("penaltyReferenceName"));
+                .andExpect(model().attributeExists(PENALTY_REF_NAME_ATTR, SANCTIONS.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
@@ -249,7 +250,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(PENALTY_REF_ATTR))
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
-                .andExpect(model().attributeExists("penaltyReferenceName"));
+                .andExpect(model().attributeExists(PENALTY_REF_NAME_ATTR, SANCTIONS.name()));
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(SANCTIONS);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
