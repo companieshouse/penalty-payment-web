@@ -57,7 +57,7 @@
                               th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-name')}"></span>
                         <span id="sanctions-account-name"
-                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:if="${penaltyReference == 'SANCTIONS' OR penaltyReference == 'SANCTIONS_ROE'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-name')}"></span>
                     </li>
                     <li>
@@ -66,7 +66,7 @@
                               th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.sort-code')}"></span>
                         <span id="sanctions-sort-code"
-                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:if="${penaltyReference == 'SANCTIONS' OR penaltyReference == 'SANCTIONS_ROE'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.sort-code')}"></span>
                     </li>
                     <li>
@@ -75,7 +75,7 @@
                               th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.account-number')}"></span>
                         <span id="sanctions-account-number"
-                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:if="${penaltyReference == 'SANCTIONS' OR penaltyReference == 'SANCTIONS_ROE'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.account-number')}"></span>
                     </li>
                     <li>
@@ -93,7 +93,7 @@
                               th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.iban')}"></span>
                         <span id="sanctions-iban"
-                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:if="${penaltyReference == 'SANCTIONS' OR penaltyReference == 'SANCTIONS_ROE'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.iban')}"></span>
                     </li>
                     <li>
@@ -102,7 +102,7 @@
                               th:if="${penaltyReference == 'LATE_FILING'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-late-filing.swift-code')}"></span>
                         <span id="sanctions-swift-code"
-                              th:if="${penaltyReference == 'SANCTIONS'}"
+                              th:if="${penaltyReference == 'SANCTIONS' OR penaltyReference == 'SANCTIONS_ROE'}"
                               th:text="${@environment.getProperty('penalty.bank-transfer-sanctions.swift-code')}"></span>
                     </li>
                     <li>
