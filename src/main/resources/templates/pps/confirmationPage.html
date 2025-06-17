@@ -72,7 +72,7 @@
                             <a href="https://www.gov.uk/guidance/online-filing-and-email-reminders-for-companies#reminders" class="govuk-link">email reminders</a>
                             to file your company accounts. This will help you file on time in future and avoid penalties.</p>
                     </div>
-                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyReferenceName == 'SANCTIONS' OR penaltyReferenceName == 'SANCTIONS_ROE'}">
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyReferenceName == 'SANCTIONS'}">
                         <h2 class="govuk-heading-m">
                             Check if you need to take further action
                         </h2>
@@ -86,6 +86,30 @@
                                 You must check if you need to take any further action relating to this offence. If an action is required and you do not comply, you may still be committing an offence and at risk of more penalties or prosecution.
                             </strong>
                         </div>
+                        <p class="govuk-body"><a href="https://www.gov.uk/contact-companies-house" class="govuk-link">Contact us</a> if you are unsure of what you need to do.</p>
+                    </div>
+                    <div class="govuk-width-container govuk-!-static-margin-top-1 govuk-!-static-margin-left-5 govuk-!-static-margin-right-5 govuk-!-static-margin-bottom-6" th:if="${penaltyReferenceName == 'SANCTIONS_ROE'}">
+                        <h2 class="govuk-heading-m">
+                            Check if you need to take further action
+                        </h2>
+                        <p class="govuk-body">
+                            The overseas entity must
+                            <a href="https://www.gov.uk/guidance/file-an-overseas-entity-update-statement" class="govuk-link">file an update statement</a>
+                            every year, to check and confirm that the information on the register is still correct, and update anything that's changed.
+                        </p>
+                        <div class="govuk-warning-text">
+                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                            <strong class="govuk-warning-text__text">
+                                <span class="govuk-visually-hidden">Warning</span>
+                                You must make sure that you have now filed all required update statements. If you have not, you may still be committing an offence and be at risk of more penalties or prosecution.
+                            </strong>
+                        </div>
+                        <p class="govuk-body">
+                            If you're not sure whether your filings are up to date,
+                            <a href="https://find-and-update.company-information.service.gov.uk/" class="govuk-link">
+                                search for the overseas entity on the Companies House register.</a>
+                            You'll be able to see when the next statement is required, and whether it's overdue.
+                        </p>
                         <p class="govuk-body"><a href="https://www.gov.uk/contact-companies-house" class="govuk-link">Contact us</a> if you are unsure of what you need to do.</p>
                     </div>
                 </div>
