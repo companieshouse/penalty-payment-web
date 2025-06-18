@@ -11,28 +11,18 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var penaltyReference = '[[${penaltyReference}]]';
+            var goalId;
 
             if (penaltyReference === 'LATE_FILING') {
-                var goalId = document.getElementById('online-payment-unavailable-stop-screen-lfp-goal-id').value;
-                if (goalId) {
-                    if (window._paq) {
-                        _paq.push(['trackGoal', goalId]);
-                    }
-                }
+                goalId = document.getElementById('online-payment-unavailable-stop-screen-lfp-goal-id')?.value;
             } else if (penaltyReference === 'SANCTIONS') {
-                var goalId = document.getElementById('online-payment-unavailable-stop-screen-sanctions-goal-id').value;
-                if (goalId) {
-                    if (window._paq) {
-                        _paq.push(['trackGoal', goalId]);
-                    }
-                }
+                goalId = document.getElementById('online-payment-unavailable-stop-screen-sanctions-goal-id')?.value;
             } else if (penaltyReference === 'SANCTIONS_ROE') {
-                var goalId = document.getElementById('online-payment-unavailable-stop-screen-sanctions-roe-goal-id').value;
-                if (goalId) {
-                    if (window._paq) {
-                        _paq.push(['trackGoal', goalId]);
-                    }
-                }
+                goalId = document.getElementById('online-payment-unavailable-stop-screen-sanctions-roe-goal-id')?.value;
+            }
+
+            if (goalId && window._paq) {
+                _paq.push(['trackGoal', goalId]);
             }
         });
     </script>
