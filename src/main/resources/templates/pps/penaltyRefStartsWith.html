@@ -15,6 +15,8 @@
                         _paq.push(['trackGoal', document.querySelector("#lfp-goal-id").value]);
                     } else if (selectedPenaltyReferenceValue === 'SANCTIONS') {
                         _paq.push(['trackGoal', document.querySelector("#sanctions-goal-id").value]);
+                    } else if (selectedPenaltyReferenceValue === 'SANCTIONS_ROE') {
+                        _paq.push(['trackGoal', document.querySelector("#sanctions-roe-goal-id").value]);
                     }
                 }
             });
@@ -67,6 +69,7 @@
                         </div>
                         <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-goal-id')}" id="lfp-goal-id">
                         <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-sanctions-goal-id')}" id="sanctions-goal-id">
+                        <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-sanctions-roe-goal-id')}" id="sanctions-roe-goal-id">
                     </fieldset>
                 </div>
 

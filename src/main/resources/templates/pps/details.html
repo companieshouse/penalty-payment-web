@@ -124,7 +124,8 @@
 
                         <input id="next-button-roe" class="govuk-button"
                                type="submit" role="button" value="Continue"
-                               th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"/>
+                               th:if="*{penaltyReferenceName == 'SANCTIONS_ROE'}"
+                               th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.penalty-details-continue-sanctions-roe-goal-id')}]]]);"/>
                     </div>
                 </div>
             </div>
