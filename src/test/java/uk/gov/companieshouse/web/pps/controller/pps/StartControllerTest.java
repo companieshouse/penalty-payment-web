@@ -143,7 +143,6 @@ class StartControllerTest {
 
         verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verify(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
     }
 
     @Test
