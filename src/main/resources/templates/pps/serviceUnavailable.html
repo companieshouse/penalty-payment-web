@@ -26,7 +26,7 @@
                 <h1 id="page-title " class="govuk-heading-xl">
                     <span id="page-title-heading">Sorry, the service is unavailable</span>
                 </h1>
-                <p class="govuk-body-l">
+                <p class="govuk-body">
                     You will be able to use the service from
                     <span id="date" th:text="${date}"></span>
                 </p>
@@ -43,7 +43,7 @@
                         If you’ve paid by bank transfer before, your bank may automatically use the same bank account and it might not be correct. Check you’re paying to the correct bank account for your penalty reference.
                     </strong>
                 </div>
-                <h3 class="govuk-heading-s">If your penalty reference starts with A</h3>
+                <h3 class="govuk-heading-m">If your penalty reference starts with A</h3>
                 <details class="govuk-details" data-module="govuk-details">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
@@ -51,10 +51,6 @@
                         </span>
                     </summary>
                     <div class="govuk-details__text">
-                        <p class="govuk-body">
-                            Check the details carefully, as they may be different from other
-                            transactions you've made with us.
-                        </p>
                         <h3 class="govuk-heading-s">Bacs payments</h3>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>
@@ -75,10 +71,9 @@
                             <li>
                                 <span class="govuk-!-font-weight-bold">Payment reference</span>:
                                 Use your penalty reference, so that we know which penalty you've paid.
-                                Your payment may be delayed if you use the wrong reference.
+                                For example, A1234567. Your payment may be delayed if you use the wrong reference.
                             </li>
                         </ul>
-                        <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
                         <h3 class="govuk-heading-s">Overseas payments</h3>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>
@@ -94,7 +89,7 @@
                             <li>
                                 <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your penalty
                                 reference, so that we know which penalty you've paid.
-                                Your payment may be delayed if you use the wrong reference.
+                                For example, A1234567. Your payment may be delayed if you use the wrong reference.
                             </li>
                         </ul>
                         <h3 class="govuk-heading-s">Payments by cheque</h3>
@@ -116,7 +111,7 @@
                     </div>
                 </details>
 
-                <h3 class="govuk-heading-s">If your penalty reference starts with P or U</h3>
+                <h3 class="govuk-heading-m">If your penalty reference starts with P or U</h3>
                 <details class="govuk-details" data-module="govuk-details">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
@@ -124,10 +119,6 @@
                         </span>
                     </summary>
                     <div class="govuk-details__text">
-                        <p class="govuk-body">
-                            Check the details carefully, as they may be
-                            different from other transactions you've made with us.
-                        </p>
                         <h3 class="govuk-heading-s">Bacs payments</h3>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>
@@ -147,7 +138,7 @@
                             </li>
                             <li>
                                 <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
-                                penalty reference, so that we know which penalty you've paid. Your payment
+                                penalty reference, so that we know which penalty you've paid. For example, P1234567 or U1234567. Your payment
                                 may be delayed if you use the wrong reference.
                             </li>
                         </ul>
@@ -165,14 +156,14 @@
                             </li>
                             <li>
                                 <span class="govuk-!-font-weight-bold">Payment reference</span>: Use your
-                                penalty reference, so that we know which penalty you've paid. Your payment
+                                penalty reference, so that we know which penalty you've paid. For example, P1234567 or U1234567. Your payment
                                 may be delayed if you use the wrong reference.
                             </li>
                         </ul>
-                        <h3 class="govuk-heading-s">What happens next</h3>
-                        <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
                     </div>
                 </details>
+                <h3 class="govuk-heading-m">What happens next</h3>
+                <p class="govuk-body">Your payment may take up to 4 working days to process.</p>
                 <p class="govuk-body">
                     If you have any questions, you can <a href="https://www.gov.uk/contact-companies-house" class="govuk-link">contact us</a>.
                 </p>
