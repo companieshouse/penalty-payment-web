@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltyS
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -80,6 +81,9 @@ class ViewPenaltiesControllerTest {
     @Mock
     private SessionService mockSessionService;
 
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
+
     private static final String COMPANY_NUMBER = "12345678";
     private static final String OVERSEAS_ENTITY_ID = "OE123456";
     private static final String LFP_PENALTY_NUMBER = "A4444444";
@@ -106,7 +110,8 @@ class ViewPenaltiesControllerTest {
                 mockCompanyService,
                 mockPenaltyPaymentService,
                 mockPayablePenaltyService,
-                mockPaymentService);
+                mockPaymentService,
+                mockFinanceServiceHealthCheck);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

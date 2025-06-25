@@ -1,0 +1,13 @@
+package uk.gov.companieshouse.web.pps.service.finance;
+
+import java.util.Optional;
+
+import org.springframework.ui.Model;
+
+public interface FinanceServiceHealthCheck {
+
+    Optional<String> checkIfAvailable(Model model);
+
+    String checkIfAvailableAtStart(Integer startId, String nextController, Model model);
+
+}

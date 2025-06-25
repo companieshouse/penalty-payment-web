@@ -15,6 +15,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -48,6 +49,7 @@ public class ViewPenaltiesController extends BaseController {
     private final PenaltyPaymentService penaltyPaymentService;
     private final PayablePenaltyService payablePenaltyService;
     private final PaymentService paymentService;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
     public ViewPenaltiesController(
@@ -58,13 +60,15 @@ public class ViewPenaltiesController extends BaseController {
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
             PayablePenaltyService payablePenaltyService,
-            PaymentService paymentService) {
+            PaymentService paymentService,
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;
         this.payablePenaltyService = payablePenaltyService;
         this.paymentService = paymentService;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
     }
 
     @Override
@@ -77,6 +81,11 @@ public class ViewPenaltiesController extends BaseController {
             @PathVariable String penaltyRef,
             Model model,
             HttpServletRequest request) {
+
+        var message = financeServiceHealthCheck.checkIfAvailable(model);
+        if (message.isPresent()) {
+            return message.get();
+        }
 
         PenaltyReference penaltyReference;
         try {

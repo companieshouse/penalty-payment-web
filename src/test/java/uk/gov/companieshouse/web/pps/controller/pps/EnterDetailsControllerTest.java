@@ -16,6 +16,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -75,6 +76,9 @@ class EnterDetailsControllerTest {
 
     @Mock
     private SessionService mockSessionService;
+
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
@@ -139,7 +143,8 @@ class EnterDetailsControllerTest {
                 mockEnterDetailsValidator,
                 mockCompanyService,
                 mockPenaltyPaymentService,
-                mockMessageSource);
+                mockMessageSource,
+                mockFinanceServiceHealthCheck);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

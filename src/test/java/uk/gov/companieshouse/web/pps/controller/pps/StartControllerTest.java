@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.security.WebSecurity;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -56,13 +57,16 @@ class StartControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
+
     @BeforeEach
     void setup() {
         StartController controller = new StartController(
                 mockNavigatorService,
                 mockSessionService,
                 mockPenaltyConfigurationProperties,
-                mockPenaltyPaymentService);
+                mockFinanceServiceHealthCheck);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
 
