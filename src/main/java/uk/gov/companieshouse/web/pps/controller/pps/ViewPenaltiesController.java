@@ -38,6 +38,7 @@ import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyP
 public class ViewPenaltiesController extends BaseController {
 
     static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";
+    static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
     static final String COMPANY_NAME_ATTR = "companyName";
     static final String PENALTY_REF_ATTR = "penaltyRef";
     static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
@@ -84,6 +85,9 @@ public class ViewPenaltiesController extends BaseController {
 
         var message = financeServiceHealthCheck.checkIfAvailable(model);
         if (message.isPresent()) {
+            if (message.get().equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+            }
             return message.get();
         }
 

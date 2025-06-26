@@ -17,7 +17,6 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Objects;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
@@ -40,7 +39,7 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     }
 
     @Override
-    public String checkIfAvailableAtStart(Integer startId, String nextController, Model model) {
+    public String checkIfAvailableAtStart(Optional<Integer> startId, String nextController, Model model) {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         try {
@@ -81,13 +80,13 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
         return Optional.of(redirectPathUnscheduledServiceDown);
     }
 
-    private String getHealthy(Integer startId,  String message, String nextController) {
+    private String getHealthy(Optional<Integer> startId, String message, String nextController) {
         LOGGER.debug("Financial health check: " + message);
-        if (Objects.nonNull(startId) && startId == 0) {
+        if (startId.isPresent() && startId.get() == 0) {
             return nextController;
         }
 
-        return penaltyConfigurationProperties.getGovUkPayPenaltyUrl();
+        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getGovUkPayPenaltyUrl();
     }
 
     private String getParsedTime(FinanceHealthcheck financeHealthcheck,

@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +40,13 @@ public class StartController extends BaseController {
     }
 
     @GetMapping
-    public String getStart(@RequestParam("start") Integer startId, Model model) {
-            return financeServiceHealthCheck.checkIfAvailableAtStart(startId,
-                    navigatorService.getNextControllerRedirect(this.getClass()), model);
+    public String getStart(@RequestParam("start") Optional<Integer> startId, Model model) {
+        String message = financeServiceHealthCheck.checkIfAvailableAtStart(startId,
+        navigatorService.getNextControllerRedirect(this.getClass()), model);
+        if (message.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+            addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+        }
+        return message;
     }
 
     @PostMapping
