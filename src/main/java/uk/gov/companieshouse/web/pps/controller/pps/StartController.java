@@ -71,6 +71,7 @@ public class StartController extends BaseController {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());
             DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
             DateFormat displayDateFormat = new SimpleDateFormat("h:mm a z 'on' EEEE d MMMM yyyy");
+            addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
             model.addAttribute("date", displayDateFormat.format(
                     inputDateFormat.parse(financeHealthcheck.getMaintenanceEndTime())));
             LOGGER.error("Service is unavailable");
