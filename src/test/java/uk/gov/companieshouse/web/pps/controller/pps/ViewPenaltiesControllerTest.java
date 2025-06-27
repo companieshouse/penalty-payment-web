@@ -371,6 +371,17 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
+    @DisplayName("Get View Penalties - failed financial health check return other view")
+    void getRequestLateFilingPenaltyOtherView() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(VIEW_PENALTIES_TEMPLATE_NAME));
+
+        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME));
+    }
+
+    @Test
     @DisplayName("Get View Penalties - failed financial health check unscheduled error")
     void getRequestLateFilingPenaltyUnscheduledError() throws Exception {
 

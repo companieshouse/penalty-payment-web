@@ -40,6 +40,8 @@ class FinanceServiceHealthCheckImplTest {
     private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/pay-penalty/ref-starts-with";
     private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
 
+    private static final String UNKNOWN_STATUS = "Unknown";
+
     private static final String MAINTENANCE_END_TIME = "2001-02-03T04:05:06-00:00";
     private static final String ERROR_MAINTENANCE_END_TIME = "0000-99-99";
 
@@ -107,6 +109,24 @@ class FinanceServiceHealthCheckImplTest {
         String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
 
         assertEquals("pps/serviceUnavailable", message);
+    }
+
+    @Test
+    @DisplayName("Health Check for start pages - unknown status")
+    void healthCheckStartEmptyStatus() throws Exception {
+        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+
+        mockFinancialHealthCheck.setMessage(UNKNOWN_STATUS);
+        mockFinancialHealthCheck.setMaintenanceEndTime(MAINTENANCE_END_TIME);
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+
+        Optional<Integer> startId = Optional.of(0);
+
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
     }
 
     @Test
