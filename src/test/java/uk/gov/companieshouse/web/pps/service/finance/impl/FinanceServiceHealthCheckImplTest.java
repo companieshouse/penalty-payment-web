@@ -80,6 +80,19 @@ class FinanceServiceHealthCheckImplTest {
     }
 
     @Test
+    @DisplayName("Health Check for start pages - healthy redirect to GOV UK Pay Penalty Empty Start Id")
+    void healthCheckStartHealthyGovPayEmptyStartId() throws Exception {
+        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+        mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.HEALTHY.getStatus());
+
+        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+        when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
+
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(Optional.empty(), PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
+    }
+
+    @Test
     @DisplayName("Health Check for start pages - unhealthy planned maintenance")
     void healthCheckStartUnhealthyPlannedMaintenance() throws Exception {
         FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
