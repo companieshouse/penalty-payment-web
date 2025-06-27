@@ -20,6 +20,7 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -48,6 +49,7 @@ public class EnterDetailsController extends BaseController {
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
     private static final String PENALTY_PAYMENT_IN_PROGRESS = "/penalty-payment-in-progress";
+    private static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
@@ -58,6 +60,7 @@ public class EnterDetailsController extends BaseController {
     private final CompanyService companyService;
     private final PenaltyPaymentService penaltyPaymentService;
     private final MessageSource messageSource;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     @SuppressWarnings("java:S107")
     // BaseController needs NavigatorService / SessionService for constructor injection
@@ -69,13 +72,15 @@ public class EnterDetailsController extends BaseController {
             EnterDetailsValidator enterDetailsValidator,
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
-            MessageSource messageSource) {
+            MessageSource messageSource,
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
         this.enterDetailsValidator = enterDetailsValidator;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;
         this.messageSource = messageSource;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
     }
 
     @Override
@@ -88,6 +93,14 @@ public class EnterDetailsController extends BaseController {
             @RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
             Model model,
             HttpServletRequest request) {
+
+        var message = financeServiceHealthCheck.checkIfAvailable(model);
+        if (message.isPresent()) {
+            if (message.get().equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+            }
+            return message.get();
+        }
 
         PenaltyReference penaltyReference;
         try {
