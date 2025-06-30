@@ -16,7 +16,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.security.WebSecurity;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,9 +34,6 @@ import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVI
 class StartControllerTest {
 
     private MockMvc mockMvc;
-
-    @Mock
-    private PenaltyPaymentService mockPenaltyPaymentService;
 
     @Mock
     private NavigatorService mockNavigatorService;
@@ -79,7 +75,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
@@ -92,7 +88,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
@@ -105,7 +101,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
@@ -129,7 +125,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
@@ -142,7 +138,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockPenaltyPaymentService);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
     }
 
     @Test
