@@ -75,7 +75,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
     }
 
     @Test
@@ -88,7 +88,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
     }
 
     @Test
@@ -101,7 +101,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
     }
 
     @Test
@@ -113,6 +113,8 @@ class StartControllerTest {
         mockMvc.perform(get(PAY_PENALTY_START_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
+
+        verifyNoMoreInteractions(mockFinanceServiceHealthCheck);
     }
 
     @Test
@@ -125,7 +127,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
     }
 
     @Test
@@ -138,7 +140,7 @@ class StartControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(PENALTY_REF_STARTS_WITH_PATH));
 
-        verifyNoMoreInteractions(mockPenaltyConfigurationProperties);
+        verifyNoMoreInteractions(mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
     }
 
     @Test
