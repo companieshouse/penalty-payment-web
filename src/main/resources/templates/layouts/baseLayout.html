@@ -10,19 +10,19 @@
     <meta name="robots" content="noindex, nofollow">
     <meta
             property="og:image"
-            th:content="@{{cdnUrl}/images/govuk-frontend/v5.9.0/govuk-opengraph-image.png(cdnUrl=${@environment.getProperty('cdn.url')})}">
+            th:content="@{{cdnUrl}/images/govuk-frontend/v5.10.2/govuk-opengraph-image.png(cdnUrl=${@environment.getProperty('cdn.url')})}">
     <link
             th:href="@{{cdnUrl}/stylesheets/chs-user-bar.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
-            th:href="@{{cdnUrl}/stylesheets/govuk-frontend/v5.9.0/govuk-frontend-5.9.0.min.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
+            th:href="@{{cdnUrl}/stylesheets/govuk-frontend/v5.10.2/govuk-frontend-5.10.2.min.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
             th:href="@{{cdnUrl}/stylesheets/govuk-link_override.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
             media="all" rel="stylesheet" type="text/css" />
     <link
             rel="icon"
-            th:href="@{{cdnUrl}/images/govuk-frontend/v5.9.0/favicon.ico(cdnUrl=${@environment.getProperty('cdn.url')})}"
+            th:href="@{{cdnUrl}/images/govuk-frontend/v5.10.2/favicon.ico(cdnUrl=${@environment.getProperty('cdn.url')})}"
             type="image/x-icon" />
     <link
             th:href="@{{cdnUrl}/stylesheets/extensions/languages-nav.css(cdnUrl=${@environment.getProperty('cdn.url')})}"
@@ -34,7 +34,7 @@
         window.PIWIK_SITE_ID = [[${@environment.getProperty('piwik.siteId')}]];
     </script>
 </head>
-<body class="govuk-template__body app-body-class">
+<body class="govuk-template__body govuk-template--rebranded app-body-class">
 
 <!-- templateName set by TemplateNameInterceptor and used in piwik-enable.js below for piwik/matomo event ids -->
 <div id="templateName" th:attr="data-id=${templateName},data-metadata=${metadata}" hidden></div>
