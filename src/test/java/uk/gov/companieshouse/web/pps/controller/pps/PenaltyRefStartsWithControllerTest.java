@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,11 +28,15 @@ import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
@@ -121,6 +126,30 @@ class PenaltyRefStartsWithControllerTest {
         assertNotNull(modelAndView);
         assertEquals(List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE),
                 modelAndView.getModel().get(AVAILABLE_PENALTY_REF_ATTR));
+    }
+
+    @Test
+    @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check planned maintenance")
+    void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
+
+        setupMockMvc();
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+
+        this.mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
+    }
+
+    @Test
+    @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check return other view")
+    void getRequestLateFilingPenaltyOtherView() throws Exception {
+
+        setupMockMvc();
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(ENTER_DETAILS_TEMPLATE_NAME));
+
+        this.mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
     }
 
     @Test
