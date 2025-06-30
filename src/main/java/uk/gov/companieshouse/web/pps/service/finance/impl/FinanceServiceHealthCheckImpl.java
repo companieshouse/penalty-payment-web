@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.finance.impl;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     }
 
     @Override
-    public String checkIfAvailableAtStart(Optional<Integer> startId, String nextController, Model model) {
+    public String checkIfAvailableAtStart(Integer startId, String nextController, Model model) {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         try {
@@ -80,9 +81,9 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
         return Optional.of(redirectPathUnscheduledServiceDown);
     }
 
-    private String getHealthy(Optional<Integer> startId, String message, String nextController) {
+    private String getHealthy(Integer startId, String message, String nextController) {
         LOGGER.debug("Financial health check: " + message);
-        if (startId.isPresent() && startId.get() == 0) {
+        if (Objects.nonNull(startId) && startId == 0) {
             return nextController;
         }
 

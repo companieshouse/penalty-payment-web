@@ -8,6 +8,6 @@ public interface FinanceServiceHealthCheck {
 
     Optional<String> checkIfAvailable(Model model);
 
-    String checkIfAvailableAtStart(Optional<Integer> startId, String nextController, Model model);
+    String checkIfAvailableAtStart(Integer startId, String nextController, Model model);
 
 }

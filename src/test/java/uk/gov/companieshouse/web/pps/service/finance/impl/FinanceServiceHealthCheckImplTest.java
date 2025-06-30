@@ -60,9 +60,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<Integer> startId = Optional.of(0);
-
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
         assertEquals(PENALTY_REF_STARTS_WITH_PATH, message);
     }
 
@@ -75,9 +73,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        Optional<Integer> startId = Optional.of(1000);
-
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(1, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
         assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
     }
 
@@ -90,7 +86,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(Optional.empty(), PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(null, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
         assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
     }
 
@@ -104,9 +100,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<Integer> startId = Optional.of(0);
-
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
 
         assertEquals("pps/serviceUnavailable", message);
     }
@@ -122,9 +116,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<Integer> startId = Optional.of(0);
-
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
 
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
     }
@@ -136,9 +128,7 @@ class FinanceServiceHealthCheckImplTest {
 
         doThrow(ServiceException.class).when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
 
-        Optional<Integer> startId = Optional.of(0);
-
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(startId, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
 
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
     }
