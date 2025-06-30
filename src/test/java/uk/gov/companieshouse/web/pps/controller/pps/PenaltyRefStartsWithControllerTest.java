@@ -35,8 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
@@ -49,6 +49,8 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 class PenaltyRefStartsWithControllerTest {
 
     private static final String SELECTED_PENALTY_REFERENCE = "selectedPenaltyReference";
+
+    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private MockMvc mockMvc;
 
@@ -141,15 +143,15 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     @Test
-    @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check return other view")
+    @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check return unschedule service down")
     void getRequestLateFilingPenaltyOtherView() throws Exception {
 
         setupMockMvc();
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(ENTER_DETAILS_TEMPLATE_NAME));
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         this.mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
     }
 
     @Test

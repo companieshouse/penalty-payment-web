@@ -235,15 +235,15 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Get Details - failed financial health check return other view")
+    @DisplayName("Get Details - failed financial health check return unschedule service down")
     void getRequestLateFilingPenaltyOtherView() throws Exception {
 
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(ENTER_DETAILS_TEMPLATE_NAME));
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
     }
 
     @Test
