@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
@@ -52,6 +53,9 @@ class PenaltyRefStartsWithControllerTest {
     @Mock
     private SessionService mockSessionService;
 
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
+
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
     private FeatureFlagConfigurationProperties featureFlagConfigurationProperties;
 
@@ -76,6 +80,7 @@ class PenaltyRefStartsWithControllerTest {
                 mockNavigatorService,
                 mockSessionService,
                 penaltyConfigurationProperties,
+                mockFinanceServiceHealthCheck,
                 featureFlagChecker);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

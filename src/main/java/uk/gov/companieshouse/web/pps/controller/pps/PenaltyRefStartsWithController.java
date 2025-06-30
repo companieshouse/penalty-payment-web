@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
@@ -30,13 +31,16 @@ public class PenaltyRefStartsWithController extends BaseController {
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
     private final List<PenaltyReference> availablePenaltyReference;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     public PenaltyRefStartsWithController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
+            FinanceServiceHealthCheck financeServiceHealthCheck,
             FeatureFlagChecker featureFlagChecker) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
                 .filter(featureFlagChecker::isPenaltyRefEnabled)
@@ -50,6 +54,15 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
+
+        var message = financeServiceHealthCheck.checkIfAvailable(model);
+        if (message.isPresent()) {
+            if (message.get().equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+            }
+            return message.get();
+        }
+
         if (availablePenaltyReference.size() == 1) {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
                     + "?ref-starts-with=" + availablePenaltyReference.getFirst().getStartsWith();

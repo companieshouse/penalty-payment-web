@@ -49,7 +49,6 @@ public class EnterDetailsController extends BaseController {
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
     private static final String PENALTY_PAYMENT_IN_PROGRESS = "/penalty-payment-in-progress";
-    private static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
