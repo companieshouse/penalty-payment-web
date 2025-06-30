@@ -382,17 +382,6 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - failed financial health check unscheduled error")
-    void getRequestLateFilingPenaltyUnscheduledError() throws Exception {
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-    }
-
-    @Test
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 

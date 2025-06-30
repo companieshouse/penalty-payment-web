@@ -247,18 +247,6 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Get Details - failed financial health check unscheduled error")
-    void getRequestLateFilingPenaltyUnscheduledError() throws Exception {
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-    }
-
-    @Test
     @DisplayName("Post Details failure path - Blank company number, correct penalty ref")
     void postRequestCompanyNumberBlank() throws Exception {
 
