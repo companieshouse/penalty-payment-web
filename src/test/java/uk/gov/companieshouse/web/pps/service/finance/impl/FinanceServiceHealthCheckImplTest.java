@@ -5,8 +5,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +34,9 @@ class FinanceServiceHealthCheckImplTest {
     @Mock
     private FinanceServiceHealthCheckImpl mockFinanceServiceHealthCheck;
 
+    @Mock
+    private Model mockModel;
+
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/pay-penalty/ref-starts-with";
     private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
@@ -60,7 +61,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
         assertEquals(PENALTY_REF_STARTS_WITH_PATH, message);
     }
 
@@ -73,7 +74,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(1, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(1, PENALTY_REF_STARTS_WITH_PATH, mockModel);
         assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
     }
 
@@ -86,7 +87,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(null, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(null, PENALTY_REF_STARTS_WITH_PATH, mockModel);
         assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
     }
 
@@ -100,7 +101,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
 
         assertEquals("pps/serviceUnavailable", message);
     }
@@ -116,7 +117,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
 
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
     }
@@ -128,7 +129,7 @@ class FinanceServiceHealthCheckImplTest {
 
         doThrow(ServiceException.class).when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, setUpModel());
+        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
 
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
     }
@@ -141,7 +142,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(setUpModel());
+        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
         assertEquals(Optional.empty(), message);
     }
 
@@ -155,7 +156,7 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(setUpModel());
+        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
         assertEquals("pps/serviceUnavailable", message.get());
     }
 
@@ -166,7 +167,7 @@ class FinanceServiceHealthCheckImplTest {
 
         doThrow(ServiceException.class).when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(setUpModel());
+        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message.get());
     }
 
@@ -181,51 +182,7 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(setUpModel());
+        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message.get());
-    }
-
-    private Model setUpModel() {
-        return new Model() {
-            @Override
-            public Model addAttribute(String attributeName, Object attributeValue) {
-                return null;
-            }
-
-            @Override
-            public Model addAttribute(Object attributeValue) {
-                return null;
-            }
-
-            @Override
-            public Model addAllAttributes(Collection<?> attributeValues) {
-                return null;
-            }
-
-            @Override
-            public Model addAllAttributes(Map<String, ?> attributes) {
-                return null;
-            }
-
-            @Override
-            public Model mergeAttributes(Map<String, ?> attributes) {
-                return null;
-            }
-
-            @Override
-            public boolean containsAttribute(String attributeName) {
-                return false;
-            }
-
-            @Override
-            public Object getAttribute(String attributeName) {
-                return null;
-            }
-
-            @Override
-            public Map<String, Object> asMap() {
-                return Map.of();
-            }
-        };
     }
 }
