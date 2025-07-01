@@ -55,12 +55,13 @@ public class PenaltyRefStartsWithController extends BaseController {
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
 
-        var message = financeServiceHealthCheck.checkIfAvailable(model);
-        if (message.isPresent()) {
-            if (message.get().equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
+        if (healthCheck.isPresent()) {
+            String viewName = healthCheck.get();
+            if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
                 addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
             }
-            return message.get();
+            return viewName;
         }
 
         if (availablePenaltyReference.size() == 1) {

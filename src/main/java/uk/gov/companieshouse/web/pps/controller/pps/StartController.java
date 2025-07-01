@@ -40,12 +40,12 @@ public class StartController extends BaseController {
     @GetMapping
     public String getStart(@RequestParam("start") Optional<Integer> startId, Model model) {
         Integer startIdValue = startId.orElse(1);
-        String message = financeServiceHealthCheck.checkIfAvailableAtStart(startIdValue,
+        String viewName = financeServiceHealthCheck.checkIfAvailableAtStart(startIdValue,
         navigatorService.getNextControllerRedirect(this.getClass()), model);
-        if (message.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+        if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
             addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
         }
-        return message;
+        return viewName;
     }
 
     @PostMapping
