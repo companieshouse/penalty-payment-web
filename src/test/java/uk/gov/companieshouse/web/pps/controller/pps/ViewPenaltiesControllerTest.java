@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltyS
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -29,6 +31,7 @@ import java.util.List;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.time.LocalDate.now;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -40,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.PENALTY_REF_ATTR;
@@ -80,6 +84,9 @@ class ViewPenaltiesControllerTest {
     @Mock
     private SessionService mockSessionService;
 
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
+
     private static final String COMPANY_NUMBER = "12345678";
     private static final String OVERSEAS_ENTITY_ID = "OE123456";
     private static final String LFP_PENALTY_NUMBER = "A4444444";
@@ -106,7 +113,8 @@ class ViewPenaltiesControllerTest {
                 mockCompanyService,
                 mockPenaltyPaymentService,
                 mockPayablePenaltyService,
-                mockPaymentService);
+                mockPaymentService,
+                mockFinanceServiceHealthCheck);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -349,6 +357,28 @@ class ViewPenaltiesControllerTest {
 
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(LATE_FILING);
         verify(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
+    }
+
+    @Test
+    @DisplayName("Get View Penalties - failed financial health check planned maintenance")
+    void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+
+        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
+    }
+
+    @Test
+    @DisplayName("Get View Penalties - failed financial health check return unschedule service down")
+    void getRequestLateFilingPenaltyOtherView() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
     }
 
     @Test

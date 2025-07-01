@@ -20,6 +20,7 @@ import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -58,6 +59,7 @@ public class EnterDetailsController extends BaseController {
     private final CompanyService companyService;
     private final PenaltyPaymentService penaltyPaymentService;
     private final MessageSource messageSource;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     @SuppressWarnings("java:S107")
     // BaseController needs NavigatorService / SessionService for constructor injection
@@ -69,13 +71,15 @@ public class EnterDetailsController extends BaseController {
             EnterDetailsValidator enterDetailsValidator,
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
-            MessageSource messageSource) {
+            MessageSource messageSource,
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.featureFlagChecker = featureFlagChecker;
         this.enterDetailsValidator = enterDetailsValidator;
         this.companyService = companyService;
         this.penaltyPaymentService = penaltyPaymentService;
         this.messageSource = messageSource;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
     }
 
     @Override
@@ -88,6 +92,15 @@ public class EnterDetailsController extends BaseController {
             @RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
             Model model,
             HttpServletRequest request) {
+
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
+        if (healthCheck.isPresent()) {
+            String viewName = healthCheck.get();
+            if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+            }
+            return viewName;
+        }
 
         PenaltyReference penaltyReference;
         try {

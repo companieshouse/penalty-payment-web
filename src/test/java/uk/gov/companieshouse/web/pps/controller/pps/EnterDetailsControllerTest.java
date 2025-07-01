@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
@@ -45,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
@@ -75,6 +78,9 @@ class EnterDetailsControllerTest {
 
     @Mock
     private SessionService mockSessionService;
+
+    @Mock
+    private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
@@ -139,7 +145,8 @@ class EnterDetailsControllerTest {
                 mockEnterDetailsValidator,
                 mockCompanyService,
                 mockPenaltyPaymentService,
-                mockMessageSource);
+                mockMessageSource,
+                mockFinanceServiceHealthCheck);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -213,6 +220,30 @@ class EnterDetailsControllerTest {
         verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
         verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
         verifyNoInteractions(mockEnterDetailsValidator);
+    }
+
+    @Test
+    @DisplayName("Get Details - failed financial health check planned maintenance")
+    void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
+    }
+
+    @Test
+    @DisplayName("Get Details - failed financial health check return unschedule service down")
+    void getRequestLateFilingPenaltyOtherView() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
     }
 
     @Test
