@@ -52,8 +52,8 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
         try {
             String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
             String uri = GET_FINANCIAL_PENALTIES_URI.expand(companyNumber, penaltyReferenceType).toString();
-            LOGGER.debug(String.format("Sending request to API to fetch financial penalties (%s) for company number %s and penalty ref %s",
-                    penaltyReferenceType, companyNumber, penaltyRef));
+            LOGGER.debug(String.format("Sending request to API [%s] to fetch financial penalties (%s) for company number %s and penalty ref %s",
+                    uri, penaltyReferenceType, companyNumber, penaltyRef));
             financialPenalties = apiClient.financialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving financial penalties from API", ex);
@@ -66,6 +66,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
                     companyNumber, penaltyRef));
             return Collections.emptyList();
         }
+        LOGGER.debug(String.format("Request to fetch financial penalties successful for company number %s and penalty ref %s", companyNumber, penaltyRef));
 
         var penaltyOrUnpaidItems = financialPenalties.getItems().stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())

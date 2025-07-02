@@ -10,6 +10,9 @@ import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenaltySession;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.financialpenalty.Transaction;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
+import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
@@ -25,6 +28,8 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     private static final UriTemplate POST_PAYABLE_URI =
             new UriTemplate("/company/{companyNumber}/penalties/payable");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
+
     private final ApiClientService apiClientService;
 
     public PayablePenaltyServiceImpl(ApiClientService apiClientService) {
@@ -38,12 +43,15 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
 
         try {
             String uri = GET_PAYABLE_URI.expand(companyNumber, payableRef).toString();
+            LOGGER.debug(String.format("Sending request to API [%s] to fetch  payable financial penalties for company number %s and payable ref %s",
+                    uri, companyNumber, payableRef));
             payableFinancialPenalties = apiClient.payableFinancialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving payable financial penalties from API", ex);
         } catch (URIValidationException ex) {
             throw new ServiceException("Invalid URI for payable financial penalties", ex);
         }
+        LOGGER.debug(String.format("Successfully fetched payable financial penalties for company number %s and payable ref %s", companyNumber, payableRef));
 
         return payableFinancialPenalties;
     }
@@ -57,12 +65,16 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
         try {
             String uri = POST_PAYABLE_URI.expand(companyNumber, penaltyRef).toString();
             FinancialPenaltySession financialPenaltySession = generateFinancialPenaltySessionData(penaltyRef, amount);
+            LOGGER.debug(String.format("Sending request to API [%s] to create payable financial penalty session for company number %s, penalty ref %s and amount %d",
+                    uri, companyNumber, penaltyRef, amount));
             apiResponse = apiClient.payableFinancialPenalty().create(uri, financialPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error creating payable financial penalty session", ex);
         } catch (URIValidationException ex) {
             throw new ServiceException("Invalid URI for payable financial penalty", ex);
         }
+        LOGGER.debug(String.format("Successfully created payable financial penalty session for company number %s, penalty ref %s and amount %d",
+                companyNumber, penaltyRef, amount));
 
         return apiResponse.getData();
     }

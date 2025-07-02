@@ -81,8 +81,11 @@ public class PaymentServiceImpl implements PaymentService {
         LOGGER.info("SESSION STATE: " + paymentSessionApi.getState());
 
         try {
+            LOGGER.debug(String.format("Sending request to API to create payment session for company number %s amd penalty ref %s",
+                    companyNumber, penaltyRef));
             ApiResponse<PaymentApi> apiResponse = apiClientService.getPublicApiClient()
                     .payment().create(PAYMENT_URL, paymentSessionApi).execute();
+            LOGGER.debug(String.format("Successfully created payment session for company number %s and penalty ref %s", companyNumber, penaltyRef));
 
             setPaymentStateOnSession(paymentState);
 

@@ -6,6 +6,9 @@ import uk.gov.companieshouse.api.ApiClient;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
+import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
@@ -15,6 +18,8 @@ public class CompanyServiceImpl implements CompanyService {
 
     private static final UriTemplate GET_COMPANY_URI =
             new UriTemplate("/company/{companyNumber}");
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private final ApiClientService apiClientService;
 
@@ -41,12 +46,14 @@ public class CompanyServiceImpl implements CompanyService {
 
         try {
             String uri = GET_COMPANY_URI.expand(companyNumber).toString();
+            LOGGER.debug(String.format("Getting company profile from %s for company number %s", uri, companyNumber));
             companyProfileApi = apiClient.company().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException("Error retrieving Company Details", ex);
         } catch (URIValidationException ex) {
             throw new ServiceException("Invalid URI for Company Details", ex);
         }
+        LOGGER.debug(String.format("Successfully got company profile for company number %s", companyNumber));
 
         return companyProfileApi;
     }
