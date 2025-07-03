@@ -94,9 +94,12 @@ public class ViewPenaltiesController extends BaseController {
         PenaltyReference penaltyReference;
         try {
             penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+            LOGGER.debug(String.format("Checking if penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
             if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
+                LOGGER.debug(String.format("Penalty reference type %s not enabled for company number %s", penaltyReference.name(), companyNumber));
                 return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
+            LOGGER.debug(String.format("Penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
         } catch (IllegalArgumentException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
@@ -117,26 +120,28 @@ public class ViewPenaltiesController extends BaseController {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
+        LOGGER.debug(String.format("Checking if online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
         // User can only pay for a penalty with no associated legal costs
         if (penaltyAndCosts.size() > 1) {
             LOGGER.info(String.format(
-                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
+                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number %s and penalty ref %s",
                     penaltyAndCosts.size(), companyNumber, penaltyRef));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts, penaltyRef);
         if (payablePenaltyOptional.isEmpty()) {
-            LOGGER.info(String.format("Online payment unavailable as there is no open penalty for company number: %s, penalty reference: %s",
+            LOGGER.info(String.format("Online payment unavailable as there is no open penalty for company number %s and penalty ref %s",
                     companyNumber, penaltyRef));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         FinancialPenalty payablePenalty = payablePenaltyOptional.get();
         if (!payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-            LOGGER.info("Penalty " + payablePenalty.getId() + " is invalid, cannot access 'view penalty' screen");
+            LOGGER.info(String.format("Penalty %s is not valid for online payment. Online partial payment of penalty is not allowed", payablePenalty.getId()));
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
+        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
         model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
@@ -159,6 +164,7 @@ public class ViewPenaltiesController extends BaseController {
         try {
             List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
 
+            LOGGER.debug(String.format("Checking if online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
             if (penaltyAndCosts.size() > 1) {
                 LOGGER.info(String.format(
                         "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number: %s, penalty reference: %s",
@@ -172,6 +178,7 @@ public class ViewPenaltiesController extends BaseController {
                         companyNumber, penaltyRef));
                 return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
             }
+            LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
             payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                     companyNumber,

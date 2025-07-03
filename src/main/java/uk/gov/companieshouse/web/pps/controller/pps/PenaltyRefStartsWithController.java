@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -64,6 +65,7 @@ public class PenaltyRefStartsWithController extends BaseController {
             return viewName;
         }
 
+        LOGGER.debug(String.format("Available penalty reference types: %s", availablePenaltyReference));
         if (availablePenaltyReference.size() == 1) {
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
                     + "?ref-starts-with=" + availablePenaltyReference.getFirst().getStartsWith();
@@ -95,9 +97,11 @@ public class PenaltyRefStartsWithController extends BaseController {
                     penaltyConfigurationProperties.getSignOutPath());
             return getTemplateName();
         }
+        PenaltyReference selectedPenaltyReference = penaltyReferenceChoice.getSelectedPenaltyReference();
+        LOGGER.debug(String.format("Selected penalty type: %s, starts with: %s", selectedPenaltyReference.name(), selectedPenaltyReference.getStartsWith()));
 
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + penaltyReferenceChoice.getSelectedPenaltyReference().getStartsWith();
+                + "?ref-starts-with=" + selectedPenaltyReference.getStartsWith();
     }
 
 }
