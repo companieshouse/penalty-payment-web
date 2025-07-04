@@ -20,6 +20,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.viewpenalty.ViewPenaltiesService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
@@ -87,6 +88,9 @@ class ViewPenaltiesControllerTest {
     @Mock
     private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
 
+    @Mock
+    private ViewPenaltiesService mockViewPenaltiesService;
+
     private static final String COMPANY_NUMBER = "12345678";
     private static final String OVERSEAS_ENTITY_ID = "OE123456";
     private static final String LFP_PENALTY_NUMBER = "A4444444";
@@ -108,13 +112,9 @@ class ViewPenaltiesControllerTest {
         ViewPenaltiesController controller = new ViewPenaltiesController(
                 mockNavigatorService,
                 mockSessionService,
-                mockFeatureFlagChecker,
                 mockPenaltyConfigurationProperties,
-                mockCompanyService,
-                mockPenaltyPaymentService,
-                mockPayablePenaltyService,
-                mockPaymentService,
-                mockFinanceServiceHealthCheck);
+                mockFinanceServiceHealthCheck,
+                mockViewPenaltiesService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
