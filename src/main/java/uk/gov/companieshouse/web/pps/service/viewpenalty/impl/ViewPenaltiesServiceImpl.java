@@ -119,8 +119,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         if (!isOutstandingAmountMatch(payablePenalty)) {
           return Pair.of(redirectPathUnscheduledServiceDown, redirectBackUrl);
         }
-
-        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
+        
         setUpModelForViewPenalties(companyProfileApi, penaltyRef, payablePenalty, model);
 
         return Pair.of(templateName, redirectBackUrl);
