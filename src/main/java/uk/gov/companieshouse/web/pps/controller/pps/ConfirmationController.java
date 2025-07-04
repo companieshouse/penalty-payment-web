@@ -95,6 +95,7 @@ public class ConfirmationController extends BaseController {
                 LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
                 return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payableResource.getLinks().get("resume_journey_uri");
             }
+            LOGGER.debug(String.format("Payment for penalty with company number %s and penalty ref %s Successful", companyNumber, penaltyRef));
 
             CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
 

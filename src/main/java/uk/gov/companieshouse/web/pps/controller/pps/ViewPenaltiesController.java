@@ -68,6 +68,7 @@ public class ViewPenaltiesController extends BaseController {
                     viewPenaltiesPageDetail.getRight(),
                     penaltyConfigurationProperties.getSignOutPath());
         }
+        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
         return viewPenaltiesPageDetail.getLeft();
     }
