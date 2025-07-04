@@ -192,6 +192,8 @@ public class EnterDetailsController extends BaseController {
                     payablePenalty.getOriginalAmount().toString(), payablePenalty.getOutstanding().toString()));
             return UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + ONLINE_PAYMENT_UNAVAILABLE;
         }
+        LOGGER.debug(String.format("Penalty %s is payable, payableStatus: %s, isPaid: %s, isDca: %s",
+                penaltyRef, payablePenalty.getPayableStatus(), payablePenalty.getPaid(), payablePenalty.getDca()));
 
         return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, penaltyRef);
     }
