@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
@@ -85,6 +87,9 @@ class EnterDetailsControllerTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
+    @Mock
+    private PenaltyDetailsService mockPenaltyDetailsService;
+
     private static final String VALID_PENALTY_REF = "A1234567";
 
     private static final String VALID_PENALTY_REF_SANCTIONS = "P1234567";
@@ -138,15 +143,13 @@ class EnterDetailsControllerTest {
     @BeforeEach
     void setup() {
         EnterDetailsController controller = new EnterDetailsController(
+                mockCompanyService,
                 mockNavigatorService,
                 mockSessionService,
-                mockFeatureFlagChecker,
                 mockPenaltyConfigurationProperties,
-                mockEnterDetailsValidator,
-                mockCompanyService,
-                mockPenaltyPaymentService,
+                mockFeatureFlagChecker,
                 mockMessageSource,
-                mockFinanceServiceHealthCheck);
+                mockPenaltyDetailsService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
