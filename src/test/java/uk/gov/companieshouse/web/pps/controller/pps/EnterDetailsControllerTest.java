@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +30,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -148,6 +147,7 @@ class EnterDetailsControllerTest {
                 mockSessionService,
                 mockPenaltyConfigurationProperties,
                 mockFeatureFlagChecker,
+                mockFinanceServiceHealthCheck,
                 mockMessageSource,
                 mockPenaltyDetailsService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
