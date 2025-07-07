@@ -16,15 +16,17 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 
-import java.util.Optional;
-
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_LINK;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_WITH_BACK_LINK;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Controller
@@ -38,6 +40,7 @@ public class EnterDetailsController extends BaseController {
 
     private final CompanyService companyService;
     private final FeatureFlagChecker featureFlagChecker;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final MessageSource messageSource;
     private final PenaltyDetailsService penaltyDetailsService;
 
@@ -49,11 +52,13 @@ public class EnterDetailsController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FeatureFlagChecker featureFlagChecker,
+            FinanceServiceHealthCheck financeServiceHealthCheck,
             MessageSource messageSource,
             PenaltyDetailsService penaltyDetailsService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.companyService = companyService;
         this.featureFlagChecker = featureFlagChecker;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
         this.messageSource = messageSource;
         this.penaltyDetailsService = penaltyDetailsService;
     }
@@ -64,23 +69,22 @@ public class EnterDetailsController extends BaseController {
     }
 
     @GetMapping
-    public String getEnterDetails(
-            @RequestParam("ref-starts-with") String penaltyReferenceStartsWith,
-            Model model,
-            HttpServletRequest request) {
+    public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith, Model model, HttpServletRequest request) {
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
+        var unscheduledServiceDownPath = penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        PPSServiceResponse serviceResponse = penaltyDetailsService.getEnterDetails(penaltyReferenceStartsWith, healthCheck, unscheduledServiceDownPath);
 
-        Optional<String> optionalRedirectPath = penaltyDetailsService.getEnterDetails(penaltyReferenceStartsWith, model, request);
-        if (optionalRedirectPath.isEmpty()) {
-            // No redirect path provided, return current controller view
-            addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignOutPath());
-            return getTemplateName();
-        } else {
-            String redirectPath = optionalRedirectPath.get();
-            if (redirectPath.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+        serviceResponse.getErrorRequestMsg().ifPresent(msg -> LOGGER.errorRequest(request, msg));
+        serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes -> {
+            if (attributes.containsKey(SIGN_OUT_WITH_BACK_LINK)) {
+                addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignedOutUrl());
+            } else if (attributes.containsKey(SIGN_OUT_LINK)) {
                 addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
             }
-            return redirectPath;
-        }
+        });
+
+        return serviceResponse.getUrl().orElseGet(this::getTemplateName);
     }
 
     @PostMapping
@@ -89,21 +93,24 @@ public class EnterDetailsController extends BaseController {
             HttpServletRequest request,
             Model model) {
 
+        var unscheduledServiceDownPath = penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-        Optional<String> optionalRedirectPath = penaltyDetailsService.postEnterDetails(enterDetails, bindingResult, request, model, companyNumber);
-        if (optionalRedirectPath.isEmpty()) {
+        PPSServiceResponse serviceResponse = penaltyDetailsService
+                .postEnterDetails(enterDetails, bindingResult, companyNumber, unscheduledServiceDownPath);
+
+        serviceResponse.getBaseModelAttributes()
+                .ifPresent(attributes -> addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignedOutUrl()));
+        serviceResponse.getErrorRequestMsg().ifPresent(msg -> LOGGER.errorRequest(request, msg));
+        var optionalRedirectUrl = serviceResponse.getUrl();
+        if (optionalRedirectUrl.isEmpty()) {
             String code = "details.penalty-details-not-found-error." + enterDetails.getPenaltyReferenceName();
             bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
-            addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignOutPath());
-
             return getTemplateName();
-        }
-
-        String redirectPath = optionalRedirectPath.get();
-        if (redirectPath.equals(PenaltyDetailsService.NEXT_CONTROLLER)) {
-            return navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, enterDetails.getPenaltyRef().toUpperCase());
         } else {
-            return redirectPath;
+            String url = optionalRedirectUrl.get();
+            return url.equals(PenaltyDetailsService.NEXT_CONTROLLER)
+                    ? navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, enterDetails.getPenaltyRef().toUpperCase())
+                    : url;
         }
     }
 

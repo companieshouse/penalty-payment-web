@@ -1,23 +1,17 @@
 package uk.gov.companieshouse.web.pps.service.penaltydetails;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Optional;
-
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
+
+import java.util.Optional;
 
 public interface PenaltyDetailsService {
     String NEXT_CONTROLLER = "next_controller";
 
-    Optional<String> getEnterDetails(
-            String penaltyReferenceStartsWith, Model model, HttpServletRequest request);
+    PPSServiceResponse getEnterDetails(
+            String penaltyReferenceStartsWith, Optional<String> healthCheck, String unscheduledServiceDownPath);
 
-    Optional<String> postEnterDetails(
-            EnterDetails enterDetails,
-            BindingResult bindingResult,
-            HttpServletRequest request,
-            Model model,
-            String companyNumber);
+    PPSServiceResponse postEnterDetails(
+            EnterDetails enterDetails, BindingResult bindingResult, String companyNumber, String unscheduledServiceDownPath);
 }
