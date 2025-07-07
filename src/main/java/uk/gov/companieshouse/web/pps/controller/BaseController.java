@@ -92,8 +92,8 @@ public abstract class BaseController {
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
 
-    private static void addAttributesToModel(Model model, Map<String, String> attributes) {
-        for (Map.Entry<String,String> itr : attributes.entrySet()) {
+    protected static void addAttributesToModel(Model model, Map<String, Object> attributes) {
+        for (Map.Entry<String, Object> itr : attributes.entrySet()) {
             model.addAttribute(itr.getKey(), itr.getValue());
         }
     }

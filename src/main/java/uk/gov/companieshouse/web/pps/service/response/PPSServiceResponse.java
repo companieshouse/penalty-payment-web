@@ -13,10 +13,13 @@ public class PPSServiceResponse {
     private String url;
     private String errorRequestMsg;
     private Map<String, String> baseModelAttributes;
-    private Map<String, String> modelAttributes;
+    private Map<String, Object> modelAttributes;
 
-    public String getUrl() {
-        return url;
+    public Optional<String> getUrl() {
+        if (StringUtils.isNotEmpty(url)) {
+            return Optional.of(url);
+        }
+        return Optional.empty();
     }
 
     public void setUrl(String url) {
@@ -42,11 +45,11 @@ public class PPSServiceResponse {
         this.baseModelAttributes = baseModelAttributes;
     }
 
-    public Map<String, String> getModelAttributes() {
+    public Map<String, Object> getModelAttributes() {
         return  Objects.requireNonNullElse(modelAttributes, Collections.emptyMap());
     }
 
-    public void setModelAttributes(Map<String, String> modelAttributes) {
+    public void setModelAttributes(Map<String, Object> modelAttributes) {
         this.modelAttributes = modelAttributes;
     }
 }
