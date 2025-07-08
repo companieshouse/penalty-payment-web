@@ -1,12 +1,11 @@
 package uk.gov.companieshouse.web.pps.service.viewpenalty;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.ui.Model;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 public interface ViewPenaltiesService {
 
-    Pair<String, String> viewPenalties(String companyNumber, String penaltyRef, HttpServletRequest request, Model model, String templateName);
+    PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef) throws IllegalArgumentException, ServiceException;
 
-    String postViewPenalties(String companyNumber, String penaltyRef, HttpServletRequest request);
+    String postViewPenalties(String companyNumber, String penaltyRef) throws ServiceException;
 }

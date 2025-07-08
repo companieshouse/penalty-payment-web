@@ -1,7 +1,8 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.viewpenalty.ViewPenaltiesService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
@@ -51,6 +54,7 @@ public class ViewPenaltiesController extends BaseController {
             @PathVariable String penaltyRef,
             Model model,
             HttpServletRequest request) {
+        PPSServiceResponse ppsServiceResponse;
 
         var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
         if (healthCheck.isPresent()) {
@@ -61,16 +65,25 @@ public class ViewPenaltiesController extends BaseController {
             return viewName;
         }
 
-        Pair<String, String> viewPenaltiesPageDetail = viewPenaltiesService.viewPenalties(companyNumber,penaltyRef, request, model, getTemplateName());
+        try {
+            ppsServiceResponse = viewPenaltiesService.viewPenalties(companyNumber,penaltyRef);
+        } catch (IllegalArgumentException | ServiceException e) {
+            LOGGER.errorRequest(request, e.getMessage(), e);
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        }
 
-        if (!viewPenaltiesPageDetail.getRight().isEmpty()) {
+        if (ppsServiceResponse.getBaseModelAttributes().isPresent()
+                && !ppsServiceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR).isEmpty()) {
             addBaseAttributesToModel(model,
-                    viewPenaltiesPageDetail.getRight(),
+                    ppsServiceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR),
                     penaltyConfigurationProperties.getSignOutPath());
         }
-        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
-        return viewPenaltiesPageDetail.getLeft();
+        if (ppsServiceResponse.getModelAttributes().isPresent()) {
+            addAttributesToModel(model, ppsServiceResponse.getModelAttributes().get());
+        }
+
+        return (ppsServiceResponse.getUrl().isPresent() ? ppsServiceResponse.getUrl().get() : getTemplateName());
     }
 
     @PostMapping
@@ -78,7 +91,12 @@ public class ViewPenaltiesController extends BaseController {
             @PathVariable String penaltyRef,
             HttpServletRequest request) {
 
-        return viewPenaltiesService.postViewPenalties(companyNumber, penaltyRef, request);
+        try {
+            return viewPenaltiesService.postViewPenalties(companyNumber, penaltyRef);
+        } catch (ServiceException e) {
+            LOGGER.errorRequest(request, e.getMessage(), e);
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        }
     }
 
 }
