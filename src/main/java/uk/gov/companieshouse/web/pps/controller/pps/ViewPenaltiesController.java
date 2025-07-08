@@ -54,7 +54,7 @@ public class ViewPenaltiesController extends BaseController {
             @PathVariable String penaltyRef,
             Model model,
             HttpServletRequest request) {
-        PPSServiceResponse ppsServiceResponse;
+        PPSServiceResponse serviceResponse;
 
         var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
         if (healthCheck.isPresent()) {
@@ -66,24 +66,20 @@ public class ViewPenaltiesController extends BaseController {
         }
 
         try {
-            ppsServiceResponse = viewPenaltiesService.viewPenalties(companyNumber,penaltyRef);
+            serviceResponse = viewPenaltiesService.viewPenalties(companyNumber,penaltyRef);
         } catch (IllegalArgumentException | ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
-        if (ppsServiceResponse.getBaseModelAttributes().isPresent()
-                && !ppsServiceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR).isEmpty()) {
-            addBaseAttributesToModel(model,
-                    ppsServiceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR),
-                    penaltyConfigurationProperties.getSignOutPath());
-        }
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
+                addBaseAttributesToModel(model,
+                        serviceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR),
+                        penaltyConfigurationProperties.getSignOutPath()));
 
-        if (ppsServiceResponse.getModelAttributes().isPresent()) {
-            addAttributesToModel(model, ppsServiceResponse.getModelAttributes().get());
-        }
+        serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-        return (ppsServiceResponse.getUrl().isPresent() ? ppsServiceResponse.getUrl().get() : getTemplateName());
+        return  serviceResponse.getUrl().orElse(getTemplateName());
     }
 
     @PostMapping
