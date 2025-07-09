@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.penaltydetails.impl;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -10,6 +12,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
+import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
@@ -19,10 +22,10 @@ import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
@@ -42,30 +45,35 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
+    private final CompanyService companyService;
     private final EnterDetailsValidator enterDetailsValidator;
     private final FeatureFlagChecker featureFlagChecker;
+    private final MessageSource messageSource;
     private final PenaltyPaymentService penaltyPaymentService;
 
     public PenaltyDetailsServiceImpl(
+            CompanyService companyService,
             EnterDetailsValidator enterDetailsValidator,
             FeatureFlagChecker featureFlagChecker,
+            MessageSource messageSource,
             PenaltyPaymentService penaltyPaymentService) {
+        this.companyService = companyService;
         this.enterDetailsValidator = enterDetailsValidator;
         this.featureFlagChecker = featureFlagChecker;
+        this.messageSource = messageSource;
         this.penaltyPaymentService = penaltyPaymentService;
     }
 
     @Override
     public PPSServiceResponse getEnterDetails(
-            String penaltyReferenceStartsWith, Optional<String> healthCheck, String unscheduledServiceDownPath) {
+            String penaltyReferenceStartsWith, String healthCheckView, String unscheduledServiceDownPath) throws ServiceException {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        if (healthCheck.isPresent()) {
-            String viewName = healthCheck.get();
-            if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+        if (StringUtils.isNotBlank(healthCheckView)) {
+            if (healthCheckView.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
                 serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_LINK, ""));
             }
-            serviceResponse.setUrl(viewName);
+            serviceResponse.setUrl(healthCheckView);
         } else {
             try {
                 PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
@@ -78,9 +86,7 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
                     serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
                 }
             } catch (IllegalArgumentException e) {
-                LOGGER.error(e);
-                serviceResponse.setUrl(REDIRECT_URL_PREFIX + unscheduledServiceDownPath);
-                serviceResponse.setErrorRequestMsg(e.getMessage());
+                throw new ServiceException(e.getMessage(), e);
             }
         }
 
@@ -89,7 +95,7 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
     @Override
     public PPSServiceResponse postEnterDetails(
-            EnterDetails enterDetails, BindingResult bindingResult, String companyNumber, String unscheduledServiceDownPath) {
+            EnterDetails enterDetails, BindingResult bindingResult) throws ServiceException {
         enterDetailsValidator.isValid(enterDetails, bindingResult);
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
@@ -103,14 +109,16 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
             serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
         } else {
             String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
-            try {
-                List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
-                serviceResponse.setUrl(getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef));
-            } catch (ServiceException ex) {
-                LOGGER.error(ex);
-                serviceResponse.setErrorRequestMsg(ex.getMessage());
-                serviceResponse.setUrl(REDIRECT_URL_PREFIX + unscheduledServiceDownPath);
+            String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
+            serviceResponse.setCompanyNumber(companyNumber);
+            List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            String url = getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef);
+            if (url == null) { // redirect url is null if no penalty is found for the company number and penalty ref pair
+                String code = "details.penalty-details-not-found-error." + enterDetails.getPenaltyReferenceName();
+                bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
+                serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
             }
+            serviceResponse.setUrl(getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef));
         }
 
         return serviceResponse;

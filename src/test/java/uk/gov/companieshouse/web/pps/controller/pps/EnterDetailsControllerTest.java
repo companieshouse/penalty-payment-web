@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
@@ -47,8 +50,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_WITH_BACK_LINK;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
@@ -154,533 +159,539 @@ class EnterDetailsControllerTest {
     }
 
     @Test
-    @DisplayName("Get Details - Late Filing view success path")
-    void getEnterDetailsWhenLateFilingRefStartsWithRequestSuccess() throws Exception {
+    @DisplayName("Get Details - Late Filing Penalty success path")
+    void getEnterDetailsForLateFilingPenalty() throws Exception {
 
-        configureStartPathProperty();
-
-        PenaltyReference lateFilingPenaltyRef = LATE_FILING;
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(lateFilingPenaltyRef)).thenReturn(TRUE);
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", lateFilingPenaltyRef.getStartsWith()))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
-                .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
-
-        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(lateFilingPenaltyRef);
-        verifyNoInteractions(mockEnterDetailsValidator);
-    }
-
-    @Test
-    @DisplayName("Get Details - Sanction view success path")
-    void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
-
-        PenaltyReference sanctionPenaltyRef = SANCTIONS;
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
-                .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
-                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
-
-        verifyNoInteractions(mockEnterDetailsValidator);
-    }
-
-    @Test
-    @DisplayName("Get Details - error path when penalty ref starts with is invalid")
-    void getEnterDetailsErrorWhenPenaltyRefStartsWithIsInvalid() throws Exception {
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", "SANCTIONS"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verifyNoInteractions(mockFeatureFlagChecker);
-        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
-        verifyNoInteractions(mockEnterDetailsValidator);
-    }
-
-    @Test
-    @DisplayName("Get Details - Sanction view error path when sanctions feature flag disabled")
-    void getEnterDetailsErrorWhenSanctionRefStartsWithRequestDisabled() throws Exception {
-
-        PenaltyReference sanctionPenaltyRef = SANCTIONS;
-
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
-        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
-        verifyNoInteractions(mockEnterDetailsValidator);
-    }
-
-    @Test
-    @DisplayName("Get Details - failed financial health check planned maintenance")
-    void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
-
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
-    }
-
-    @Test
-    @DisplayName("Get Details - failed financial health check return unschedule service down")
-    void getRequestLateFilingPenaltyOtherView() throws Exception {
-
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - Blank company number, correct penalty ref")
-    void postRequestCompanyNumberBlank() throws Exception {
-
-        configureStartPathProperty();
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
-                .andExpect(status().isOk())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
-                .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
-                .andExpect(model().attributeHasFieldErrors(ENTER_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
-                .andExpect(model().attributeErrorCount(ENTER_DETAILS_MODEL_ATTR, 1));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-    }
-
-    @Test
-    @DisplayName("Post Details success path - lower case LLP, correct penalty ref")
-    void postRequestCompanyNumberLowerCase() throws Exception {
-        configureNextController();
-        configureAppendCompanyNumber(UPPER_CASE_LLP);
-        configureValidPenalty(UPPER_CASE_LLP, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, LOWER_CASE_LLP))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(UPPER_CASE_LLP);
-    }
-
-    @Test
-    @DisplayName("Post Details success path - upper case LLP, correct penalty ref")
-    void postRequestCompanyNumberUpperCase() throws Exception {
-        configureNextController();
-        configureAppendCompanyNumber(UPPER_CASE_LLP);
-        configureValidPenalty(UPPER_CASE_LLP, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, UPPER_CASE_LLP))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(UPPER_CASE_LLP);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - no payable late filing penalties found")
-    void postRequestNoPayableFinancialPenaltyFound() throws Exception {
-
-        configureStartPathProperty();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - no payable sanction penalties found")
-    void postRequestNoPayableSanctionPenaltyFound() throws Exception {
-
-        configureStartPathProperty();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_SANCTIONS)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - no payable roe penalties found")
-    void postRequestNoPayableRoePenaltyFound() throws Exception {
-
-        configureStartPathProperty();
-        configureValidAppendCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS_ROE.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_ROE)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_OVERSEAS_ENTITY_ID))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS_ROE", null, UK);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - multiple payable penalties with penalty ref not found")
-    void postRequestMultiplePayablePenaltiesWithPenaltyRefNotFound() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        String penaltyRef = "P1234567";
-        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, penaltyRef))
-                .thenReturn(Collections.emptyList());
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, penaltyRef)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
-    }
-
-    @Test
-    @DisplayName("Post Details success path - multiple payable penalties with one penalty ref match")
-    void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
-
-        configureNextController();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, VALID_PENALTY_REF))
-                .thenReturn(List.of(PPSTestUtility.validFinancialPenalty(VALID_PENALTY_REF, now().minusMonths(2).toString())));
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - multiple payable penalties with multiple penalty ref match")
-    void postRequestMultiplePayablePenaltiesWithMultiplePenaltyRefMatch() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        String penaltyRef = "P0000603";
-        LocalDate madeUpDate = now();
-        List<FinancialPenalty> financialPenalties = new ArrayList<>();
-        financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000600", madeUpDate.minusYears(4).toString()));
-        financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000601", madeUpDate.minusYears(3).toString()));
-        financialPenalties.add(PPSTestUtility.paidFinancialPenalty("P0000602", madeUpDate.minusYears(2).toString()));
-        financialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, madeUpDate.minusYears(1).toString()));
-        financialPenalties.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(penaltyRef, madeUpDate.minusMonths(6).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, penaltyRef))
-                .thenReturn(financialPenalties);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, penaltyRef)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/pay-penalty/company/00987654/penalty/P0000603/online-payment-unavailable"));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - payable penalty does not match provided penalty ref")
-    void postRequestPenaltyRefsDoNotMatch() throws Exception {
-
-        configureStartPathProperty();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyWrongID(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty has legal fees (DCA)")
-    void postRequestPenaltyWithDCAPayments() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyDCA(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(PENALTY_IN_DCA_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty has payment pending")
-    void postRequestPenaltyWithPendingPayment() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyPaymentPending(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(PENALTY_PAYMENT_IN_PROGRESS_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty is already paid")
-    void postRequestPenaltyHasAlreadyBeenPaid() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyAlreadyPaid(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(ALREADY_PAID_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty has negative outstanding amount")
-    void postRequestPenaltyHasNegativeOutstandingAmount() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyNegativeOutstanding(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty has been partially paid")
-    void postRequestPenaltyIsPartiallyPaid() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configurePenaltyPartiallyPaid(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - penalty is not of type 'penalty'")
-    void postRequestPenaltyIsNotPenaltyType() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, VALID_PENALTY_REF))
-                .thenReturn(Collections.emptyList());
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
-    }
-
-    @Test
-    @DisplayName("Post Details failure path - error retrieving Late Filing Penalty")
-    void postRequestErrorRetrievingPenalty() throws Exception {
-
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureErrorRetrievingPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    @Test
-    @DisplayName("Post Details success path")
-    void postRequestPenaltySuccess() throws Exception {
-        configureNextController();
-        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
-        configureValidPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
-
-        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(MOCK_CONTROLLER_PATH));
-
-        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
-        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
-    }
-
-    private void configureNextController() {
-        when(mockNavigatorService.getNextControllerRedirect(any(), any(), any()))
-                .thenReturn(MOCK_CONTROLLER_PATH);
-    }
-
-    private void configureValidAppendCompanyNumber(String companyNumber) {
-        when(mockCompanyService.appendToCompanyNumber(companyNumber))
-                .thenReturn(VALID_COMPANY_NUMBER);
-    }
-
-    private void configureAppendCompanyNumber(String companyNumber) {
-        when(mockCompanyService.appendToCompanyNumber(companyNumber))
-                .thenReturn(companyNumber);
-    }
-
-    private void configureValidPenalty(String companyNumber, String penaltyRef) throws ServiceException {
-        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
-        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(validFinancialPenalties);
-    }
-
-    private void configurePenaltyWrongID(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> wrongId = new ArrayList<>();
-        wrongId.add(PPSTestUtility.validFinancialPenalty(companyNumber, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(wrongId);
-    }
-
-    private void configurePenaltyDCA(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> dcaFinancialPenalty = new ArrayList<>();
-        dcaFinancialPenalty.add(PPSTestUtility.dcaFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(dcaFinancialPenalty);
-    }
-
-    private void configurePenaltyPaymentPending(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> paymentPendingFinancialPenalty = new ArrayList<>();
-        paymentPendingFinancialPenalty.add(PPSTestUtility.paymentPendingFinancialPenalty(penaltyRef));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(paymentPendingFinancialPenalty);
-    }
-
-    private void configurePenaltyAlreadyPaid(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> paidFinancialPenalty = new ArrayList<>();
-        paidFinancialPenalty.add(PPSTestUtility.paidFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(paidFinancialPenalty);
-    }
-
-    private void configurePenaltyNegativeOutstanding(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> negativeOustandingFinancialPenalty = new ArrayList<>();
-        negativeOustandingFinancialPenalty.add(PPSTestUtility.negativeOustandingFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(negativeOustandingFinancialPenalty);
-    }
-
-    private void configurePenaltyPartiallyPaid(String companyNumber, String penaltyRef)
-            throws ServiceException {
-        List<FinancialPenalty> partialPaidFinancialPenalty = new ArrayList<>();
-        partialPaidFinancialPenalty.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
-
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
-                .thenReturn(partialPaidFinancialPenalty);
-    }
-
-    private void configureErrorRetrievingPenalty(String companyNumber, String penaltyRef)
-            throws ServiceException {
-
-        doThrow(ServiceException.class)
-                .when(mockPenaltyPaymentService).getFinancialPenalties(companyNumber, penaltyRef);
-    }
-
-    private void configureStartPathProperty() {
         when(mockPenaltyConfigurationProperties.getStartPath())
                 .thenReturn(START_PATH);
+
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        var enterDetails = new EnterDetails();
+        var unscheduledServiceDownPath = "";
+        var healthCheckView = "";
+        var lfpStartsWith = LATE_FILING.getStartsWith();
+        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
+        serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
+        serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
+        when(mockPenaltyDetailsService.getEnterDetails(lfpStartsWith, healthCheckView, unscheduledServiceDownPath)).thenReturn(serviceResponse);
+
+        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+                        .queryParam("ref-starts-with", lfpStartsWith))
+                .andExpect(status().isOk())
+                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
+                .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
+                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR))
+                .andExpect(model().attributeExists(USER_SIGN_OUT_URL_ATTR));
     }
+
+//    @Test
+//    @DisplayName("Get Details - Sanction view success path")
+//    void getEnterDetailsWhenSanctionRefStartsWithRequestSuccess() throws Exception {
+//
+//        PenaltyReference sanctionPenaltyRef = SANCTIONS;
+//        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(TRUE);
+//
+//        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+//                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
+//                .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
+//                .andExpect(model().attributeExists(BACK_LINK_MODEL_ATTR));
+//
+//        verifyNoInteractions(mockEnterDetailsValidator);
+//    }
+//
+//    @Test
+//    @DisplayName("Get Details - error path when penalty ref starts with is invalid")
+//    void getEnterDetailsErrorWhenPenaltyRefStartsWithIsInvalid() throws Exception {
+//
+//        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+//
+//        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+//                        .queryParam("ref-starts-with", "SANCTIONS"))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+//
+//        verifyNoInteractions(mockFeatureFlagChecker);
+//        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
+//        verifyNoInteractions(mockEnterDetailsValidator);
+//    }
+//
+//    @Test
+//    @DisplayName("Get Details - Sanction view error path when sanctions feature flag disabled")
+//    void getEnterDetailsErrorWhenSanctionRefStartsWithRequestDisabled() throws Exception {
+//
+//        PenaltyReference sanctionPenaltyRef = SANCTIONS;
+//
+//        when(mockFeatureFlagChecker.isPenaltyRefEnabled(sanctionPenaltyRef)).thenReturn(FALSE);
+//        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+//
+//        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+//                        .queryParam("ref-starts-with", sanctionPenaltyRef.getStartsWith()))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+//
+//        verify(mockFeatureFlagChecker).isPenaltyRefEnabled(sanctionPenaltyRef);
+//        verify(mockPenaltyConfigurationProperties).getUnscheduledServiceDownPath();
+//        verifyNoInteractions(mockEnterDetailsValidator);
+//    }
+//
+//    @Test
+//    @DisplayName("Get Details - failed financial health check planned maintenance")
+//    void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
+//
+//        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+//
+//        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+//                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(SERVICE_UNAVAILABLE_VIEW_NAME));
+//    }
+//
+//    @Test
+//    @DisplayName("Get Details - failed financial health check return unschedule service down")
+//    void getRequestLateFilingPenaltyOtherView() throws Exception {
+//
+//        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+//
+//        this.mockMvc.perform(get(ENTER_DETAILS_PATH)
+//                        .queryParam("ref-starts-with", LATE_FILING.getStartsWith()))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - Blank company number, correct penalty ref")
+//    void postRequestCompanyNumberBlank() throws Exception {
+//
+//        configureStartPathProperty();
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
+//                .andExpect(model().attributeExists(TEMPLATE_NAME_MODEL_ATTR))
+//                .andExpect(model().attributeHasFieldErrors(ENTER_DETAILS_MODEL_ATTR, COMPANY_NUMBER_ATTRIBUTE))
+//                .andExpect(model().attributeErrorCount(ENTER_DETAILS_MODEL_ATTR, 1));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details success path - lower case LLP, correct penalty ref")
+//    void postRequestCompanyNumberLowerCase() throws Exception {
+//        configureNextController();
+//        configureAppendCompanyNumber(UPPER_CASE_LLP);
+//        configureValidPenalty(UPPER_CASE_LLP, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, LOWER_CASE_LLP))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(UPPER_CASE_LLP);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details success path - upper case LLP, correct penalty ref")
+//    void postRequestCompanyNumberUpperCase() throws Exception {
+//        configureNextController();
+//        configureAppendCompanyNumber(UPPER_CASE_LLP);
+//        configureValidPenalty(UPPER_CASE_LLP, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, UPPER_CASE_LLP))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(UPPER_CASE_LLP);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - no payable late filing penalties found")
+//    void postRequestNoPayableFinancialPenaltyFound() throws Exception {
+//
+//        configureStartPathProperty();
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - no payable sanction penalties found")
+//    void postRequestNoPayableSanctionPenaltyFound() throws Exception {
+//
+//        configureStartPathProperty();
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_SANCTIONS)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS", null, UK);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - no payable roe penalties found")
+//    void postRequestNoPayableRoePenaltyFound() throws Exception {
+//
+//        configureStartPathProperty();
+//        configureValidAppendCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, SANCTIONS_ROE.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF_ROE)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_OVERSEAS_ENTITY_ID))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_OVERSEAS_ENTITY_ID);
+//        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.SANCTIONS_ROE", null, UK);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - multiple payable penalties with penalty ref not found")
+//    void postRequestMultiplePayablePenaltiesWithPenaltyRefNotFound() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        String penaltyRef = "P1234567";
+//        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, penaltyRef))
+//                .thenReturn(Collections.emptyList());
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, penaltyRef)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details success path - multiple payable penalties with one penalty ref match")
+//    void postRequestMultiplePayablePenaltiesWithOnePenaltyRefMatch() throws Exception {
+//
+//        configureNextController();
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, VALID_PENALTY_REF))
+//                .thenReturn(List.of(PPSTestUtility.validFinancialPenalty(VALID_PENALTY_REF, now().minusMonths(2).toString())));
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - multiple payable penalties with multiple penalty ref match")
+//    void postRequestMultiplePayablePenaltiesWithMultiplePenaltyRefMatch() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        String penaltyRef = "P0000603";
+//        LocalDate madeUpDate = now();
+//        List<FinancialPenalty> financialPenalties = new ArrayList<>();
+//        financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000600", madeUpDate.minusYears(4).toString()));
+//        financialPenalties.add(PPSTestUtility.validFinancialPenalty("P0000601", madeUpDate.minusYears(3).toString()));
+//        financialPenalties.add(PPSTestUtility.paidFinancialPenalty("P0000602", madeUpDate.minusYears(2).toString()));
+//        financialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, madeUpDate.minusYears(1).toString()));
+//        financialPenalties.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(penaltyRef, madeUpDate.minusMonths(6).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, penaltyRef))
+//                .thenReturn(financialPenalties);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, penaltyRef)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name("redirect:/pay-penalty/company/00987654/penalty/P0000603/online-payment-unavailable"));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - payable penalty does not match provided penalty ref")
+//    void postRequestPenaltyRefsDoNotMatch() throws Exception {
+//
+//        configureStartPathProperty();
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyWrongID(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty has legal fees (DCA)")
+//    void postRequestPenaltyWithDCAPayments() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyDCA(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(PENALTY_IN_DCA_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty has payment pending")
+//    void postRequestPenaltyWithPendingPayment() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyPaymentPending(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(PENALTY_PAYMENT_IN_PROGRESS_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty is already paid")
+//    void postRequestPenaltyHasAlreadyBeenPaid() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyAlreadyPaid(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(ALREADY_PAID_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty has negative outstanding amount")
+//    void postRequestPenaltyHasNegativeOutstandingAmount() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyNegativeOutstanding(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty has been partially paid")
+//    void postRequestPenaltyIsPartiallyPaid() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configurePenaltyPartiallyPaid(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(ONLINE_PAYMENT_UNAVAILABLE_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - penalty is not of type 'penalty'")
+//    void postRequestPenaltyIsNotPenaltyType() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        when(mockPenaltyPaymentService.getFinancialPenalties(VALID_COMPANY_NUMBER, VALID_PENALTY_REF))
+//                .thenReturn(Collections.emptyList());
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is2xxSuccessful())
+//                .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//        verify(mockMessageSource).getMessage("details.penalty-details-not-found-error.LATE_FILING", null, UK);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details failure path - error retrieving Late Filing Penalty")
+//    void postRequestErrorRetrievingPenalty() throws Exception {
+//
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configureErrorRetrievingPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    @Test
+//    @DisplayName("Post Details success path")
+//    void postRequestPenaltySuccess() throws Exception {
+//        configureNextController();
+//        configureValidAppendCompanyNumber(VALID_COMPANY_NUMBER);
+//        configureValidPenalty(VALID_COMPANY_NUMBER, VALID_PENALTY_REF);
+//
+//        this.mockMvc.perform(post(ENTER_DETAILS_PATH)
+//                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+//                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF)
+//                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(view().name(MOCK_CONTROLLER_PATH));
+//
+//        verify(mockEnterDetailsValidator).isValid(any(EnterDetails.class), any(BindingResult.class));
+//        verify(mockCompanyService).appendToCompanyNumber(VALID_COMPANY_NUMBER);
+//    }
+//
+//    private void configureNextController() {
+//        when(mockNavigatorService.getNextControllerRedirect(any(), any(), any()))
+//                .thenReturn(MOCK_CONTROLLER_PATH);
+//    }
+//
+//    private void configureValidAppendCompanyNumber(String companyNumber) {
+//        when(mockCompanyService.appendToCompanyNumber(companyNumber))
+//                .thenReturn(VALID_COMPANY_NUMBER);
+//    }
+//
+//    private void configureAppendCompanyNumber(String companyNumber) {
+//        when(mockCompanyService.appendToCompanyNumber(companyNumber))
+//                .thenReturn(companyNumber);
+//    }
+//
+//    private void configureValidPenalty(String companyNumber, String penaltyRef) throws ServiceException {
+//        List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
+//        validFinancialPenalties.add(PPSTestUtility.validFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(validFinancialPenalties);
+//    }
+//
+//    private void configurePenaltyWrongID(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> wrongId = new ArrayList<>();
+//        wrongId.add(PPSTestUtility.validFinancialPenalty(companyNumber, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(wrongId);
+//    }
+//
+//    private void configurePenaltyDCA(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> dcaFinancialPenalty = new ArrayList<>();
+//        dcaFinancialPenalty.add(PPSTestUtility.dcaFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(dcaFinancialPenalty);
+//    }
+//
+//    private void configurePenaltyPaymentPending(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> paymentPendingFinancialPenalty = new ArrayList<>();
+//        paymentPendingFinancialPenalty.add(PPSTestUtility.paymentPendingFinancialPenalty(penaltyRef));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(paymentPendingFinancialPenalty);
+//    }
+//
+//    private void configurePenaltyAlreadyPaid(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> paidFinancialPenalty = new ArrayList<>();
+//        paidFinancialPenalty.add(PPSTestUtility.paidFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(paidFinancialPenalty);
+//    }
+//
+//    private void configurePenaltyNegativeOutstanding(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> negativeOustandingFinancialPenalty = new ArrayList<>();
+//        negativeOustandingFinancialPenalty.add(PPSTestUtility.negativeOustandingFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(negativeOustandingFinancialPenalty);
+//    }
+//
+//    private void configurePenaltyPartiallyPaid(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//        List<FinancialPenalty> partialPaidFinancialPenalty = new ArrayList<>();
+//        partialPaidFinancialPenalty.add(PPSTestUtility.partialPaidFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
+//
+//        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+//                .thenReturn(partialPaidFinancialPenalty);
+//    }
+//
+//    private void configureErrorRetrievingPenalty(String companyNumber, String penaltyRef)
+//            throws ServiceException {
+//
+//        doThrow(ServiceException.class)
+//                .when(mockPenaltyPaymentService).getFinancialPenalties(companyNumber, penaltyRef);
+//    }
+//
+//    private void configureStartPathProperty() {
+//        when(mockPenaltyConfigurationProperties.getStartPath())
+//                .thenReturn(START_PATH);
+//    }
 
 }

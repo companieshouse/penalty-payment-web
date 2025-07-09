@@ -9,6 +9,7 @@ public class PPSServiceResponse {
 
     private String url;
     private String errorRequestMsg;
+    private String companyNumber;
     private Map<String, String> baseModelAttributes;
     private Map<String, Object> modelAttributes;
 
@@ -37,6 +38,14 @@ public class PPSServiceResponse {
 
     public void setErrorRequestMsg(String errorRequestMsg) {
         this.errorRequestMsg = errorRequestMsg;
+    }
+
+    public Optional<String> getCompanyNumber() {
+        return StringUtils.isNotEmpty(companyNumber) ? Optional.of(companyNumber) : Optional.empty();
+    }
+
+    public void setCompanyNumber(String companyNumber) {
+        this.companyNumber = companyNumber;
     }
 
     public Optional<Map<String, String>> getBaseModelAttributes() {
