@@ -23,11 +23,6 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 public class ViewPenaltiesController extends BaseController {
 
     static final String VIEW_PENALTIES_TEMPLATE_NAME = "pps/viewPenalties";
-    static final String COMPANY_NAME_ATTR = "companyName";
-    static final String PENALTY_REF_ATTR = "penaltyRef";
-    static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
-    static final String REASON_ATTR = "reasonForPenalty";
-    static final String AMOUNT_ATTR = "outstanding";
 
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final ViewPenaltiesService viewPenaltiesService;
@@ -66,7 +61,7 @@ public class ViewPenaltiesController extends BaseController {
         }
 
         try {
-            serviceResponse = viewPenaltiesService.viewPenalties(companyNumber,penaltyRef);
+            serviceResponse = viewPenaltiesService.viewPenalties(companyNumber, penaltyRef);
         } catch (IllegalArgumentException | ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
@@ -79,7 +74,7 @@ public class ViewPenaltiesController extends BaseController {
 
         serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-        return  serviceResponse.getUrl().orElse(getTemplateName());
+        return serviceResponse.getUrl().orElse(getTemplateName());
     }
 
     @PostMapping
