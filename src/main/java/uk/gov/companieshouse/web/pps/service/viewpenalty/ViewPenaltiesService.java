@@ -7,5 +7,5 @@ public interface ViewPenaltiesService {
 
     PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef) throws IllegalArgumentException, ServiceException;
 
-    String postViewPenalties(String companyNumber, String penaltyRef) throws ServiceException;
+    String postPenalties(String companyNumber, String penaltyRef) throws ServiceException;
 }

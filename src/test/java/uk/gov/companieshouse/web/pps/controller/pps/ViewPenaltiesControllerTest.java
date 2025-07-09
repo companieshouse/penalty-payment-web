@@ -271,14 +271,14 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 
-        when(mockViewPenaltiesService.postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
+        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
                 .thenReturn(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER);
 
         this.mockMvc.perform(post(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER));
 
-        verify(mockViewPenaltiesService).postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
 
     }
 
@@ -286,14 +286,14 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View Penalties - error returning Late Filing Penalty")
     void postRequestErrorRetrievingPenalty() throws Exception {
 
-        when(mockViewPenaltiesService.postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
+        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
                 .thenReturn(REDIRECT_PATH + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
 
     }
 
@@ -302,7 +302,7 @@ class ViewPenaltiesControllerTest {
     void postRequestExceptionRetrievingPenalty() throws Exception {
 
         doThrow(ServiceException.class).
-                when(mockViewPenaltiesService).postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+                when(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -310,7 +310,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).postViewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
 
     }
 

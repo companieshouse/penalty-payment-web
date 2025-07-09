@@ -105,7 +105,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
     }
 
     @Override
-    public String postViewPenalties(
+    public String postPenalties(
             String companyNumber,
             String penaltyRef) throws ServiceException {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +

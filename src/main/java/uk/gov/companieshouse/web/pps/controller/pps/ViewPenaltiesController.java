@@ -78,12 +78,12 @@ public class ViewPenaltiesController extends BaseController {
     }
 
     @PostMapping
-    public String postViewPenalties(@PathVariable String companyNumber,
+    public String postPenalties(@PathVariable String companyNumber,
             @PathVariable String penaltyRef,
             HttpServletRequest request) {
 
         try {
-            return viewPenaltiesService.postViewPenalties(companyNumber, penaltyRef);
+            return viewPenaltiesService.postPenalties(companyNumber, penaltyRef);
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
