@@ -69,12 +69,12 @@ class ViewPenaltiesControllerTest {
 
     private static final String COMPANY_NUMBER = "12345678";
     private static final String OVERSEAS_ENTITY_ID = "OE123456";
-    private static final String LFP_PENALTY_NUMBER = "A4444444";
+    private static final String LFP_PENALTY_REF = "A4444444";
     private static final String SANCTIONS_CS_PENALTY_REF = "P1234567";
     private static final String SANCTIONS_ROE_PENALTY_REF = "U1234567";
 
     private static final String VIEW_PENALTIES_PATH = "/pay-penalty/company/%s/penalty/%s/view-penalties";
-    private static final String LFP_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+    private static final String LFP_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, LFP_PENALTY_REF);
     private static final String SANCTIONS_CS_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
     private static final String SANCTIONS_ROE_VIEW_PENALTIES_PATH = String.format(VIEW_PENALTIES_PATH, OVERSEAS_ENTITY_ID, SANCTIONS_ROE_PENALTY_REF);
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
@@ -103,15 +103,15 @@ class ViewPenaltiesControllerTest {
         baseModelAttributes.put(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH);
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NUMBER);
-        modelAttributes.put(PENALTY_REF_ATTR, LFP_PENALTY_NUMBER);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(LFP_PENALTY_NUMBER).name());
+        modelAttributes.put(PENALTY_REF_ATTR, LFP_PENALTY_REF);
+        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(LFP_PENALTY_REF).name());
         modelAttributes.put(REASON_ATTR, VALID_LATE_FILING_REASON);
         modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         serviceResponse.setBaseModelAttributes(baseModelAttributes);
         serviceResponse.setModelAttributes(modelAttributes);
 
-        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER)).thenReturn(serviceResponse);
+        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().isOk())
@@ -123,7 +123,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
                 .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, LATE_FILING.name()));
 
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
         verify(mockPenaltyConfigurationProperties).getSignOutPath();
         verify(mockPenaltyConfigurationProperties).getSurveyLink();
     }
@@ -201,13 +201,13 @@ class ViewPenaltiesControllerTest {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         serviceResponse.setUrl(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
-        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER)).thenReturn(serviceResponse);
+        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
@@ -216,7 +216,7 @@ class ViewPenaltiesControllerTest {
     void getRequestLateFilingPenaltyIllegalArgumentException() throws Exception {
 
         doThrow(IllegalArgumentException.class).
-                when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+                when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -224,7 +224,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
@@ -233,7 +233,7 @@ class ViewPenaltiesControllerTest {
     void getRequestLateFilingPenaltyServiceException() throws Exception {
 
         doThrow(ServiceException.class).
-                when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+                when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -241,7 +241,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
@@ -271,14 +271,14 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View Penalties - success path")
     void postRequestSuccess() throws Exception {
 
-        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
+        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF))
                 .thenReturn(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER);
 
         this.mockMvc.perform(post(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_PATH + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER));
 
-        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
@@ -286,14 +286,14 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Post View Penalties - error returning Late Filing Penalty")
     void postRequestErrorRetrievingPenalty() throws Exception {
 
-        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER))
+        when(mockViewPenaltiesService.postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF))
                 .thenReturn(REDIRECT_PATH + UNSCHEDULED_SERVICE_DOWN_PATH);
 
         this.mockMvc.perform(post(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
@@ -302,7 +302,7 @@ class ViewPenaltiesControllerTest {
     void postRequestExceptionRetrievingPenalty() throws Exception {
 
         doThrow(ServiceException.class).
-                when(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+                when(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -310,7 +310,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
 
-        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_NUMBER);
+        verify(mockViewPenaltiesService).postPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
     }
 
