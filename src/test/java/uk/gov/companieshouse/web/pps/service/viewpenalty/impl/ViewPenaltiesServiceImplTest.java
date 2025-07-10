@@ -158,6 +158,11 @@ class ViewPenaltiesServiceImplTest {
     void viewPenaltiesCompanyProfileException() throws Exception {
 
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
+        List<FinancialPenalty> mockPenalties = new ArrayList<>();
+        mockPenalties.add(
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+
         doThrow(ServiceException.class).when(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
 
         assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
@@ -180,7 +185,6 @@ class ViewPenaltiesServiceImplTest {
     @DisplayName("View Penalty - not a single payable penalty")
     void viewPenaltiesNotSinglePayablePenalty() throws Exception {
 
-        CompanyProfileApi mockCompanyProfileApi = validCompanyProfile(COMPANY_NUMBER);
         List<FinancialPenalty> mockMultiplePenalties = new ArrayList<>();
         mockMultiplePenalties.add(
                 PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
@@ -189,7 +193,6 @@ class ViewPenaltiesServiceImplTest {
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER)).thenReturn(mockCompanyProfileApi);
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockMultiplePenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
@@ -202,14 +205,12 @@ class ViewPenaltiesServiceImplTest {
     @DisplayName("View Penalty - no open penalty")
     void viewPenaltiesNoOpenPenalty() throws Exception {
 
-        CompanyProfileApi mockCompanyProfileApi = validCompanyProfile(COMPANY_NUMBER);
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
                 PPSTestUtility.dcaFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER)).thenReturn(mockCompanyProfileApi);
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
@@ -222,14 +223,12 @@ class ViewPenaltiesServiceImplTest {
     @DisplayName("View Penalty - partial payment of penalty")
     void viewPenaltiesPartialPenalty() throws Exception {
 
-        CompanyProfileApi mockCompanyProfileApi = validCompanyProfile(COMPANY_NUMBER);
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
                 PPSTestUtility.partialPaidFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockCompanyService.getCompanyProfile(COMPANY_NUMBER)).thenReturn(mockCompanyProfileApi);
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
