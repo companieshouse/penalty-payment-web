@@ -25,11 +25,13 @@ public class PPSTestUtility {
     public static final Integer VALID_AMOUNT = 750;
     public static final Integer PARTIAL_PAID_AMOUNT = 300;
     public static final Integer ZERO_AMOUNT = 0;
+    public static final String COMPANY_NAME = "Brewery";
     public static final String PENALTY_TYPE = "penalty";
     public static final String OTHER_TYPE = "other";
     public static final String DATE = "2018-12-12";
-    public static final String PAYABLE_REF = "DD72961607";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
+    public static final String PAYABLE_REF = "DD72961607";
+    public static final String SIGN_OUT_PATH = "/sign-out";
     public static final String VALID_PENALTY_REF = "A0000007";
     public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
     public static final String VALID_CS_REASON = "Failure to file a confirmation statement";

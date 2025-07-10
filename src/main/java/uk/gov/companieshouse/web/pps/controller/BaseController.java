@@ -91,4 +91,10 @@ public abstract class BaseController {
         model.addAttribute(PHASE_BANNER_ATTR, "Beta");
         model.addAttribute(PHASE_BANNER_LINK_ATTR, surveyLink);
     }
+
+    protected static void addAttributesToModel(Model model, Map<String, Object> attributes) {
+        for (Map.Entry<String, Object> itr : attributes.entrySet()) {
+            model.addAttribute(itr.getKey(), itr.getValue());
+        }
+    }
 }

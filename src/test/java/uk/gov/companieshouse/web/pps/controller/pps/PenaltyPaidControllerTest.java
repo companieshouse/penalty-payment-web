@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyPaidController.PENALTY_PAID_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,7 +54,6 @@ class PenaltyPaidControllerTest {
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final String BACK_LINK_MODEL_ATTR = "backLink";
-    private static final String COMPANY_NAME_ATTR = "companyName";
     private static final String PENALTY_REF_ATTR = "penaltyRef";
 
     @BeforeEach

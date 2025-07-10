@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
+
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
@@ -37,8 +39,6 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String JOURNEY_LINK = "journey";
 
     private static final String PAYMENT_URL = "/payments";
-
-    private static final String PAYMENT_STATE = "payment_state";
 
     private static final String PENALTY_PAYMENT_REFERENCE_PREFIX = "financial_penalty_";
 
