@@ -89,7 +89,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
             return setServiceDownUrl(ppsServiceResponse);
         }
 
-        FinancialPenalty payablePenalty = payablePenaltyOptional.get();
+        FinancialPenalty payablePenalty = payablePenaltyOptional.orElseThrow();
         if (!isOutstandingAmountMatch(payablePenalty)) {
           return setServiceDownUrl(ppsServiceResponse);
         }
@@ -127,7 +127,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         PayableFinancialPenaltySession payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                 companyNumber,
                 penaltyRef,
-                payablePenaltyOptional.get().getOutstanding());
+                payablePenaltyOptional.orElseThrow().getOutstanding());
 
         return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
                 payableFinancialPenaltySession, companyNumber, penaltyRef) + "?summary=false";
