@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.ServiceConstants;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
@@ -69,7 +70,7 @@ public class ViewPenaltiesController extends BaseController {
 
         serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
                 addBaseAttributesToModel(model,
-                        serviceResponse.getBaseModelAttributes().get().get(BACK_LINK_URL_ATTR),
+                        serviceResponse.getBaseModelAttributes().get().get(ServiceConstants.BACK_LINK_URL_ATTR),
                         penaltyConfigurationProperties.getSignOutPath()));
 
         serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
