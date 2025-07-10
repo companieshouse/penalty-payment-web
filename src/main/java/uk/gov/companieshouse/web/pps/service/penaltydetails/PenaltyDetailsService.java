@@ -9,7 +9,7 @@ public interface PenaltyDetailsService {
     String NEXT_CONTROLLER = "next_controller";
 
     PPSServiceResponse getEnterDetails(
-            String penaltyReferenceStartsWith, String healthCheckView, String unscheduledServiceDownPath) throws ServiceException;
+            String penaltyReferenceStartsWith, String healthCheckRedirect, String unscheduledServiceDownPath) throws ServiceException;
 
     PPSServiceResponse postEnterDetails(
             EnterDetails enterDetails, BindingResult bindingResult) throws ServiceException;
