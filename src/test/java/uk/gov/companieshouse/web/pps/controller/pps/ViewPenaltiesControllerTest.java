@@ -3,11 +3,14 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +23,7 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.viewpenalty.ViewPenaltiesService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
+import uk.gov.companieshouse.web.pps.util.PenaltyTestData;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +46,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_ROE_REASON;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
@@ -95,25 +100,26 @@ class ViewPenaltiesControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    @Test
-    @DisplayName("Get View Penalties - success path LFP")
-    void getRequestSuccess() throws Exception {
+    @ParameterizedTest
+    @MethodSource("penaltyTestDataProvider")
+    @DisplayName("Get View Penalties - success path")
+    void getRequestSuccess(PenaltyTestData penaltyTestData) throws Exception {
 
         Map<String, String> baseModelAttributes = new HashMap<>();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH);
         Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NUMBER);
-        modelAttributes.put(PENALTY_REF_ATTR, LFP_PENALTY_REF);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(LFP_PENALTY_REF).name());
-        modelAttributes.put(REASON_ATTR, VALID_LATE_FILING_REASON);
+        modelAttributes.put(COMPANY_NAME_ATTR, penaltyTestData.customerCode());
+        modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
+        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyTestData.penaltyRef()).name());
+        modelAttributes.put(REASON_ATTR, penaltyTestData.reasonForPenalty());
         modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         serviceResponse.setBaseModelAttributes(baseModelAttributes);
         serviceResponse.setModelAttributes(modelAttributes);
 
-        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(serviceResponse);
+        when(mockViewPenaltiesService.viewPenalties(penaltyTestData.customerCode(), penaltyTestData.penaltyRef())).thenReturn(serviceResponse);
 
-        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
+        this.mockMvc.perform(get(penaltyTestData.path()))
                 .andExpect(status().isOk())
                 .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
@@ -121,75 +127,9 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
                 .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
-                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, LATE_FILING.name()));
+                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, penaltyTestData.name()));
 
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
-        verify(mockPenaltyConfigurationProperties).getSignOutPath();
-        verify(mockPenaltyConfigurationProperties).getSurveyLink();
-    }
-
-    @Test
-    @DisplayName("Get View Penalties - success path Sanctions")
-    void getRequestSuccessSanctions() throws Exception {
-
-        Map<String, String> baseModelAttributes = new HashMap<>();
-        baseModelAttributes.put(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH);
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NUMBER);
-        modelAttributes.put(PENALTY_REF_ATTR, SANCTIONS_CS_PENALTY_REF);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(SANCTIONS_CS_PENALTY_REF).name());
-        modelAttributes.put(REASON_ATTR, VALID_CS_REASON);
-        modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        serviceResponse.setBaseModelAttributes(baseModelAttributes);
-        serviceResponse.setModelAttributes(modelAttributes);
-
-        when(mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF)).thenReturn(serviceResponse);
-
-        this.mockMvc.perform(get(SANCTIONS_CS_VIEW_PENALTIES_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
-                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
-                .andExpect(model().attributeExists(PENALTY_REF_ATTR))
-                .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR))
-                .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
-                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS.name()));
-
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
-        verify(mockPenaltyConfigurationProperties).getSignOutPath();
-        verify(mockPenaltyConfigurationProperties).getSurveyLink();
-    }
-
-    @Test
-    @DisplayName("Get View Penalties - success path Sanctions Roe")
-    void getRequestSuccessSanctionsRoe() throws Exception {
-
-        Map<String, String> baseModelAttributes = new HashMap<>();
-        baseModelAttributes.put(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH);
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NUMBER);
-        modelAttributes.put(PENALTY_REF_ATTR, SANCTIONS_ROE_PENALTY_REF);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(SANCTIONS_ROE_PENALTY_REF).name());
-        modelAttributes.put(REASON_ATTR, VALID_CS_REASON);
-        modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        serviceResponse.setBaseModelAttributes(baseModelAttributes);
-        serviceResponse.setModelAttributes(modelAttributes);
-
-        when(mockViewPenaltiesService.viewPenalties(OVERSEAS_ENTITY_ID, SANCTIONS_ROE_PENALTY_REF)).thenReturn(serviceResponse);
-
-        this.mockMvc.perform(get(SANCTIONS_ROE_VIEW_PENALTIES_PATH))
-                .andExpect(status().isOk())
-                .andExpect(view().name(VIEW_PENALTIES_TEMPLATE_NAME))
-                .andExpect(model().attributeExists(COMPANY_NAME_ATTR))
-                .andExpect(model().attributeExists(PENALTY_REF_ATTR))
-                .andExpect(model().attributeExists(REASON_ATTR))
-                .andExpect(model().attributeExists(AMOUNT_ATTR))
-                .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
-                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, SANCTIONS_ROE.name()));
-
-        verify(mockViewPenaltiesService).viewPenalties(OVERSEAS_ENTITY_ID, SANCTIONS_ROE_PENALTY_REF);
+        verify(mockViewPenaltiesService).viewPenalties(penaltyTestData.customerCode(), penaltyTestData.penaltyRef());
         verify(mockPenaltyConfigurationProperties).getSignOutPath();
         verify(mockPenaltyConfigurationProperties).getSurveyLink();
     }
@@ -314,4 +254,25 @@ class ViewPenaltiesControllerTest {
 
     }
 
+    static Stream<PenaltyTestData> penaltyTestDataProvider() {
+        PenaltyTestData lfp = new PenaltyTestData(
+                COMPANY_NUMBER,
+                LFP_VIEW_PENALTIES_PATH,
+                LFP_PENALTY_REF,
+                VALID_LATE_FILING_REASON,
+                LATE_FILING.name());
+        PenaltyTestData cs = new PenaltyTestData(
+                COMPANY_NUMBER,
+                SANCTIONS_CS_VIEW_PENALTIES_PATH,
+                SANCTIONS_CS_PENALTY_REF,
+                VALID_CS_REASON,
+                SANCTIONS.name());
+        PenaltyTestData roe = new PenaltyTestData(
+                OVERSEAS_ENTITY_ID,
+                SANCTIONS_ROE_VIEW_PENALTIES_PATH,
+                SANCTIONS_ROE_PENALTY_REF,
+                VALID_ROE_REASON,
+                SANCTIONS_ROE.name());
+        return Stream.of(lfp, cs, roe);
+    }
 }
