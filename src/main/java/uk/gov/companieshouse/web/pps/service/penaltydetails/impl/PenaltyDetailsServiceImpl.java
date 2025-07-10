@@ -66,14 +66,14 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
     @Override
     public PPSServiceResponse getEnterDetails(
-            String penaltyReferenceStartsWith, String healthCheckView, String unscheduledServiceDownPath) throws ServiceException {
+            String penaltyReferenceStartsWith, String healthCheckRedirect, String unscheduledServiceDownPath) throws ServiceException {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        if (StringUtils.isNotBlank(healthCheckView)) {
-            if (healthCheckView.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+        if (StringUtils.isNotBlank(healthCheckRedirect)) {
+            if (healthCheckRedirect.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
                 serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_LINK, ""));
             }
-            serviceResponse.setUrl(healthCheckView);
+            serviceResponse.setUrl(healthCheckRedirect);
         } else {
             try {
                 PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
@@ -113,12 +113,12 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
             serviceResponse.setCompanyNumber(companyNumber);
             List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
             String url = getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef);
+            serviceResponse.setUrl(url);
             if (url == null) { // redirect url is null if no penalty is found for the company number and penalty ref pair
                 String code = "details.penalty-details-not-found-error." + enterDetails.getPenaltyReferenceName();
                 bindingResult.reject("globalError", messageSource.getMessage(code, null, UK));
                 serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
             }
-            serviceResponse.setUrl(getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef));
         }
 
         return serviceResponse;
