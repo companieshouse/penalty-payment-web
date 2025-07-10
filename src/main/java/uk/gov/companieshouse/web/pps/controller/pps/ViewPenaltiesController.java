@@ -28,7 +28,8 @@ public class ViewPenaltiesController extends BaseController {
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final ViewPenaltiesService viewPenaltiesService;
 
-    @SuppressWarnings("java:S107") // BaseController needs NavigatorService / SessionService for constructor injection
+    @SuppressWarnings("java:S107")
+    // BaseController needs NavigatorService / SessionService for constructor injection
     public ViewPenaltiesController(
             NavigatorService navigatorService,
             SessionService sessionService,
@@ -56,7 +57,8 @@ public class ViewPenaltiesController extends BaseController {
         if (healthCheck.isPresent()) {
             String viewName = healthCheck.get();
             if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+                addBaseAttributesWithoutBackUrlToModel(model,
+                        penaltyConfigurationProperties.getSignedOutUrl());
             }
             return viewName;
         }
@@ -65,15 +67,18 @@ public class ViewPenaltiesController extends BaseController {
             serviceResponse = viewPenaltiesService.viewPenalties(companyNumber, penaltyRef);
         } catch (IllegalArgumentException | ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
                 addBaseAttributesToModel(model,
-                        serviceResponse.getBaseModelAttributes().get().get(ServiceConstants.BACK_LINK_URL_ATTR),
+                        serviceResponse.getBaseModelAttributes().get()
+                                .get(ServiceConstants.BACK_LINK_URL_ATTR),
                         penaltyConfigurationProperties.getSignOutPath()));
 
-        serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
+        serviceResponse.getModelAttributes()
+                .ifPresent(attributes -> addAttributesToModel(model, attributes));
 
         return serviceResponse.getUrl().orElse(getTemplateName());
     }
@@ -87,7 +92,8 @@ public class ViewPenaltiesController extends BaseController {
             return viewPenaltiesService.postPenalties(companyNumber, penaltyRef);
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

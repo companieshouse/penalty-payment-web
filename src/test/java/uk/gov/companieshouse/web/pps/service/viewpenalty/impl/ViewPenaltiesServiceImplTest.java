@@ -109,27 +109,38 @@ class ViewPenaltiesServiceImplTest {
     @DisplayName("View Penalty - successful case")
     void viewPenaltiesSuccessful(PenaltyTestData penaltyTestData) throws Exception {
 
-        CompanyProfileApi mockCompanyProfileApi = validCompanyProfile(penaltyTestData.customerCode());
+        CompanyProfileApi mockCompanyProfileApi = validCompanyProfile(
+                penaltyTestData.customerCode());
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.validFinancialPenalty(penaltyTestData.penaltyRef(), now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(penaltyTestData.penaltyRef(),
+                        now().minusYears(1).toString()));
 
         configureFeatureFlag(penaltyTestData.penaltyRef(), TRUE);
-        when(mockCompanyService.getCompanyProfile(penaltyTestData.customerCode())).thenReturn(mockCompanyProfileApi);
-        when(mockPenaltyPaymentService.getFinancialPenalties(penaltyTestData.customerCode(), penaltyTestData.penaltyRef())).thenReturn(mockPenalties);
+        when(mockCompanyService.getCompanyProfile(penaltyTestData.customerCode())).thenReturn(
+                mockCompanyProfileApi);
+        when(mockPenaltyPaymentService.getFinancialPenalties(penaltyTestData.customerCode(),
+                penaltyTestData.penaltyRef())).thenReturn(mockPenalties);
 
-        PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(penaltyTestData.customerCode(),
+        PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(
+                penaltyTestData.customerCode(),
                 penaltyTestData.penaltyRef());
 
         assertFalse(serviceResponse.getUrl().isPresent());
         assertTrue(serviceResponse.getModelAttributes().isPresent());
-        assertThat(serviceResponse.getModelAttributes().get().toString(), containsString(COMPANY_NAME_ATTR));
-        assertThat(serviceResponse.getModelAttributes().get().toString(), containsString(PENALTY_REF_ATTR));
-        assertThat(serviceResponse.getModelAttributes().get().toString(), containsString(PENALTY_REF_NAME_ATTR));
-        assertThat(serviceResponse.getModelAttributes().get().toString(), containsString(REASON_ATTR));
-        assertThat(serviceResponse.getModelAttributes().get().toString(), containsString(AMOUNT_ATTR));
+        assertThat(serviceResponse.getModelAttributes().get().toString(),
+                containsString(COMPANY_NAME_ATTR));
+        assertThat(serviceResponse.getModelAttributes().get().toString(),
+                containsString(PENALTY_REF_ATTR));
+        assertThat(serviceResponse.getModelAttributes().get().toString(),
+                containsString(PENALTY_REF_NAME_ATTR));
+        assertThat(serviceResponse.getModelAttributes().get().toString(),
+                containsString(REASON_ATTR));
+        assertThat(serviceResponse.getModelAttributes().get().toString(),
+                containsString(AMOUNT_ATTR));
         assertTrue(serviceResponse.getBaseModelAttributes().isPresent());
-        assertThat(serviceResponse.getBaseModelAttributes().get().toString(), containsString(BACK_LINK_URL_ATTR));
+        assertThat(serviceResponse.getBaseModelAttributes().get().toString(),
+                containsString(BACK_LINK_URL_ATTR));
     }
 
     @Test
@@ -137,8 +148,10 @@ class ViewPenaltiesServiceImplTest {
     void viewPenaltiesPenaltyRefException() {
 
         IllegalArgumentException expectedException = assertThrowsExactly(
-                IllegalArgumentException.class, () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, INVALID_PENALTY_REF));
-        assertEquals("Penalty Reference Starts With 'F' is invalid", expectedException.getMessage());
+                IllegalArgumentException.class,
+                () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, INVALID_PENALTY_REF));
+        assertEquals("Penalty Reference Starts With 'F' is invalid",
+                expectedException.getMessage());
     }
 
     @Test
@@ -148,7 +161,8 @@ class ViewPenaltiesServiceImplTest {
         configureFeatureFlag(SANCTIONS_CS_PENALTY_REF, FALSE);
         configureUnscheduleError();
 
-        PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER, SANCTIONS_CS_PENALTY_REF);
+        PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                SANCTIONS_CS_PENALTY_REF);
 
         assertEquals(setMockUnscheduleErrorServiceResponse().getUrl(), serviceResponse.getUrl());
     }
@@ -160,13 +174,16 @@ class ViewPenaltiesServiceImplTest {
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         doThrow(ServiceException.class).when(mockCompanyService).getCompanyProfile(COMPANY_NUMBER);
 
-        assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF));
+        assertThrowsExactly(ServiceException.class,
+                () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF));
     }
 
     @Test
@@ -174,11 +191,13 @@ class ViewPenaltiesServiceImplTest {
     void viewPenaltiesFinancialPenaltiesException() throws Exception {
 
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        doThrow(ServiceException.class).when(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF);
+        doThrow(ServiceException.class).when(mockPenaltyPaymentService)
+                .getFinancialPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF);
 
-        assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF));
+        assertThrowsExactly(ServiceException.class,
+                () -> mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF));
     }
 
     @Test
@@ -187,13 +206,16 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockMultiplePenalties = new ArrayList<>();
         mockMultiplePenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
         mockMultiplePenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockMultiplePenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockMultiplePenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
                 LFP_PENALTY_REF);
@@ -207,11 +229,13 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.dcaFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.dcaFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
                 LFP_PENALTY_REF);
@@ -225,11 +249,13 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.partialPaidFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.partialPaidFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
         configureUnscheduleError();
         configureFeatureFlag(LFP_PENALTY_REF, TRUE);
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         PPSServiceResponse serviceResponse = mockViewPenaltiesService.viewPenalties(COMPANY_NUMBER,
                 LFP_PENALTY_REF);
@@ -244,29 +270,38 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.validFinancialPenalty(penaltyTestData.penaltyRef(), now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(penaltyTestData.penaltyRef(),
+                        now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(penaltyTestData.customerCode(), penaltyTestData.penaltyRef())).thenReturn(mockPenalties);
-        when(mockPayablePenaltyService.createPayableFinancialPenaltySession(penaltyTestData.customerCode(),
-                penaltyTestData.penaltyRef(), VALID_AMOUNT)).thenReturn(payableFinancialPenaltySession);
-        when(mockPaymentService.createPaymentSession(payableFinancialPenaltySession, penaltyTestData.customerCode(),
+        when(mockPenaltyPaymentService.getFinancialPenalties(penaltyTestData.customerCode(),
+                penaltyTestData.penaltyRef())).thenReturn(mockPenalties);
+        when(mockPayablePenaltyService.createPayableFinancialPenaltySession(
+                penaltyTestData.customerCode(),
+                penaltyTestData.penaltyRef(), VALID_AMOUNT)).thenReturn(
+                payableFinancialPenaltySession);
+        when(mockPaymentService.createPaymentSession(payableFinancialPenaltySession,
+                penaltyTestData.customerCode(),
                 penaltyTestData.penaltyRef())).thenReturn(MOCK_PAYMENTS_URL);
 
-        String serviceResponse = mockViewPenaltiesService.postPenalties(penaltyTestData.customerCode(),
+        String serviceResponse = mockViewPenaltiesService.postPenalties(
+                penaltyTestData.customerCode(),
                 penaltyTestData.penaltyRef());
 
-        assertEquals(REDIRECT_URL_PREFIX + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER , serviceResponse);
+        assertEquals(REDIRECT_URL_PREFIX + MOCK_PAYMENTS_URL + SUMMARY_FALSE_PARAMETER,
+                serviceResponse);
     }
 
     @Test
     @DisplayName("Post Penalty - exception when get financial penalties")
     void postPenaltiesFinancialPenaltiesException() throws Exception {
 
-        doThrow(ServiceException.class).when(mockPenaltyPaymentService).getFinancialPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF);
+        doThrow(ServiceException.class).when(mockPenaltyPaymentService)
+                .getFinancialPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF);
 
-        assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF));
+        assertThrowsExactly(ServiceException.class,
+                () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF));
     }
 
     @Test
@@ -275,12 +310,15 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockMultiplePenalties = new ArrayList<>();
         mockMultiplePenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
         mockMultiplePenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
         configureUnscheduleError();
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockMultiplePenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockMultiplePenalties);
 
         String serviceResponse = mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
                 LFP_PENALTY_REF);
@@ -294,10 +332,12 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.dcaFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.dcaFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
         configureUnscheduleError();
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
         String serviceResponse = mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
                 LFP_PENALTY_REF);
@@ -311,15 +351,19 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
 
-        doThrow(ServiceException.class).when(mockPayablePenaltyService).createPayableFinancialPenaltySession(COMPANY_NUMBER,
-                LFP_PENALTY_REF, VALID_AMOUNT);
+        doThrow(ServiceException.class).when(mockPayablePenaltyService)
+                .createPayableFinancialPenaltySession(COMPANY_NUMBER,
+                        LFP_PENALTY_REF, VALID_AMOUNT);
 
-        assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF));
+        assertThrowsExactly(ServiceException.class,
+                () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF));
     }
 
     @Test
@@ -328,28 +372,34 @@ class ViewPenaltiesServiceImplTest {
 
         List<FinancialPenalty> mockPenalties = new ArrayList<>();
         mockPenalties.add(
-                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF, now().minusYears(1).toString()));
+                PPSTestUtility.validFinancialPenalty(LFP_PENALTY_REF,
+                        now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, LFP_PENALTY_REF)).thenReturn(mockPenalties);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                LFP_PENALTY_REF)).thenReturn(mockPenalties);
         when(mockPayablePenaltyService.createPayableFinancialPenaltySession(COMPANY_NUMBER,
                 LFP_PENALTY_REF, VALID_AMOUNT)).thenReturn(payableFinancialPenaltySession);
 
-        doThrow(ServiceException.class).when(mockPaymentService).createPaymentSession(payableFinancialPenaltySession, COMPANY_NUMBER,
-                LFP_PENALTY_REF);
+        doThrow(ServiceException.class).when(mockPaymentService)
+                .createPaymentSession(payableFinancialPenaltySession, COMPANY_NUMBER,
+                        LFP_PENALTY_REF);
 
-        assertThrowsExactly(ServiceException.class, () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
-                LFP_PENALTY_REF));
+        assertThrowsExactly(ServiceException.class,
+                () -> mockViewPenaltiesService.postPenalties(COMPANY_NUMBER,
+                        LFP_PENALTY_REF));
     }
 
     private void configureUnscheduleError() {
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
+                UNSCHEDULED_SERVICE_DOWN_PATH);
     }
 
     private void configureFeatureFlag(String penaltyRef, Boolean flag) {
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(PenaltyUtils.getPenaltyReferenceType(penaltyRef))).thenReturn(flag);
+        when(mockFeatureFlagChecker.isPenaltyRefEnabled(
+                PenaltyUtils.getPenaltyReferenceType(penaltyRef))).thenReturn(flag);
     }
 
-    private PPSServiceResponse setMockUnscheduleErrorServiceResponse(){
+    private PPSServiceResponse setMockUnscheduleErrorServiceResponse() {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
         return mockServiceResponse;

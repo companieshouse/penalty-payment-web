@@ -68,35 +68,43 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
     public PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef)
             throws IllegalArgumentException, ServiceException {
         PPSServiceResponse ppsServiceResponse = new PPSServiceResponse();
-        Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef, companyNumber);
+        Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef,
+                companyNumber);
 
         if (penaltyReference.isEmpty()) {
             return setServiceDownUrl(ppsServiceResponse);
         }
         setBackUrl(ppsServiceResponse, penaltyReference.get());
 
-        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
+                companyNumber, penaltyRef);
 
-        LOGGER.debug(String.format("Checking if online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
+        LOGGER.debug(String.format(
+                "Checking if online payment for penalty %s is available for company number %s",
+                penaltyRef, companyNumber));
 
         // User can only pay for a penalty with no associated legal costs
         if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
             return setServiceDownUrl(ppsServiceResponse);
         }
 
-        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts, penaltyRef);
-        if (isPenaltyRefNoOpenPenalty(payablePenaltyOptional, companyNumber, penaltyRef)) {
+        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts,
+                penaltyRef);
+        if (payablePenaltyOptional.isEmpty()) {
+            loggingPenaltyRefNoOpenPenalty(companyNumber, penaltyRef);
             return setServiceDownUrl(ppsServiceResponse);
         }
 
-        FinancialPenalty payablePenalty = payablePenaltyOptional.orElseThrow();
+        FinancialPenalty payablePenalty = payablePenaltyOptional.get();
         if (!isOutstandingAmountMatch(payablePenalty)) {
-          return setServiceDownUrl(ppsServiceResponse);
+            return setServiceDownUrl(ppsServiceResponse);
         }
 
         setModelForViewPenalties(ppsServiceResponse, companyNumber, penaltyRef, payablePenalty);
 
-        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
+        LOGGER.debug(
+                String.format("Online payment for penalty %s is available for company number %s",
+                        penaltyRef, companyNumber));
 
         return ppsServiceResponse;
     }
@@ -108,32 +116,40 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
-        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
+                companyNumber, penaltyRef);
 
-        LOGGER.debug(String.format("Checking if online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
+        LOGGER.debug(String.format(
+                "Checking if online payment for penalty %s is available for company number %s",
+                penaltyRef, companyNumber));
 
         if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
             return redirectPathUnscheduledServiceDown;
         }
 
-        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts, penaltyRef);
+        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts,
+                penaltyRef);
 
-        if (isPenaltyRefNoOpenPenalty(payablePenaltyOptional, companyNumber, penaltyRef)) {
+        if (payablePenaltyOptional.isEmpty()) {
+            loggingPenaltyRefNoOpenPenalty(companyNumber, penaltyRef);
             return redirectPathUnscheduledServiceDown;
         }
 
-        LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
+        LOGGER.debug(
+                String.format("Online payment for penalty %s is available for company number %s",
+                        penaltyRef, companyNumber));
 
         PayableFinancialPenaltySession payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                 companyNumber,
                 penaltyRef,
-                payablePenaltyOptional.orElseThrow().getOutstanding());
+                payablePenaltyOptional.get().getOutstanding());
 
         return UrlBasedViewResolver.REDIRECT_URL_PREFIX + paymentService.createPaymentSession(
                 payableFinancialPenaltySession, companyNumber, penaltyRef) + "?summary=false";
     }
 
-    private Optional<FinancialPenalty> getOpenPenalty(List<FinancialPenalty> penaltyAndCosts, String penaltyRef) {
+    private Optional<FinancialPenalty> getOpenPenalty(List<FinancialPenalty> penaltyAndCosts,
+            String penaltyRef) {
         return penaltyAndCosts.stream()
                 .filter(penalty -> penaltyRef.equals(penalty.getId()))
                 .filter(penalty -> OPEN == penalty.getPayableStatus())
@@ -145,14 +161,16 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
             PPSServiceResponse ppsServiceResponse,
             String companyNumber,
             String penaltyRef,
-            FinancialPenalty payablePenalty) throws ServiceException{
+            FinancialPenalty payablePenalty) throws ServiceException {
         CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyRef);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
+        modelAttributes.put(PENALTY_REF_NAME_ATTR,
+                PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
         modelAttributes.put(REASON_ATTR, payablePenalty.getReason());
-        modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payablePenalty.getOutstanding()));
+        modelAttributes.put(AMOUNT_ATTR,
+                PenaltyUtils.getFormattedAmount(payablePenalty.getOutstanding()));
         ppsServiceResponse.setModelAttributes(modelAttributes);
     }
 
@@ -162,45 +180,51 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
             String penaltyRef) {
         if (penaltyAndCosts.size() > 1) {
             LOGGER.info(String.format(
-                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number %s and penalty ref %s",                    penaltyAndCosts.size(), companyNumber, penaltyRef));
+                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number %s and penalty ref %s",
+                    penaltyAndCosts.size(), companyNumber, penaltyRef));
             return true;
         }
         return false;
     }
 
-    private boolean isPenaltyRefNoOpenPenalty(
-            Optional<FinancialPenalty> payablePenaltyOptional,
+    private void loggingPenaltyRefNoOpenPenalty(
             String companyNumber,
             String penaltyRef
     ) {
-        if (payablePenaltyOptional.isEmpty()) {
-            LOGGER.info(String.format("Online payment unavailable as there is no open penalty for company number %s and penalty ref %s",
-                    companyNumber, penaltyRef));
-            return true;
-        }
-        return false;
+        LOGGER.info(String.format(
+                "Online payment unavailable as there is no open penalty for company number %s and penalty ref %s",
+                companyNumber, penaltyRef));
     }
 
     private boolean isOutstandingAmountMatch(FinancialPenalty payablePenalty) {
         if (!payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-            LOGGER.info(String.format("Penalty %s is not valid for online payment. Online partial payment of penalty is not allowed", payablePenalty.getId()));
+            LOGGER.info(String.format(
+                    "Penalty %s is not valid for online payment. Online partial payment of penalty is not allowed",
+                    payablePenalty.getId()));
             return false;
         }
         return true;
     }
 
-    private Optional<PenaltyReference> getPenaltyReference(String penaltyRef, String companyNumber) throws IllegalArgumentException {
+    private Optional<PenaltyReference> getPenaltyReference(String penaltyRef, String companyNumber)
+            throws IllegalArgumentException {
         PenaltyReference penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
-        LOGGER.debug(String.format("Checking if penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
+        LOGGER.debug(
+                String.format("Checking if penalty ref type %s is enabled for company number %s",
+                        penaltyReference.name(), companyNumber));
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
-            LOGGER.debug(String.format("Penalty reference type %s not enabled for company number %s", penaltyReference.name(), companyNumber));
+            LOGGER.debug(
+                    String.format("Penalty reference type %s not enabled for company number %s",
+                            penaltyReference.name(), companyNumber));
             return Optional.empty();
         }
-        LOGGER.debug(String.format("Penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
+        LOGGER.debug(String.format("Penalty ref type %s is enabled for company number %s",
+                penaltyReference.name(), companyNumber));
         return Optional.of(penaltyReference);
     }
 
-    private void setBackUrl(PPSServiceResponse ppsServiceResponse, PenaltyReference penaltyReference) {
+    private void setBackUrl(PPSServiceResponse ppsServiceResponse,
+            PenaltyReference penaltyReference) {
         Map<String, String> baseModelAttributes = new HashMap<>();
         String redirectBackUrl = penaltyConfigurationProperties.getEnterDetailsPath()
                 + "?ref-starts-with=" + penaltyReference.getStartsWith();
