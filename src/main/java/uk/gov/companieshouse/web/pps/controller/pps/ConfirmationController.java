@@ -7,22 +7,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
-import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
-import uk.gov.companieshouse.api.model.financialpenalty.TransactionPayableFinancialPenalty;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.confirmation.ConfirmationService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
-
-import java.util.Map;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/payable/{payableRef}/confirmation")
@@ -30,28 +24,15 @@ public class ConfirmationController extends BaseController {
 
     static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";
 
-    private static final String PAYMENT_STATE = "payment_state";
-
-    static final String PENALTY_REF_ATTR = "penaltyRef";
-    static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
-    static final String COMPANY_NAME_ATTR = "companyName";
-    static final String COMPANY_NUMBER_ATTR = "companyNumber";
-    static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
-    static final String PAYMENT_DATE_ATTR = "paymentDate";
-    static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
-
-    private final CompanyService companyService;
-    private final PayablePenaltyService payablePenaltyService;
+    private final ConfirmationService confirmationService;
 
     public ConfirmationController(
             NavigatorService navigatorService,
             SessionService sessionService,
-            CompanyService companyService,
-            PayablePenaltyService payablePenaltyService,
-            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            ConfirmationService confirmationService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.companyService = companyService;
-        this.payablePenaltyService = payablePenaltyService;
+        this.confirmationService = confirmationService;
     }
 
     @Override
@@ -60,7 +41,8 @@ public class ConfirmationController extends BaseController {
     }
 
     @GetMapping
-    public String getConfirmation(@PathVariable String companyNumber,
+    public String getConfirmation(
+            @PathVariable String companyNumber,
             @PathVariable String penaltyRef,
             @PathVariable String payableRef,
             @RequestParam("state") String paymentState,
@@ -68,52 +50,34 @@ public class ConfirmationController extends BaseController {
             HttpServletRequest request,
             Model model) {
 
-        Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
-
-        // Check that the session state is present
-        if (!sessionData.containsKey(PAYMENT_STATE)) {
-            LOGGER.errorRequest(request, "Payment state value is not present in session, Expected: " + paymentState);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
-        }
-
-        String sessionPaymentState = (String) sessionData.get(PAYMENT_STATE);
-        sessionData.remove(PAYMENT_STATE);
-
-        // Check that the session state has not been tampered with
-        if (!paymentState.equals(sessionPaymentState)) {
-            LOGGER.errorRequest(request, "Payment state value in session is not as expected, possible tampering of session "
-                    + "Expected: " + sessionPaymentState + ", Received: " + paymentState);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
-        }
-
         try {
-            PayableFinancialPenalties payableResource = payablePenaltyService.getPayableFinancialPenalties(companyNumber, payableRef);
-            TransactionPayableFinancialPenalty payableResourceTransaction = payableResource.getTransactions().getFirst();
+            PPSServiceResponse serviceResponse = confirmationService.getConfirmationUrl(
+                    companyNumber, penaltyRef, payableRef, paymentState, paymentStatus);
 
-            // If the payment is anything but paid return user to beginning of journey
-            if (!paymentStatus.equals("paid")) {
-                LOGGER.info("Payment status is " + paymentStatus + " and not of status 'paid', returning to beginning of journey");
-                return UrlBasedViewResolver.REDIRECT_URL_PREFIX + payableResource.getLinks().get("resume_journey_uri");
+            var url = serviceResponse.getUrl();
+            var errMsg = serviceResponse.getErrorRequestMsg();
+
+            if (errMsg.isPresent() && url.isPresent()) {
+                LOGGER.errorRequest(request, errMsg.get());
+                return url.get();
             }
             LOGGER.debug(String.format("Payment for penalty with company number %s and penalty ref %s Successful", companyNumber, penaltyRef));
 
-            CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
+            serviceResponse.getModelAttributes()
+                    .ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-            model.addAttribute(PENALTY_REF_ATTR, penaltyRef);
-            model.addAttribute(PENALTY_REF_NAME_ATTR, PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
-            model.addAttribute(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
-            model.addAttribute(COMPANY_NUMBER_ATTR, companyNumber);
-            model.addAttribute(REASON_FOR_PENALTY_ATTR, payableResourceTransaction.getReason());
-            model.addAttribute(PAYMENT_DATE_ATTR, PenaltyUtils.getPaymentDateDisplay());
-            model.addAttribute(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(payableResourceTransaction.getAmount()));
+            serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
+                    addBaseAttributesWithoutBackToModel(
+                            model,
+                            sessionService.getSessionDataFromContext(),
+                            serviceResponse.getBaseModelAttributes().get().get(SIGN_OUT_URL_ATTR)));
 
-            addBaseAttributesWithoutBackToModel(model, sessionService.getSessionDataFromContext(),
-                    penaltyConfigurationProperties.getSignOutPath());
+            return serviceResponse.getUrl().orElse(getTemplateName());
 
-            return getTemplateName();
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 

@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,7 +43,6 @@ class PenaltyInDcaControllerTest {
     private static final String PENALTY_IN_DCA_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/penalty-in-dca";
 
     private static final String ENTER_DETAILS_PATH = "/pay-penalty/enter-details";
-    private static final String SIGN_OUT_PATH = "/sign-out";
 
     @BeforeEach
     void setup() {
