@@ -65,19 +65,16 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
     }
 
     @Override
-    public PPSServiceResponse viewPenalties(
-            String companyNumber,
-            String penaltyRef) throws IllegalArgumentException, ServiceException {
+    public PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef)
+            throws IllegalArgumentException, ServiceException {
         PPSServiceResponse ppsServiceResponse = new PPSServiceResponse();
-        PenaltyReference penaltyReference;
-        penaltyReference = getPenaltyReference(penaltyRef, companyNumber);
+        Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef, companyNumber);
 
-        if (penaltyReference == null) {
+        if (penaltyReference.isEmpty()) {
             return setServiceDownUrl(ppsServiceResponse);
         }
-        setBackUrl(ppsServiceResponse, penaltyReference);
+        setBackUrl(ppsServiceResponse, penaltyReference.get());
 
-        CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
         List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
 
         LOGGER.debug(String.format("Checking if online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
@@ -97,7 +94,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
           return setServiceDownUrl(ppsServiceResponse);
         }
 
-        setModelForViewPenalties(ppsServiceResponse, companyProfileApi, penaltyRef, payablePenalty);
+        setModelForViewPenalties(ppsServiceResponse, companyNumber, penaltyRef, payablePenalty);
 
         LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
@@ -110,7 +107,6 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
             String penaltyRef) throws ServiceException {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
-        PayableFinancialPenaltySession payableFinancialPenaltySession;
 
         List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
 
@@ -128,7 +124,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
 
         LOGGER.debug(String.format("Online payment for penalty %s is available for company number %s", penaltyRef, companyNumber));
 
-        payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
+        PayableFinancialPenaltySession payableFinancialPenaltySession = payablePenaltyService.createPayableFinancialPenaltySession(
                 companyNumber,
                 penaltyRef,
                 payablePenaltyOptional.get().getOutstanding());
@@ -147,9 +143,10 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
 
     private void setModelForViewPenalties(
             PPSServiceResponse ppsServiceResponse,
-            CompanyProfileApi companyProfileApi,
+            String companyNumber,
             String penaltyRef,
-            FinancialPenalty payablePenalty) {
+            FinancialPenalty payablePenalty) throws ServiceException{
+        CompanyProfileApi companyProfileApi = companyService.getCompanyProfile(companyNumber);
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyRef);
@@ -192,15 +189,15 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         return true;
     }
 
-    private PenaltyReference getPenaltyReference(String penaltyRef, String companyNumber) throws IllegalArgumentException {
+    private Optional<PenaltyReference> getPenaltyReference(String penaltyRef, String companyNumber) throws IllegalArgumentException {
         PenaltyReference penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
         LOGGER.debug(String.format("Checking if penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
         if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
             LOGGER.debug(String.format("Penalty reference type %s not enabled for company number %s", penaltyReference.name(), companyNumber));
-            return null;
+            return Optional.empty();
         }
         LOGGER.debug(String.format("Penalty ref type %s is enabled for company number %s", penaltyReference.name(), companyNumber));
-        return penaltyReference;
+        return Optional.of(penaltyReference);
     }
 
     private void setBackUrl(PPSServiceResponse ppsServiceResponse, PenaltyReference penaltyReference) {
