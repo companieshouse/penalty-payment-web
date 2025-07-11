@@ -17,8 +17,8 @@ import uk.gov.companieshouse.web.pps.config.FeatureFlagConfigurationProperties;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 
 import java.util.List;
 import java.util.Map;
@@ -63,6 +63,9 @@ class PenaltyRefStartsWithControllerTest {
     @Mock
     private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
 
+    @Mock
+    private PenaltyRefStartsWithService mockPenaltyRefStartsWithService;
+
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
     private FeatureFlagConfigurationProperties featureFlagConfigurationProperties;
 
@@ -80,15 +83,12 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     void setupMockMvc() {
-        FeatureFlagChecker featureFlagChecker = new FeatureFlagChecker(
-                featureFlagConfigurationProperties);
-
         PenaltyRefStartsWithController controller = new PenaltyRefStartsWithController(
                 mockNavigatorService,
                 mockSessionService,
                 penaltyConfigurationProperties,
                 mockFinanceServiceHealthCheck,
-                featureFlagChecker);
+                mockPenaltyRefStartsWithService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

@@ -8,7 +8,11 @@ public class ServiceConstants {
     public static final String COMPANY_NUMBER_ATTR = "companyNumber";
     public static final String PENALTY_REF_ATTR = "penaltyRef";
 
+    public static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
+    public static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
+
     public static final String SIGN_OUT_URL_ATTR = "signOutPath";
+    public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
 
     private ServiceConstants() {}
 }

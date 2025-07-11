@@ -13,15 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
+import uk.gov.companieshouse.web.pps.service.ServiceConstants;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import java.util.List;
-
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 @Controller
 @RequestMapping("/pay-penalty/ref-starts-with")
@@ -31,21 +30,18 @@ public class PenaltyRefStartsWithController extends BaseController {
     static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
 
-    private final List<PenaltyReference> availablePenaltyReference;
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
+    private final PenaltyRefStartsWithService penaltyRefStartsWithService;
 
     public PenaltyRefStartsWithController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             FinanceServiceHealthCheck financeServiceHealthCheck,
-            FeatureFlagChecker featureFlagChecker) {
+            PenaltyRefStartsWithService penaltyRefStartsWithService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.financeServiceHealthCheck = financeServiceHealthCheck;
-        availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
-                .stream()
-                .filter(featureFlagChecker::isPenaltyRefEnabled)
-                .toList();
+        this.penaltyRefStartsWithService = penaltyRefStartsWithService;
     }
 
     @Override
@@ -60,25 +56,24 @@ public class PenaltyRefStartsWithController extends BaseController {
         if (healthCheck.isPresent()) {
             String viewName = healthCheck.get();
             if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
+                addBaseAttributesWithoutBackUrlToModel(model,
+                        penaltyConfigurationProperties.getSignedOutUrl());
             }
             return viewName;
         }
 
-        LOGGER.debug(String.format("Available penalty reference types: %s", availablePenaltyReference));
-        if (availablePenaltyReference.size() == 1) {
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                    + "?ref-starts-with=" + availablePenaltyReference.getFirst().getStartsWith();
-        }
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithService.viewPenaltyRefStartWith();
 
-        model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-        model.addAttribute(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
+                addBaseAttributesToModel(model,
+                        serviceResponse.getBaseModelAttributes().get()
+                                .get(ServiceConstants.BACK_LINK_URL_ATTR),
+                        penaltyConfigurationProperties.getSignOutPath()));
 
-        addBaseAttributesToModel(model,
-                penaltyConfigurationProperties.getStartPath(),
-                penaltyConfigurationProperties.getSignOutPath());
+        serviceResponse.getModelAttributes()
+                .ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-        return getTemplateName();
+        return serviceResponse.getUrl().orElse(getTemplateName());
     }
 
     @PostMapping
@@ -86,22 +81,27 @@ public class PenaltyRefStartsWithController extends BaseController {
             @Valid @ModelAttribute(PENALTY_REFERENCE_CHOICE_ATTR) PenaltyReferenceChoice penaltyReferenceChoice,
             BindingResult bindingResult,
             Model model) {
+        PPSServiceResponse serviceResponse;
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            model.addAttribute(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-            addBaseAttributesToModel(model,
-                    penaltyConfigurationProperties.getStartPath(),
-                    penaltyConfigurationProperties.getSignOutPath());
-            return getTemplateName();
+            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartWithError();
+        } else {
+            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartWithNext(
+                    penaltyReferenceChoice);
         }
-        PenaltyReference selectedPenaltyReference = penaltyReferenceChoice.getSelectedPenaltyReference();
-        LOGGER.debug(String.format("Selected penalty type: %s, starts with: %s", selectedPenaltyReference.name(), selectedPenaltyReference.getStartsWith()));
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
+                addBaseAttributesToModel(model,
+                        serviceResponse.getBaseModelAttributes().get()
+                                .get(ServiceConstants.BACK_LINK_URL_ATTR),
+                        penaltyConfigurationProperties.getSignOutPath()));
 
-        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + selectedPenaltyReference.getStartsWith();
+        serviceResponse.getModelAttributes()
+                .ifPresent(attributes -> addAttributesToModel(model, attributes));
+
+        return serviceResponse.getUrl().orElse(getTemplateName());
     }
 
 }
