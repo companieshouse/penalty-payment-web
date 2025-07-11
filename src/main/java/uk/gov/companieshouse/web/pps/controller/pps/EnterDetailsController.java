@@ -2,8 +2,6 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +15,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
-import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
@@ -26,7 +23,6 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_LINK;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_WITH_BACK_LINK;

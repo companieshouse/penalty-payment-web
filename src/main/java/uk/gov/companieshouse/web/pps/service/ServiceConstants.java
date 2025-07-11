@@ -7,6 +7,9 @@ public class ServiceConstants {
     public static final String COMPANY_NUMBER_ATTR = "companyNumber";
     public static final String PENALTY_REF_ATTR = "penaltyRef";
     public static final String SIGN_OUT_URL_ATTR = "signOutPath";
+    public static final String SIGN_OUT_WITH_BACK_LINK = "signOutWithBackLink";
+    public static final String SIGN_OUT_LINK = "signOutLink";
 
-    private ServiceConstants() {}
+    private ServiceConstants() {
+    }
 }
