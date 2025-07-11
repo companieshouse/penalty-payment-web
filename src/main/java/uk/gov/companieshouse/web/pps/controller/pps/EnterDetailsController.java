@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,12 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
+import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
-import static java.lang.Boolean.TRUE;
+import java.util.List;
+
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_LINK;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_WITH_BACK_LINK;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @NextController(ViewPenaltiesController.class)
@@ -37,7 +37,7 @@ public class EnterDetailsController extends BaseController {
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
-    private final FeatureFlagChecker featureFlagChecker;
+    private final EnterDetailsValidator enterDetailsValidator;
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final PenaltyDetailsService penaltyDetailsService;
 
@@ -47,11 +47,11 @@ public class EnterDetailsController extends BaseController {
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker,
+            EnterDetailsValidator enterDetailsValidator,
             FinanceServiceHealthCheck financeServiceHealthCheck,
             PenaltyDetailsService penaltyDetailsService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.featureFlagChecker = featureFlagChecker;
+        this.enterDetailsValidator = enterDetailsValidator;
         this.financeServiceHealthCheck = financeServiceHealthCheck;
         this.penaltyDetailsService = penaltyDetailsService;
     }
@@ -64,24 +64,17 @@ public class EnterDetailsController extends BaseController {
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith, Model model, HttpServletRequest request) {
         var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
-        var unscheduledServiceDownPath = penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         try {
             PPSServiceResponse serviceResponse = penaltyDetailsService
-                    .getEnterDetails(penaltyReferenceStartsWith, healthCheck.orElse(""), unscheduledServiceDownPath);
+                    .getEnterDetails(penaltyReferenceStartsWith, healthCheck.orElse(""));
 
             serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
-            serviceResponse.getBaseModelAttributes().ifPresent(attributes -> {
-                if (attributes.containsKey(SIGN_OUT_WITH_BACK_LINK)) {
-                    addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignedOutUrl());
-                } else if (attributes.containsKey(SIGN_OUT_LINK)) {
-                    addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
-                }
-            });
+            configureBaseAttributes(serviceResponse, model);
 
             return serviceResponse.getUrl().orElseGet(this::getTemplateName);
-        } catch (ServiceException e) {
+        } catch (IllegalArgumentException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + unscheduledServiceDownPath;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 
@@ -90,34 +83,40 @@ public class EnterDetailsController extends BaseController {
             BindingResult bindingResult,
             HttpServletRequest request,
             Model model) {
-
-        var unscheduledServiceDownPath = penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        enterDetailsValidator.isValid(enterDetails, bindingResult);
+        boolean hasBindingErrors = handleBindingResult(bindingResult);
         try {
-            PPSServiceResponse serviceResponse = penaltyDetailsService.postEnterDetails(enterDetails, bindingResult);
-            serviceResponse.getBaseModelAttributes()
-                    .ifPresent(attributes -> addBaseAttributesToModel(model, setBackLink(), penaltyConfigurationProperties.getSignedOutUrl()));
-            serviceResponse.getErrorRequestMsg().ifPresent(msg -> LOGGER.errorRequest(request, msg));
-            var optionalRedirectUrl = serviceResponse.getUrl();
-            var companyNumber = serviceResponse.getCompanyNumber().orElse("");
-            if (optionalRedirectUrl.isEmpty()) {
-                return getTemplateName();
-            } else {
-                String url = optionalRedirectUrl.get();
-                return url.equals(PenaltyDetailsService.NEXT_CONTROLLER)
-                        ? navigatorService.getNextControllerRedirect(this.getClass(), companyNumber, enterDetails.getPenaltyRef().toUpperCase())
-                        : url;
-            }
+            PPSServiceResponse serviceResponse = penaltyDetailsService.postEnterDetails(enterDetails, hasBindingErrors, this.getClass());
+            configureBaseAttributes(serviceResponse, model);
+            serviceResponse.getErrorRequestMsg().ifPresent(errMsg ->
+                    // Failed to get a financial penalty for given company number and penalty ref pair
+                    bindingResult.reject("globalError", serviceResponse.getErrorRequestMsg().get()));
+            return serviceResponse.getUrl().orElseGet(this::getTemplateName);
         } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
-            return REDIRECT_URL_PREFIX + unscheduledServiceDownPath;
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
     }
 
-    private String setBackLink() {
-        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
-            return penaltyConfigurationProperties.getRefStartsWithPath();
+    private void configureBaseAttributes(PPSServiceResponse serviceResponse, Model model) {
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes -> {
+            if (attributes.containsKey(BACK_LINK_URL_ATTR) && attributes.containsKey(SIGN_OUT_URL_ATTR)) {
+                addBaseAttributesToModel(model, attributes.get(BACK_LINK_URL_ATTR), attributes.get(SIGN_OUT_URL_ATTR));
+            } else if (attributes.containsKey(SIGN_OUT_URL_ATTR)) {
+                addBaseAttributesWithoutBackUrlToModel(model, SIGN_OUT_URL_ATTR);
+            }
+        });
+    }
+
+    private boolean handleBindingResult(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for (FieldError error : errors) {
+                LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
+            }
+            return true;
         }
-        return penaltyConfigurationProperties.getStartPath();
+        return false;
     }
 
 }

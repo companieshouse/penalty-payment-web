@@ -12,5 +12,6 @@ public class ServiceConstants {
     public static final String SIGN_OUT_URL_ATTR = "signOutPath";
     public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
 
-    private ServiceConstants() {}
+    private ServiceConstants() {
+    }
 }

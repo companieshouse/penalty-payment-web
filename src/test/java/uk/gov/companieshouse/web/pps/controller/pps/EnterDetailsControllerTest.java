@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -20,13 +21,15 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,9 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_WITH_BACK_LINK;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -47,7 +51,7 @@ class EnterDetailsControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private FeatureFlagChecker mockFeatureFlagChecker;
+    private EnterDetailsValidator mockEnterDetailsValidator;
 
     @Mock
     private NavigatorService mockNavigatorService;
@@ -71,7 +75,9 @@ class EnterDetailsControllerTest {
 
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
-    private static final String START_PATH = "/pay-penalty";
+    private static final String BACK_LINK_URL = "/pay-penalty/ref-starts-with";
+
+    private static final String SIGN_OUT_URL = "/pay-penalty/sign-out";
 
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
@@ -93,7 +99,7 @@ class EnterDetailsControllerTest {
                 mockNavigatorService,
                 mockSessionService,
                 mockPenaltyConfigurationProperties,
-                mockFeatureFlagChecker,
+                mockEnterDetailsValidator,
                 mockFinanceServiceHealthCheck,
                 mockPenaltyDetailsService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -104,17 +110,12 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details success path")
     void getEnterDetailsSuccessPath(PenaltyReference penaltyReference) throws Exception {
 
-        when(mockPenaltyConfigurationProperties.getStartPath())
-                .thenReturn(START_PATH);
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn("");
-
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
         var enterDetails = new EnterDetails();
         var startsWith = penaltyReference.getStartsWith();
         enterDetails.setPenaltyReferenceName(penaltyReference.name());
+        var serviceResponse = buildServiceResponse(true, true);
         serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
-        serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
-        when(mockPenaltyDetailsService.getEnterDetails(startsWith, "", "")).thenReturn(serviceResponse);
+        when(mockPenaltyDetailsService.getEnterDetails(startsWith, "")).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", startsWith))
@@ -129,13 +130,12 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details Health check fails")
     void getEnterDetailsWhenHealthCheckFails(String viewName) throws Exception {
 
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(viewName));
 
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        var serviceResponse = buildServiceResponse(false, false);
         var startsWith = LATE_FILING.getStartsWith();
         serviceResponse.setUrl(viewName);
-        when(mockPenaltyDetailsService.getEnterDetails(startsWith, viewName, UNSCHEDULED_SERVICE_DOWN_PATH)).thenReturn(serviceResponse);
+        when(mockPenaltyDetailsService.getEnterDetails(startsWith, viewName)).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", startsWith))
@@ -150,8 +150,8 @@ class EnterDetailsControllerTest {
     void getEnterDetailsRedirectPath() throws Exception {
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-        when(mockPenaltyDetailsService.getEnterDetails("Z", "", UNSCHEDULED_SERVICE_DOWN_PATH))
-                .thenThrow(new ServiceException("Starts with is invalid", new Exception()));
+        when(mockPenaltyDetailsService.getEnterDetails("Z", ""))
+                .thenThrow(new IllegalArgumentException("Starts with is invalid", new Exception()));
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", "Z"))
@@ -165,13 +165,11 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details fails for invalid penalty reference starts with")
     void getEnterDetailsWhenStartsWithIsInvalid() throws Exception {
 
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        var serviceResponse = buildServiceResponse(false, false);
         var startsWith = SANCTIONS.getStartsWith();
         var url = REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH;
         serviceResponse.setUrl(url);
-        when(mockPenaltyDetailsService.getEnterDetails(startsWith, "", UNSCHEDULED_SERVICE_DOWN_PATH)).thenReturn(serviceResponse);
+        when(mockPenaltyDetailsService.getEnterDetails(startsWith, "")).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", startsWith))
@@ -183,23 +181,22 @@ class EnterDetailsControllerTest {
 
 
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "LATE_FILING, 12345678, A1234567",
+            "SANCTIONS, 12345678, P1234567",
+            "SANCTIONS_ROE, OE123456, U1234567"
+    })
     @DisplayName("Post Details success path")
-    void postRequestSuccessPath(PenaltyReference penaltyReference) throws Exception {
-
-        when(mockPenaltyConfigurationProperties.getStartPath())
-                .thenReturn(START_PATH);
-        when(mockNavigatorService.getNextControllerRedirect(any(), any(), any())).thenReturn(NEXT_CONTROLLER_PATH);
-
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
-        serviceResponse.setUrl(PenaltyDetailsService.NEXT_CONTROLLER);
-        when(mockPenaltyDetailsService.postEnterDetails(any(), any())).thenReturn(serviceResponse);
+    void postRequestSuccessPath(String penaltyReferenceName, String penaltyRef, String companyNumber) throws Exception {
+        var serviceResponse = buildServiceResponse(true, true);
+        serviceResponse.setUrl(NEXT_CONTROLLER_PATH);
+        when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any()))
+                .thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, penaltyReference.name())
-                        .param(COMPANY_NUMBER_ATTRIBUTE, VALID_COMPANY_NUMBER)
-                        .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
+                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, penaltyReferenceName)
+                        .param(COMPANY_NUMBER_ATTRIBUTE, companyNumber)
+                        .param(PENALTY_REF_ATTRIBUTE, penaltyRef))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(NEXT_CONTROLLER_PATH));
     }
@@ -208,12 +205,8 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - Input validation error")
     void postRequestInvalidInput() throws Exception {
 
-        when(mockPenaltyConfigurationProperties.getStartPath())
-                .thenReturn(START_PATH);
-
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
-        when(mockPenaltyDetailsService.postEnterDetails(any(), any())).thenReturn(serviceResponse);
+        var serviceResponse = buildServiceResponse(true, true);
+        when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -230,12 +223,8 @@ class EnterDetailsControllerTest {
     @DisplayName("Post Details failure path - penalty not found")
     void postRequestPenaltyNotFound() throws Exception {
 
-        when(mockPenaltyConfigurationProperties.getStartPath())
-                .thenReturn(START_PATH);
-
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_WITH_BACK_LINK, ""));
-        when(mockPenaltyDetailsService.postEnterDetails(any(), any())).thenReturn(serviceResponse);
+        PPSServiceResponse serviceResponse = buildServiceResponse(true, true);
+        when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -252,7 +241,8 @@ class EnterDetailsControllerTest {
     void postRequestFailsToGetFinancialPenalties() throws Exception {
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-        when(mockPenaltyDetailsService.postEnterDetails(any(), any())).thenThrow(new ServiceException("Failed to get penalties", new Exception()));
+        when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any()))
+                .thenThrow(new ServiceException("Failed to get penalties", new Exception()));
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
                         .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
@@ -260,5 +250,20 @@ class EnterDetailsControllerTest {
                         .param(PENALTY_REF_ATTRIBUTE, VALID_PENALTY_REF))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+    }
+
+    private PPSServiceResponse buildServiceResponse(boolean backLink, boolean signoutLink) {
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        Map<String, String> baseAttributes = new HashMap<>();
+        if (backLink) {
+            baseAttributes.put(BACK_LINK_URL_ATTR, BACK_LINK_URL);
+        }
+        if (signoutLink) {
+            baseAttributes.put(SIGN_OUT_URL_ATTR, SIGN_OUT_URL);
+        }
+        if (!baseAttributes.isEmpty()) {
+            serviceResponse.setBaseModelAttributes(baseAttributes);
+        }
+        return serviceResponse;
     }
 }

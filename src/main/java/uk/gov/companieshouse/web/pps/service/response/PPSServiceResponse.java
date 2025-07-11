@@ -39,8 +39,8 @@ public class PPSServiceResponse {
         this.errorRequestMsg = errorRequestMsg;
     }
 
-    public Optional<String> getCompanyNumber() {
-        return StringUtils.isNotEmpty(companyNumber) ? Optional.of(companyNumber) : Optional.empty();
+    public String getCompanyNumber() {
+        return companyNumber;
     }
 
     public void setCompanyNumber(String companyNumber) {
