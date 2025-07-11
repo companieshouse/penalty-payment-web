@@ -158,7 +158,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
     }
 
     private void setModelForViewPenalties(
-            PPSServiceResponse ppsServiceResponse,
+            PPSServiceResponse serviceResponse,
             String companyNumber,
             String penaltyRef,
             FinancialPenalty payablePenalty) throws ServiceException {
@@ -171,7 +171,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         modelAttributes.put(REASON_ATTR, payablePenalty.getReason());
         modelAttributes.put(AMOUNT_ATTR,
                 PenaltyUtils.getFormattedAmount(payablePenalty.getOutstanding()));
-        ppsServiceResponse.setModelAttributes(modelAttributes);
+        serviceResponse.setModelAttributes(modelAttributes);
     }
 
     private boolean isPenaltyRefMultiplePenalty(
@@ -223,13 +223,13 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         return Optional.of(penaltyReference);
     }
 
-    private void setBackUrl(PPSServiceResponse ppsServiceResponse,
+    private void setBackUrl(PPSServiceResponse serviceResponse,
             PenaltyReference penaltyReference) {
         Map<String, String> baseModelAttributes = new HashMap<>();
         String redirectBackUrl = penaltyConfigurationProperties.getEnterDetailsPath()
                 + "?ref-starts-with=" + penaltyReference.getStartsWith();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, redirectBackUrl);
-        ppsServiceResponse.setBaseModelAttributes(baseModelAttributes);
+        serviceResponse.setBaseModelAttributes(baseModelAttributes);
     }
 
     private PPSServiceResponse setServiceDownUrl(PPSServiceResponse ppsServiceResponse) {
