@@ -13,90 +13,71 @@ import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
 import java.util.Map;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
 
 @Controller
 @NextController(StartController.class)
 @RequestMapping("/pay-penalty/sign-out")
 public class SignOutController extends BaseController {
 
-    private final AllowlistChecker allowlistChecker;
+    private final SignOutService signOutService;
 
     static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
-    private static final String SIGN_IN_KEY = "signin_info";
-    private static final String HOME = "/pay-penalty/";
     private static final String BACK_LINK = "backLink";
 
     public SignOutController(
             NavigatorService navigatorService,
             SessionService sessionService,
-            AllowlistChecker allowlistChecker,
-            PenaltyConfigurationProperties penaltyConfigurationProperties) {
+            PenaltyConfigurationProperties penaltyConfigurationProperties,
+            SignOutService signOutService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.allowlistChecker = allowlistChecker;
+        this.signOutService = signOutService;
     }
-
 
     @Override
     protected String getTemplateName() {
         return SIGN_OUT_TEMPLATE_NAME;
     }
 
-
     @GetMapping
     public String getSignOut(final HttpServletRequest request, Model model) {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
-        if (!sessionData.containsKey(SIGN_IN_KEY)) {
+        if (!signOutService.isUserSignedIn(sessionData)) {
             LOGGER.info("No session data present: " + sessionData);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX + signOutService.getUnscheduledDownPath();
         }
 
         LOGGER.debug("Processing sign out");
-
-        String referrer = request.getHeader("Referer");
-        if (referrer == null) {
-            model.addAttribute(BACK_LINK, HOME);
-            LOGGER.info("No Referer has been found");
+        String backLink = signOutService.resolveBackLink(request);
+        if (backLink != null) {
+            model.addAttribute(BACK_LINK, backLink);
+            LOGGER.info("Referer is " + backLink);
         } else {
-            String allowedUrl = allowlistChecker.checkURL(referrer);
-            if (allowlistChecker.checkSignOutIsReferer(allowedUrl)) {
-                LOGGER.info("Refer is sign-out- not updating attribute");
-                return getTemplateName();
-            }
-            LOGGER.info("Referer is " + allowedUrl);
-            request.getSession().setAttribute("url_prior_signout", allowedUrl);
-            model.addAttribute(BACK_LINK, allowedUrl);
+            model.addAttribute(BACK_LINK, "/pay-penalty/");
+            LOGGER.info("Refer is sign-out or missing - fallback applied");
         }
-        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
+
+        addPhaseBannerToModel(model, signOutService.getSurveyLink());
         return getTemplateName();
     }
-
 
     @PostMapping
     public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         LOGGER.debug("Processing sign out POST");
-        String valueGet = request.getParameter("radio");
-        String url = (String) request.getSession().getAttribute("url_prior_signout");
+        String radioValue = request.getParameter("radio");
+        String priorUrl = (String) request.getSession().getAttribute("url_prior_signout");
 
-        if (StringUtils.isEmpty(valueGet)) {
+        if (StringUtils.isEmpty(radioValue)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);
-            redirectAttributes.addFlashAttribute(BACK_LINK, url);
-            return new RedirectView(penaltyConfigurationProperties.getSignOutPath(),
-                    true, false);
+            redirectAttributes.addFlashAttribute(BACK_LINK, priorUrl);
         }
-        if (valueGet.equals("yes")) {
-            return new RedirectView(penaltyConfigurationProperties.getSignedOutUrl() + "/signout");
-        }
-        if (valueGet.equals("no")) {
-            return new RedirectView(url);
-        }
-        return new RedirectView(HOME);
-    }
 
+        String targetUrl = signOutService.determineRedirect(radioValue, priorUrl);
+        return new RedirectView(targetUrl, true, false);
+    }
 }
