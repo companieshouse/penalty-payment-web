@@ -4,4 +4,3 @@ public record PenaltyTestData(String customerCode, String path, String penaltyRe
                               String reasonForPenalty, String name) {
 
 }
-

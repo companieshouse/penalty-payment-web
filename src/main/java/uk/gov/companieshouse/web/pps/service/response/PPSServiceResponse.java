@@ -12,6 +12,16 @@ public class PPSServiceResponse {
     private Map<String, String> baseModelAttributes;
     private Map<String, Object> modelAttributes;
 
+    public PPSServiceResponse() {}
+
+    public PPSServiceResponse(String url, String errorRequestMsg,
+            Map<String, String> baseModelAttributes, Map<String, Object> modelAttributes) {
+        this.url = url;
+        this.errorRequestMsg = errorRequestMsg;
+        this.baseModelAttributes = baseModelAttributes;
+        this.modelAttributes = modelAttributes;
+    }
+
     public Optional<String> getUrl() {
         return StringUtils.isNotEmpty(url) ? Optional.of(url) : Optional.empty();
     }
