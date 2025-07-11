@@ -15,6 +15,7 @@ public class PenaltyConfigurationProperties {
     private String refStartsWithPath;
     private String enterDetailsPath;
     private String unscheduledServiceDownPath;
+    private String homePath;
     private String signOutPath;
     private String surveyLink;
     private String serviceBannerLink;
@@ -55,6 +56,10 @@ public class PenaltyConfigurationProperties {
     public void setUnscheduledServiceDownPath(String unscheduledServiceDownPath) {
         this.unscheduledServiceDownPath = unscheduledServiceDownPath;
     }
+
+    public String getHomePath() { return homePath; }
+
+    public void setHomePath(String homePath) { this.homePath = homePath; }
 
     public String getSignOutPath() {
         return signOutPath;
