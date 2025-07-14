@@ -47,6 +47,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 class PenaltyRefStartsWithControllerTest {
 
     private static final String SELECTED_PENALTY_REFERENCE = "selectedPenaltyReference";
+    
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String REF_STARTS_WITH_PATH = "?ref-starts-with=%s";
 
