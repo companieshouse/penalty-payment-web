@@ -6,16 +6,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.company.CompanyService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaidService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
@@ -28,15 +28,15 @@ public class PenaltyPaidController extends BaseController {
         return PENALTY_PAID_TEMPLATE_NAME;
     }
 
-    private final CompanyService companyService;
+    private final PenaltyPaidService penaltyPaidService;
 
     public PenaltyPaidController(
             NavigatorService navigatorService,
             SessionService sessionService,
-            CompanyService companyService,
+            PenaltyPaidService penaltyPaidService,
             PenaltyConfigurationProperties penaltyConfigurationProperties) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.companyService = companyService;
+        this.penaltyPaidService = penaltyPaidService;
     }
 
     @GetMapping
@@ -45,22 +45,23 @@ public class PenaltyPaidController extends BaseController {
             Model model,
             HttpServletRequest request) {
 
-        CompanyProfileApi companyProfileApi;
-
         try {
-            companyProfileApi = companyService.getCompanyProfile(companyNumber);
+            PPSServiceResponse serviceResponse = penaltyPaidService.getPaid(companyNumber,
+                    penaltyRef);
+
+            serviceResponse.getModelAttributes()
+                    .ifPresent(attributes -> addAttributesToModel(model, attributes));
+
+            serviceResponse.getBaseModelAttributes()
+                    .ifPresent(attributes -> addBaseAttributesToModel(
+                            model, attributes.get(BACK_LINK_ATTR),
+                            attributes.get(SIGN_OUT_URL_ATTR)));
+
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);
-            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+            return REDIRECT_URL_PREFIX
+                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
-
-        model.addAttribute("companyName", companyProfileApi.getCompanyName());
-        model.addAttribute("penaltyRef", penaltyRef);
-
-        addBaseAttributesToModel(model,
-                penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef).getStartsWith(),
-                penaltyConfigurationProperties.getSignOutPath());
 
         return getTemplateName();
     }
