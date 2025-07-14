@@ -38,7 +38,6 @@ class PenaltyRefStartsWithServiceImplTest {
 
     private static final String REF_STARTS_WITH_PATH = "?ref-starts-with=%s";
 
-
     private FeatureFlagChecker featureFlagChecker;
 
     @Mock
@@ -47,7 +46,6 @@ class PenaltyRefStartsWithServiceImplTest {
     private PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     private FeatureFlagConfigurationProperties featureFlagConfigurationProperties;
-
 
     @BeforeEach
     void setup() {
@@ -63,11 +61,12 @@ class PenaltyRefStartsWithServiceImplTest {
 
     @Test
     @DisplayName("Get viewPenaltyRefStartWith - redirect late filing details")
-    void getPenaltyRefStartsWithFeatureFlagDisabled(){
+    void getPenaltyRefStartsWithFeatureFlagDisabled() {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), FALSE, SANCTIONS_ROE.name(), FALSE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
 
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
@@ -78,11 +77,12 @@ class PenaltyRefStartsWithServiceImplTest {
 
     @Test
     @DisplayName("Get viewPenaltyRefStartWith - successful")
-    void getPenaltyRefStartsSuccessful(){
+    void getPenaltyRefStartsSuccessful() {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
 
         PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.viewPenaltyRefStartWith();
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -102,7 +102,8 @@ class PenaltyRefStartsWithServiceImplTest {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
 
         PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithError();
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -120,13 +121,15 @@ class PenaltyRefStartsWithServiceImplTest {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
         PenaltyReferenceChoice penaltyReferenceChoice = new PenaltyReferenceChoice();
         penaltyReferenceChoice.setSelectedPenaltyReference(LATE_FILING);
 
-        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(penaltyReferenceChoice);
+        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(
+                penaltyReferenceChoice);
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }
 
@@ -136,13 +139,15 @@ class PenaltyRefStartsWithServiceImplTest {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS));
         PenaltyReferenceChoice penaltyReferenceChoice = new PenaltyReferenceChoice();
         penaltyReferenceChoice.setSelectedPenaltyReference(SANCTIONS);
 
-        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(penaltyReferenceChoice);
+        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(
+                penaltyReferenceChoice);
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }
 
@@ -152,18 +157,21 @@ class PenaltyRefStartsWithServiceImplTest {
         featureFlagConfigurationProperties
                 .setPenaltyRefEnabled(Map.of(SANCTIONS.name(), TRUE, SANCTIONS_ROE.name(), TRUE));
         featureFlagChecker = new FeatureFlagChecker(featureFlagConfigurationProperties);
-        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(penaltyConfigurationProperties, featureFlagChecker);
+        mockPenaltyRefStartsWithService = new PenaltyRefStartsWithServiceImpl(
+                penaltyConfigurationProperties, featureFlagChecker);
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS_ROE));
         PenaltyReferenceChoice penaltyReferenceChoice = new PenaltyReferenceChoice();
         penaltyReferenceChoice.setSelectedPenaltyReference(SANCTIONS_ROE);
 
-        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(penaltyReferenceChoice);
+        PPSServiceResponse serviceResponse = mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(
+                penaltyReferenceChoice);
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }
 
     private String setUpEnterDetailsUrl(PenaltyReference penaltyReference) {
-        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath() + String.format(REF_STARTS_WITH_PATH, penaltyReference.getStartsWith());
+        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
+                + String.format(REF_STARTS_WITH_PATH, penaltyReference.getStartsWith());
     }
 
 }
