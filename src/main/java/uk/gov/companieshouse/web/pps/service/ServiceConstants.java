@@ -7,6 +7,9 @@ public class ServiceConstants {
     public static final String COMPANY_NAME_ATTR = "companyName";
     public static final String COMPANY_NUMBER_ATTR = "companyNumber";
     public static final String PENALTY_REF_ATTR = "penaltyRef";
+    public static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
+    public static final String REASON_ATTR = "reasonForPenalty";
+    public static final String AMOUNT_ATTR = "outstanding";
 
     public static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
     public static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
