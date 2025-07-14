@@ -37,8 +37,15 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.CS_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.OVERSEAS_ENTITY_ID;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PAYABLE_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.ROE_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NAME;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_ROE_REASON;
@@ -66,13 +73,6 @@ class ConfirmationControllerTest {
     @Mock
     private ConfirmationService mockConfirmationService;
 
-    private static final String COMPANY_NUMBER = "12345678";
-    private static final String OVERSEAS_ENTITY_ID = "OE123456";
-    private static final String LFP_PENALTY_REF = "A1234567";
-    private static final String CS_PENALTY_REF = "P1234567";
-    private static final String ROE_PENALTY_REF = "U1234567";
-    private static final String PAYABLE_REF = "PR_123456";
-
     private static final String VIEW_CONFIRMATION_PATH_LFP =
             "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/payable/"
                     + PAYABLE_REF + "/confirmation";
@@ -86,8 +86,6 @@ class ConfirmationControllerTest {
     private static final String RESUME_URL_PATH =
             "redirect:/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF
                     + "/view-penalties";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH =
-            "/pay-penalty/unscheduled-service-down";
 
     private static final String REF = "ref";
     private static final String STATE = "state";
