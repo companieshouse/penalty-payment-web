@@ -52,7 +52,8 @@ class PenaltyRefStartsWithServiceImplTest {
                 List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
 
-        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
+        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
+                mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
 
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
@@ -70,7 +71,8 @@ class PenaltyRefStartsWithServiceImplTest {
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
 
-        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
+        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
+                mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartWith();
 
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -93,7 +95,8 @@ class PenaltyRefStartsWithServiceImplTest {
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
 
-        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
+        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
+                mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartWithError();
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -115,7 +118,8 @@ class PenaltyRefStartsWithServiceImplTest {
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
 
-        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
+        penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
+                mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
 
         PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(startsWith);
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
@@ -129,7 +133,8 @@ class PenaltyRefStartsWithServiceImplTest {
     }
 
     private String setUpEnterDetailsUrl(PenaltyReference penaltyReference) {
-        when(mockPenaltyConfigurationProperties.getEnterDetailsPath()).thenReturn(ENTER_DETAILS_PATH);
+        when(mockPenaltyConfigurationProperties.getEnterDetailsPath()).thenReturn(
+                ENTER_DETAILS_PATH);
         return REDIRECT_URL_PREFIX + mockPenaltyConfigurationProperties.getEnterDetailsPath()
                 + String.format(REF_STARTS_WITH_PATH, penaltyReference.getStartsWith());
     }
