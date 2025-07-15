@@ -94,7 +94,7 @@ class PenaltyRefStartsWithControllerTest {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
 
-        when(mockPenaltyRefStartsWithService.viewPenaltyRefStartWith()).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.viewPenaltyRefStartsWith()).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 
@@ -110,7 +110,7 @@ class PenaltyRefStartsWithControllerTest {
         mockServiceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
 
-        when(mockPenaltyRefStartsWithService.viewPenaltyRefStartWith()).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.viewPenaltyRefStartsWith()).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 
@@ -153,7 +153,7 @@ class PenaltyRefStartsWithControllerTest {
         mockServiceResponse.setModelAttributes(setModelForPostPenaltyRefStartWithError());
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
 
-        when(mockPenaltyRefStartsWithService.postPenaltyRefStartWithError()).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithError()).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 
@@ -173,7 +173,7 @@ class PenaltyRefStartsWithControllerTest {
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
 
-        when(mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 
@@ -191,7 +191,7 @@ class PenaltyRefStartsWithControllerTest {
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS));
 
-        when(mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 
@@ -209,7 +209,7 @@ class PenaltyRefStartsWithControllerTest {
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS_ROE));
 
-        when(mockPenaltyRefStartsWithService.postPenaltyRefStartWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
+        when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         setupMockMvc();
 

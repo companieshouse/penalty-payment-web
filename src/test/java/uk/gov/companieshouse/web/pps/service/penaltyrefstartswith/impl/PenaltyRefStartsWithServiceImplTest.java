@@ -58,7 +58,7 @@ class PenaltyRefStartsWithServiceImplTest {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
 
-        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartWith();
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }
 
@@ -73,7 +73,7 @@ class PenaltyRefStartsWithServiceImplTest {
 
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
                 mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
-        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartWith();
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
 
         assertEquals(Optional.empty(), serviceResponse.getUrl());
         assertTrue(serviceResponse.getModelAttributes().isPresent());
@@ -98,7 +98,7 @@ class PenaltyRefStartsWithServiceImplTest {
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
                 mockPenaltyConfigurationProperties, mockFeatureFlagChecker);
 
-        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartWithError();
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartsWithError();
         assertEquals(Optional.empty(), serviceResponse.getUrl());
         assertTrue(serviceResponse.getModelAttributes().isPresent());
         assertThat(serviceResponse.getModelAttributes().get().toString(),
@@ -127,7 +127,7 @@ class PenaltyRefStartsWithServiceImplTest {
         PenaltyReferenceChoice penaltyReferenceChoice = new PenaltyReferenceChoice();
         penaltyReferenceChoice.setSelectedPenaltyReference(penaltyReference);
 
-        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartWithNext(
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartsWithNext(
                 penaltyReferenceChoice);
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }

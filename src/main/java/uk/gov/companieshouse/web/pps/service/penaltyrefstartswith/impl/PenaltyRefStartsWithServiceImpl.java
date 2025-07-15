@@ -40,7 +40,7 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     }
 
     @Override
-    public PPSServiceResponse viewPenaltyRefStartWith() {
+    public PPSServiceResponse viewPenaltyRefStartsWith() {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         LOGGER.debug(
                 String.format("Available penalty reference types: %s", availablePenaltyReference));
@@ -55,7 +55,7 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     }
 
     @Override
-    public PPSServiceResponse postPenaltyRefStartWithError() {
+    public PPSServiceResponse postPenaltyRefStartsWithError() {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
 
         serviceResponse.setModelAttributes(setModelForPostPenaltyRefStartWith());
@@ -64,7 +64,7 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     }
 
     @Override
-    public PPSServiceResponse postPenaltyRefStartWithNext(
+    public PPSServiceResponse postPenaltyRefStartsWithNext(
             PenaltyReferenceChoice penaltyReferenceChoice) {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();

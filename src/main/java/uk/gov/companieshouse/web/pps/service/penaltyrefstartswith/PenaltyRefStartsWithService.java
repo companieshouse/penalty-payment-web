@@ -5,10 +5,10 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 public interface PenaltyRefStartsWithService {
 
-    PPSServiceResponse viewPenaltyRefStartWith();
+    PPSServiceResponse viewPenaltyRefStartsWith();
 
-    PPSServiceResponse postPenaltyRefStartWithError();
+    PPSServiceResponse postPenaltyRefStartsWithError();
 
-    PPSServiceResponse postPenaltyRefStartWithNext(
+    PPSServiceResponse postPenaltyRefStartsWithNext(
             PenaltyReferenceChoice penaltyReferenceChoice);
 }

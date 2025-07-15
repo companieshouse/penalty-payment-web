@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
+
 import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -27,8 +29,7 @@ import java.util.List;
 public class PenaltyRefStartsWithController extends BaseController {
 
     static final String PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";
-    static final String AVAILABLE_PENALTY_REF_ATTR = "availablePenaltyReference";
-    static final String PENALTY_REFERENCE_CHOICE_ATTR = "penaltyReferenceChoice";
+
 
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final PenaltyRefStartsWithService penaltyRefStartsWithService;
@@ -62,7 +63,7 @@ public class PenaltyRefStartsWithController extends BaseController {
             return viewName;
         }
 
-        PPSServiceResponse serviceResponse = penaltyRefStartsWithService.viewPenaltyRefStartWith();
+        PPSServiceResponse serviceResponse = penaltyRefStartsWithService.viewPenaltyRefStartsWith();
 
         serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
                 addBaseAttributesToModel(model,
@@ -87,9 +88,9 @@ public class PenaltyRefStartsWithController extends BaseController {
             for (FieldError error : errors) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
-            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartWithError();
+            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartsWithError();
         } else {
-            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartWithNext(
+            serviceResponse = penaltyRefStartsWithService.postPenaltyRefStartsWithNext(
                     penaltyReferenceChoice);
         }
         serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
