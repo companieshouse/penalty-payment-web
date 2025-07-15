@@ -48,8 +48,8 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
             return setUpEnterDetails();
         }
 
-        setModelForViewPenaltyRefStartWith(serviceResponse);
-        setBackUrl(serviceResponse);
+        serviceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
+        serviceResponse.setBaseModelAttributes(setBackUrl());
 
         return serviceResponse;
     }
@@ -58,8 +58,8 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     public PPSServiceResponse postPenaltyRefStartWithError() {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
 
-        setModelForPostPenaltyRefStartWith(serviceResponse);
-        setBackUrl(serviceResponse);
+        serviceResponse.setModelAttributes(setModelForPostPenaltyRefStartWith());
+        serviceResponse.setBaseModelAttributes(setBackUrl());
         return serviceResponse;
     }
 
@@ -89,22 +89,22 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
         return serviceResponse;
     }
 
-    private void setModelForViewPenaltyRefStartWith(PPSServiceResponse serviceResponse) {
+    private Map<String, Object> setModelForViewPenaltyRefStartWith() {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
         modelAttributes.put(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
-        serviceResponse.setModelAttributes(modelAttributes);
+        return modelAttributes;
     }
 
-    private void setModelForPostPenaltyRefStartWith(PPSServiceResponse serviceResponse) {
+    private Map<String, Object> setModelForPostPenaltyRefStartWith() {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-        serviceResponse.setModelAttributes(modelAttributes);
+        return modelAttributes;
     }
 
-    private void setBackUrl(PPSServiceResponse ppsServiceResponse) {
+    private Map<String, String> setBackUrl() {
         Map<String, String> baseModelAttributes = new HashMap<>();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, penaltyConfigurationProperties.getStartPath());
-        ppsServiceResponse.setBaseModelAttributes(baseModelAttributes);
+        return baseModelAttributes;
     }
 }
