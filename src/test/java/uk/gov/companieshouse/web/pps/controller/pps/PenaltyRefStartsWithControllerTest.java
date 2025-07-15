@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
-import uk.gov.companieshouse.web.pps.service.ServiceConstants;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
@@ -34,10 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.AVAILABLE_PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
@@ -232,15 +231,17 @@ class PenaltyRefStartsWithControllerTest {
 
     private Map<String, Object> setModelForViewPenaltyRefStartWith() {
         Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(ServiceConstants.AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
         modelAttributes.put(
-                ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
+                AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
+        modelAttributes.put(
+                PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
         return modelAttributes;
     }
 
     private Map<String, Object> setModelForPostPenaltyRefStartWithError() {
         Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(ServiceConstants.AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
+        modelAttributes.put(
+                AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
         return modelAttributes;
     }
 }
