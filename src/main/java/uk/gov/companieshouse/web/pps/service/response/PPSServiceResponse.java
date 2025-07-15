@@ -12,7 +12,8 @@ public class PPSServiceResponse {
     private Map<String, String> baseModelAttributes;
     private Map<String, Object> modelAttributes;
 
-    public PPSServiceResponse() {}
+    public PPSServiceResponse() {
+    }
 
     public PPSServiceResponse(String url, String errorRequestMsg,
             Map<String, String> baseModelAttributes, Map<String, Object> modelAttributes) {
