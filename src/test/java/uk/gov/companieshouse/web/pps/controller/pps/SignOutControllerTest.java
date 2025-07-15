@@ -45,7 +45,7 @@ class SignOutControllerTest {
     private static final String RADIO = "radio";
     private static final String BACK_LINK = "backLink";
     private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
-    private static final String SIGNED_OUT_URL = "http://localhost/account/signout";
+    private static final String SIGNED_OUT_URL = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String UNSCHEDULED_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String SURVEY_LINK = "https://survey";
 
