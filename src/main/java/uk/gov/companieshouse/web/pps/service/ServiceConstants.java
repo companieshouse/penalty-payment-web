@@ -11,6 +11,7 @@ public class ServiceConstants {
     public static final String AMOUNT_ATTR = "outstanding";
     public static final String SIGN_OUT_URL_ATTR = "signOutPath";
     public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
+    public static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
     private ServiceConstants() {
     }

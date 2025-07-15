@@ -32,13 +32,13 @@ import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLO
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.ENTER_DETAILS_MODEL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Service
 public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
-    private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PAYABLE_PENALTY = "Payable penalty ";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
@@ -104,7 +104,6 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
         } else {
             String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
             String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-            serviceResponse.setCompanyNumber(companyNumber);
             List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
             getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef, clazz)
                     .ifPresentOrElse(serviceResponse::setUrl, () -> {

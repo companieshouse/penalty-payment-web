@@ -23,9 +23,8 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
-import java.util.List;
-
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.ENTER_DETAILS_MODEL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
@@ -35,14 +34,10 @@ public class EnterDetailsController extends BaseController {
 
     static final String ENTER_DETAILS_TEMPLATE_NAME = "pps/details";
 
-    private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
-
     private final EnterDetailsValidator enterDetailsValidator;
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final PenaltyDetailsService penaltyDetailsService;
 
-    @SuppressWarnings("java:S107")
-    // BaseController needs NavigatorService / SessionService for constructor injection
     public EnterDetailsController(
             NavigatorService navigatorService,
             SessionService sessionService,
@@ -110,8 +105,7 @@ public class EnterDetailsController extends BaseController {
 
     private boolean handleBindingResult(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
+            for (FieldError error : bindingResult.getFieldErrors()) {
                 LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
             }
             return true;
