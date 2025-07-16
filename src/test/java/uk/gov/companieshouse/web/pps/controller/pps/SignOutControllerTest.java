@@ -27,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIGN_OUT_TEMPLATE_NAME;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,13 +43,11 @@ class SignOutControllerTest {
     @Mock private Map<String, Object> sessionData;
 
     private static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
-    private static final String SIGN_OUT_TEMPLATE_NAME = "pps/signOut";
-    private static final String RADIO = "radio";
-    private static final String BACK_LINK = "backLink";
-    private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String SIGNED_OUT_URL = System.getProperty("ACCOUNT_LOCAL_URL");
+    private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String UNSCHEDULED_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
-    private static final String SURVEY_LINK = "https://survey";
+    private static final String BACK_LINK = "backLink";
+    private static final String RADIO = "radio";
 
     @BeforeEach
     void setup() {
@@ -61,12 +61,11 @@ class SignOutControllerTest {
     }
 
     @Test
-    @DisplayName("GET sign out - user is signed in, no referer header present")
-    void getSignOutNoReferer() throws Exception {
+    @DisplayName("GET Sign out - success with no referer")
+    void getRequestSuccess() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(null);
-        when(mockSignOutService.getSurveyLink()).thenReturn(SURVEY_LINK);
 
         mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
@@ -75,12 +74,11 @@ class SignOutControllerTest {
     }
 
     @Test
-    @DisplayName("GET sign out - user is signed in, valid referer used as backlink")
-    void getSignOutWithReferer() throws Exception {
+    @DisplayName("GET Sign out - success with referer backlink")
+    void getPreviousReferer() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(PREVIOUS_PATH);
-        when(mockSignOutService.getSurveyLink()).thenReturn(SURVEY_LINK);
 
         mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
@@ -89,49 +87,61 @@ class SignOutControllerTest {
     }
 
     @Test
-    @DisplayName("GET sign out - no session or user not signed in, redirect to service down page")
-    void getSignOutNoSession() throws Exception {
+    @DisplayName("GET Sign out - referer is sign out itself")
+    void getCheckSignOutIsReferer() throws Exception {
+        when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
+        when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
+        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(null); // emulate self-referer
+
+        mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", SIGN_OUT_PATH))
+                .andExpect(status().isOk())
+                .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
+    }
+
+    @Test
+    @DisplayName("GET Sign out - user not signed in or no session")
+    void noSuccessGet() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(false);
         when(mockSignOutService.getUnscheduledDownPath()).thenReturn(UNSCHEDULED_DOWN_PATH);
 
         mockMvc.perform(get(SIGN_OUT_PATH))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl(UNSCHEDULED_DOWN_PATH));
+                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_DOWN_PATH))
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
-    @DisplayName("POST sign out - radio is yes, redirect to signed out")
-    void postSignOutRadioYes() throws Exception {
-        when(mockSignOutService.determineRedirect("yes", null)).thenReturn(SIGNED_OUT_URL);
+    @DisplayName("POST Sign out - yes selected")
+    void postRequestRadioYes() throws Exception {
+        when(mockSignOutService.determineRedirect("yes", null)).thenReturn(SIGNED_OUT_URL + "/signout");
 
-        mockMvc.perform(post(SIGN_OUT_PATH).param(RADIO, "yes"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl(SIGNED_OUT_URL));
+        mockMvc.perform(post(SIGN_OUT_PATH)
+                        .param(RADIO, "yes"))
+                .andExpect(redirectedUrl(SIGNED_OUT_URL + "/signout"));
     }
 
     @Test
-    @DisplayName("POST sign out - radio is no, redirect back to previous URL")
-    void postSignOutRadioNo() throws Exception {
+    @DisplayName("POST Sign out - no selected with referer")
+    void postRequestRadioNoWithValidReferer() throws Exception {
         HashMap<String, Object> sessionAttrs = new HashMap<>();
         sessionAttrs.put("url_prior_signout", PREVIOUS_PATH);
 
         when(mockSignOutService.determineRedirect("no", PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
         mockMvc.perform(post(SIGN_OUT_PATH)
+                        .header("Referer", PREVIOUS_PATH)
                         .sessionAttrs(sessionAttrs)
+                        .param("url_prior_signout", PREVIOUS_PATH)
                         .param(RADIO, "no"))
-                .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
     }
 
     @Test
-    @DisplayName("POST sign out - radio not selected, redirect back with error")
-    void postSignOutNoRadioSelected() throws Exception {
+    @DisplayName("POST Sign out - no radio selected")
+    void postRequestRadioNull() throws Exception {
         when(mockSignOutService.determineRedirect(null, null)).thenReturn(SIGN_OUT_PATH);
 
         mockMvc.perform(post(SIGN_OUT_PATH))
-                .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attributeExists("errorMessage"));
     }
