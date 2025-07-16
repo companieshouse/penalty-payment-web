@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
-import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController;
@@ -44,7 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
-import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
@@ -73,9 +72,6 @@ class PenaltyDetailsServiceImplTest {
 
     @Mock
     private PenaltyDetailsService penaltyDetailsService;
-
-    @Mock
-    private BindingResult mockBindingResult;
 
     private Class<EnterDetailsController> enterDetailsControllerClass;
 
@@ -109,8 +105,6 @@ class PenaltyDetailsServiceImplTest {
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
-    private static final String COMPANY_NUMBER_ATTRIBUTE = "companyNumber";
-
     @BeforeEach
     void setup() {
         penaltyDetailsService = new PenaltyDetailsServiceImpl(
@@ -127,7 +121,7 @@ class PenaltyDetailsServiceImplTest {
     @ParameterizedTest
     @EnumSource(PenaltyReference.class)
     @DisplayName("Get Details - Successful")
-    void getEnterDetailsSuccessful(PenaltyReference penaltyReference) throws Exception {
+    void getEnterDetailsSuccessful(PenaltyReference penaltyReference) {
 
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(penaltyReference)).thenReturn(true);
 
@@ -145,7 +139,7 @@ class PenaltyDetailsServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {SERVICE_UNAVAILABLE_VIEW_NAME, UNSCHEDULED_SERVICE_DOWN_PATH})
     @DisplayName("Get Details - Unsuccessful health check")
-    void getEnterDetailsFailedHealthCheck(String healthCheckRedirect) throws Exception {
+    void getEnterDetailsFailedHealthCheck(String healthCheckRedirect) {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .getEnterDetails(LATE_FILING.getStartsWith(), healthCheckRedirect);
@@ -164,7 +158,7 @@ class PenaltyDetailsServiceImplTest {
     @ParameterizedTest
     @EnumSource(PenaltyReference.class)
     @DisplayName("Get Details - Penalty reference type not enabled")
-    void getEnterDetailsFailedHealthCheck(PenaltyReference penaltyReference) throws Exception {
+    void getEnterDetailsFailedHealthCheck(PenaltyReference penaltyReference) {
 
         when(mockFeatureFlagChecker.isPenaltyRefEnabled(penaltyReference)).thenReturn(false);
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
@@ -188,10 +182,9 @@ class PenaltyDetailsServiceImplTest {
     }
 
 
-    @ParameterizedTest
-    @CsvSource({ENTER_DETAILS_MODEL_ATTR + "," + COMPANY_NUMBER_ATTRIBUTE + ",Enter company name"})
+    @Test
     @DisplayName("Post Details with input validation errors")
-    void postDetailsWithInputValidationErrors(String objectName, String field, String defaultMsg) throws Exception {
+    void postDetailsWithInputValidationErrors() throws Exception {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(buildEnterDetails(null, null, null), true, enterDetailsControllerClass);

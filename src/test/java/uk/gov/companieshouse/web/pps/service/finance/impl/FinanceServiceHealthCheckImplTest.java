@@ -1,11 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.finance.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,12 +8,23 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ui.Model;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheckStatus;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.MESSAGE;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -34,11 +39,7 @@ class FinanceServiceHealthCheckImplTest {
     @Mock
     private FinanceServiceHealthCheckImpl mockFinanceServiceHealthCheck;
 
-    @Mock
-    private Model mockModel;
-
     private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
-    private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/pay-penalty/ref-starts-with";
     private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
 
     private static final String UNKNOWN_STATUS = "Unknown";
@@ -61,8 +62,12 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
-        assertEquals(PENALTY_REF_STARTS_WITH_PATH, message);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0);
+
+        assertFalse( result.getUrl().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
+        assertFalse( result.getModelAttributes().isPresent());
     }
 
     @Test
@@ -74,8 +79,14 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(1, PENALTY_REF_STARTS_WITH_PATH, mockModel);
-        assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(1);
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, result.getUrl().get());
+
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
+        assertFalse( result.getModelAttributes().isPresent());
     }
 
     @Test
@@ -87,23 +98,39 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getGovUkPayPenaltyUrl()).thenReturn(GOV_UK_PAY_PENALTY_URL);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(null, PENALTY_REF_STARTS_WITH_PATH, mockModel);
-        assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, message);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(null);
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + GOV_UK_PAY_PENALTY_URL, result.getUrl().get());
+
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
+        assertFalse( result.getModelAttributes().isPresent());
     }
 
     @Test
     @DisplayName("Health Check for start pages - unhealthy planned maintenance")
     void healthCheckStartUnhealthyPlannedMaintenance() throws Exception {
         FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
-
         mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
         mockFinancialHealthCheck.setMaintenanceEndTime(MAINTENANCE_END_TIME);
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0);
 
-        assertEquals("pps/serviceUnavailable", message);
+        assertTrue( result.getUrl().isPresent());
+        assertEquals("pps/serviceUnavailable", result.getUrl().get());
+
+        assertTrue( result.getModelAttributes().isPresent());
+        assertTrue(result.getModelAttributes().get().containsKey(MESSAGE));
+        assertEquals(1, result.getModelAttributes().get().size());
+
+        assertTrue( result.getBaseModelAttributes().isPresent());
+        assertTrue(result.getBaseModelAttributes().get().containsKey(SIGN_OUT_URL_ATTR));
+        assertEquals(1, result.getBaseModelAttributes().get().size());
+
     }
 
     @Test
@@ -117,9 +144,14 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0);
 
-        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
+
+        assertFalse( result.getModelAttributes().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
     }
 
     @Test
@@ -129,10 +161,16 @@ class FinanceServiceHealthCheckImplTest {
 
         doThrow(ServiceException.class).when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
 
-        String message = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0, PENALTY_REF_STARTS_WITH_PATH, mockModel);
+        var result = mockFinanceServiceHealthCheck.checkIfAvailableAtStart(0);
 
-        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message);
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
+
+        assertFalse( result.getModelAttributes().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
     }
+
 
     @Test
     @DisplayName("Health Check for other pages - healthy")
@@ -142,8 +180,12 @@ class FinanceServiceHealthCheckImplTest {
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
-        assertEquals(Optional.empty(), message);
+        PPSServiceResponse result = mockFinanceServiceHealthCheck.checkIfAvailable();
+
+        assertFalse( result.getUrl().isPresent());
+        assertFalse( result.getModelAttributes().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
     }
 
     @Test
@@ -155,9 +197,20 @@ class FinanceServiceHealthCheckImplTest {
         mockFinancialHealthCheck.setMaintenanceEndTime(MAINTENANCE_END_TIME);
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
-        assertEquals("pps/serviceUnavailable", message.get());
+        PPSServiceResponse result = mockFinanceServiceHealthCheck.checkIfAvailable();
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
+
+        assertTrue( result.getModelAttributes().isPresent());
+        assertTrue(result.getModelAttributes().get().containsKey(MESSAGE));
+        assertEquals(1, result.getModelAttributes().get().size());
+
+        assertTrue( result.getBaseModelAttributes().isPresent());
+        assertTrue(result.getBaseModelAttributes().get().containsKey(SIGN_OUT_URL_ATTR));
+        assertEquals(1, result.getBaseModelAttributes().get().size());
     }
 
     @Test
@@ -167,8 +220,14 @@ class FinanceServiceHealthCheckImplTest {
 
         doThrow(ServiceException.class).when(mockPenaltyPaymentService).checkFinanceSystemAvailableTime();
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
-        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message.get());
+        PPSServiceResponse result = mockFinanceServiceHealthCheck.checkIfAvailable();
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
+
+        assertFalse( result.getModelAttributes().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
     }
 
     @Test
@@ -182,7 +241,14 @@ class FinanceServiceHealthCheckImplTest {
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
 
-        Optional<String> message = mockFinanceServiceHealthCheck.checkIfAvailable(mockModel);
-        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, message.get());
+        PPSServiceResponse result = mockFinanceServiceHealthCheck.checkIfAvailable();
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
+
+        assertFalse( result.getModelAttributes().isPresent());
+        assertFalse(result.getErrorRequestMsg().isPresent());
+        assertFalse( result.getBaseModelAttributes().isPresent());
+
     }
 }

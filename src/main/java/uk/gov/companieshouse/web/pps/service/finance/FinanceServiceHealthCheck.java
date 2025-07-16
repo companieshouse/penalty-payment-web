@@ -1,13 +1,11 @@
 package uk.gov.companieshouse.web.pps.service.finance;
 
-import java.util.Optional;
-
-import org.springframework.ui.Model;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 public interface FinanceServiceHealthCheck {
 
-    Optional<String> checkIfAvailable(Model model);
+    PPSServiceResponse checkIfAvailable();
 
-    String checkIfAvailableAtStart(Integer startId, String nextController, Model model);
+    PPSServiceResponse checkIfAvailableAtStart(Integer startId);
 
 }

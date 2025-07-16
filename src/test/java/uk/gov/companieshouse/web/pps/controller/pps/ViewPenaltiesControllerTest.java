@@ -1,9 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,11 +18,13 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.viewpenalty.ViewPenaltiesService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-
 import uk.gov.companieshouse.web.pps.util.PenaltyTestData;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesController.VIEW_PENALTIES_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
@@ -44,6 +41,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAM
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_ROE_REASON;
@@ -105,6 +103,8 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - success path")
     void getRequestSuccess(PenaltyTestData penaltyTestData) throws Exception {
 
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         Map<String, String> baseModelAttributes = new HashMap<>();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH);
         Map<String, Object> modelAttributes = new HashMap<>();
@@ -138,6 +138,8 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - unscheduled error")
     void getRequestLateFilingPenaltyPenaltyRefNotFound() throws Exception {
 
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         serviceResponse.setUrl(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
 
@@ -154,6 +156,8 @@ class ViewPenaltiesControllerTest {
     @Test
     @DisplayName("Get View Penalties - IllegalArgumentException when view penalties")
     void getRequestLateFilingPenaltyIllegalArgumentException() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
 
         doThrow(IllegalArgumentException.class).
                 when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
@@ -172,6 +176,8 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - ServiceException when getCompanyProfile")
     void getRequestLateFilingPenaltyServiceException() throws Exception {
 
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         doThrow(ServiceException.class).
                 when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
 
@@ -189,7 +195,12 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - failed financial health check planned maintenance")
     void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
 
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        serviceResponse.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is2xxSuccessful())
@@ -200,7 +211,10 @@ class ViewPenaltiesControllerTest {
     @DisplayName("Get View Penalties - failed financial health check return unschedule service down")
     void getRequestLateFilingPenaltyOtherView() throws Exception {
 
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        serviceResponse.setUrl(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
                 .andExpect(status().is3xxRedirection())

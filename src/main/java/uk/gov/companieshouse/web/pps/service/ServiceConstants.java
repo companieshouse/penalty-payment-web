@@ -15,6 +15,10 @@ public class ServiceConstants {
     public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
     public static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
 
+    public static final String MESSAGE = "message";
+
+    public static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
+
     private ServiceConstants() {
     }
 }

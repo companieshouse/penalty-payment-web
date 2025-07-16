@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import java.util.HashMap;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +17,11 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -32,14 +31,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.controller.BaseController.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -90,6 +89,8 @@ class PenaltyRefStartsWithControllerTest {
     @Test
     @DisplayName("Get 'penaltyRefStartsWith' screen - redirect late filing details")
     void getPenaltyRefStartsWithSanctionsDisabled() throws Exception {
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
 
@@ -105,6 +106,8 @@ class PenaltyRefStartsWithControllerTest {
     @Test
     @DisplayName("Get 'penaltyRefStartsWith' screen - success")
     void getPenaltyRefStartsWithSanctionsEnabled() throws Exception {
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
@@ -124,8 +127,11 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check planned maintenance")
     void getRequestLateFilingPenaltyPlanMaintenance() throws Exception {
 
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        serviceResponse.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
+
         setupMockMvc();
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME));
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().is2xxSuccessful())
@@ -136,8 +142,11 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - failed financial health check return unschedule service down")
     void getRequestLateFilingPenaltyOtherView() throws Exception {
 
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        serviceResponse.setUrl(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH);
+
         setupMockMvc();
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(penaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().is3xxRedirection())

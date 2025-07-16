@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,6 @@ class CustomErrorControllerTest {
 
     private static final String REDIRECT_PATH = "redirect:";
     private static final String PAGE_NOT_FOUND_PATH = "/pay-penalty/page-not-found";
-    private static final String UNSCHEDULE_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     private static final int ERROR_CODE_NOT_FOUND = 404;
     private static final int ERROR_CODE_SERVICE_UNAVAILABLE = 503;
@@ -46,9 +46,10 @@ class CustomErrorControllerTest {
     void getUnexpectedError() {
         CustomErrorController controller = new CustomErrorController(mockPenaltyConfigurationProperties);
 
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULE_SERVICE_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
+                UNSCHEDULED_SERVICE_DOWN_PATH);
         when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(ERROR_CODE_SERVICE_UNAVAILABLE);
 
-        assertEquals(REDIRECT_PATH + UNSCHEDULE_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
+        assertEquals(REDIRECT_PATH + UNSCHEDULED_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
     }
 }

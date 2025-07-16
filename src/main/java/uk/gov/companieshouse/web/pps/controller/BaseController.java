@@ -27,7 +27,6 @@ public abstract class BaseController {
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
     public static final String PHASE_BANNER_LINK_ATTR = "phaseBannerLink";
-    public static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;

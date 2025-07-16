@@ -26,7 +26,6 @@ import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.controller.pps.StartController.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
@@ -110,6 +109,8 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details success path")
     void getEnterDetailsSuccessPath(PenaltyReference penaltyReference) throws Exception {
 
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
         var enterDetails = new EnterDetails();
         var startsWith = penaltyReference.getStartsWith();
         enterDetails.setPenaltyReferenceName(penaltyReference.name());
@@ -130,7 +131,10 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details Health check fails")
     void getEnterDetailsWhenHealthCheckFails(String viewName) throws Exception {
 
-        when(mockFinanceServiceHealthCheck.checkIfAvailable(any())).thenReturn(Optional.of(viewName));
+        PPSServiceResponse response = new PPSServiceResponse();
+        response.setUrl(viewName);
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(response);
 
         var serviceResponse = buildServiceResponse(false, false);
         var startsWith = LATE_FILING.getStartsWith();
@@ -149,6 +153,7 @@ class EnterDetailsControllerTest {
     @DisplayName("Get Details redirect path")
     void getEnterDetailsRedirectPath() throws Exception {
 
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyDetailsService.getEnterDetails("Z", ""))
                 .thenThrow(new IllegalArgumentException("Starts with is invalid", new Exception()));
@@ -164,6 +169,8 @@ class EnterDetailsControllerTest {
     @Test
     @DisplayName("Get Details fails for invalid penalty reference starts with")
     void getEnterDetailsWhenStartsWithIsInvalid() throws Exception {
+
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
 
         var serviceResponse = buildServiceResponse(false, false);
         var startsWith = SANCTIONS.getStartsWith();

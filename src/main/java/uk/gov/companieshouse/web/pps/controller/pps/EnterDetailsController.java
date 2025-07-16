@@ -58,10 +58,10 @@ public class EnterDetailsController extends BaseController {
 
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith, Model model, HttpServletRequest request) {
-        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable();
         try {
             PPSServiceResponse serviceResponse = penaltyDetailsService
-                    .getEnterDetails(penaltyReferenceStartsWith, healthCheck.orElse(""));
+                    .getEnterDetails(penaltyReferenceStartsWith, healthCheck.getUrl().orElse(""));
 
             serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
             configureBaseAttributes(serviceResponse, model);

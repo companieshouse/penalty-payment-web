@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 
 import jakarta.validation.Valid;
 
@@ -53,12 +54,12 @@ public class PenaltyRefStartsWithController extends BaseController {
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
 
-        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
-        if (healthCheck.isPresent()) {
-            String viewName = healthCheck.get();
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable();
+        var url = healthCheck.getUrl();
+        if (url.isPresent()) {
+            String viewName = url.get();
             if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                addBaseAttributesWithoutBackUrlToModel(model,
-                        penaltyConfigurationProperties.getSignedOutUrl());
+                addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
             }
             return viewName;
         }

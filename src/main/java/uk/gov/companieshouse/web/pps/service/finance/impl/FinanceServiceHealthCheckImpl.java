@@ -1,10 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.finance.impl;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheckStatus;
 import uk.gov.companieshouse.logging.Logger;
@@ -14,12 +10,19 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.MESSAGE;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Service
 public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck {
@@ -30,8 +33,6 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final PenaltyPaymentService penaltyPaymentService;
 
-    static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
-
     public FinanceServiceHealthCheckImpl(
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             PenaltyPaymentService penaltyPaymentService) {
@@ -40,74 +41,94 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     }
 
     @Override
-    public String checkIfAvailableAtStart(Integer startId, String nextController, Model model) {
+    public PPSServiceResponse checkIfAvailableAtStart(Integer startId) {
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         try {
             FinanceHealthcheck financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
             if (financeHealthcheck.getMessage()
                     .equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
-                return getHealthy(startId, financeHealthcheck.getMessage(), nextController);
+                serviceResponse.setUrl(getHealthy(startId, financeHealthcheck.getMessage()));
+                return serviceResponse;
             } else if (financeHealthcheck.getMessage()
                     .equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
-                return getParsedTime(financeHealthcheck, redirectPathUnscheduledServiceDown, model);
-
+                return getRedirectPath(financeHealthcheck, redirectPathUnscheduledServiceDown);
             }
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
 
-        return redirectPathUnscheduledServiceDown;
+        serviceResponse.setUrl(redirectPathUnscheduledServiceDown);
+        return serviceResponse;
     }
 
     @Override
-    public Optional<String> checkIfAvailable(Model model) {
+    public PPSServiceResponse checkIfAvailable() {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
 
         try {
             FinanceHealthcheck financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
             if (financeHealthcheck.getMessage()
                     .equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
-                return Optional.of(getParsedTime(
-                        financeHealthcheck, redirectPathUnscheduledServiceDown, model));
-            } else {
-                return Optional.empty();
+                return getRedirectPath(financeHealthcheck, redirectPathUnscheduledServiceDown);
             }
+            return serviceResponse;
         } catch (ServiceException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
 
-        return Optional.of(redirectPathUnscheduledServiceDown);
+        serviceResponse.setUrl(redirectPathUnscheduledServiceDown);
+        return serviceResponse;
     }
 
-    private String getHealthy(Integer startId, String message, String nextController) {
+    private String getHealthy(Integer startId, String message) {
         LOGGER.debug("Financial health check: " + message);
         if (Objects.nonNull(startId) && startId == 0) {
-            return nextController;
+            return "";
         }
 
         return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getGovUkPayPenaltyUrl();
     }
 
-    private String getParsedTime(FinanceHealthcheck financeHealthcheck,
-            String redirectPathUnscheduledServiceDown, Model model) {
-        try {
+    private PPSServiceResponse getRedirectPath(FinanceHealthcheck financeHealthcheck,
+            String redirectPathUnscheduledServiceDown) {
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+
+        var time = getParsedDateTime(financeHealthcheck.getMaintenanceEndTime());
+
+        if (time.isPresent()) {
             LOGGER.debug("financial health check: " + financeHealthcheck.getMessage());
             LOGGER.error("Service is unavailable");
-            model.addAttribute(
-                    "message", getDateTime(financeHealthcheck.getMaintenanceEndTime()));
-            return SERVICE_UNAVAILABLE_VIEW_NAME;
+            serviceResponse.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
+            serviceResponse.setModelAttributes(createModelUpdate(time.get()));
+            serviceResponse.setBaseModelAttributes(createBaseModelUpdate());
+        } else {
+            serviceResponse.setUrl(redirectPathUnscheduledServiceDown);
+        }
+
+        return serviceResponse;
+    }
+
+    private Optional<String> getParsedDateTime(final String endTime) {
+        DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        DateFormat displayDateFormat = new SimpleDateFormat("h:mm a z 'on' EEEE d MMMM yyyy");
+        try {
+            return Optional.of(displayDateFormat.format(inputDateFormat.parse(endTime)));
         } catch (ParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            return redirectPathUnscheduledServiceDown;
+            return Optional.empty();
         }
     }
 
-    private String getDateTime(final String endTime) throws ParseException {
-        DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        DateFormat displayDateFormat = new SimpleDateFormat("h:mm a z 'on' EEEE d MMMM yyyy");
-           return displayDateFormat.format(inputDateFormat.parse(endTime));
+    private Map<String, Object> createModelUpdate(String time) {
+        return Map.of(MESSAGE, time);
+    }
+
+    private Map<String, String> createBaseModelUpdate() {
+        return Map.of(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
     }
 }
 
