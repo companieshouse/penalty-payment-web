@@ -61,9 +61,9 @@ public class SignOutServiceImpl implements SignOutService {
             return config.getSignedOutUrl() + "/signout";
         }
         if ("no".equalsIgnoreCase(radioValue)) {
-            return StringUtils.defaultIfEmpty(priorUrl, config.getHomePath());
+            return StringUtils.defaultIfEmpty(priorUrl, config.getPayPenaltyPath());
         }
-        return config.getHomePath();
+        return config.getPayPenaltyPath();
     }
 
 }
