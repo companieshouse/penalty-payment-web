@@ -19,6 +19,7 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyTestData;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -107,7 +108,7 @@ class PenaltyPaidControllerTest {
         modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
         modelAttributes.put(COMPANY_NAME_ATTR, "Brewery");
 
-        return new PPSServiceResponse("", "", baseModelAttributes, modelAttributes);
+        return new PPSServiceResponse("", "", baseModelAttributes, modelAttributes, Collections.emptyMap());
     }
 
     @Test
