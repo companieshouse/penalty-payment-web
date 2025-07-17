@@ -33,21 +33,19 @@ import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLO
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.ENTER_DETAILS_MODEL_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @Service
 public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
+    protected static final Logger LOGGER = LoggerFactory.getLogger(
+            PPSWebApplication.APPLICATION_NAME_SPACE);
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PAYABLE_PENALTY = "Payable penalty ";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
     private static final String PENALTY_PAID = "/penalty-paid";
     private static final String PENALTY_PAYMENT_IN_PROGRESS = "/penalty-payment-in-progress";
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
-
     private final CompanyService companyService;
     private final FeatureFlagChecker featureFlagChecker;
     private final MessageSource messageSource;
@@ -81,22 +79,20 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         if (url.isPresent()) {
-            var name = url.get();
-            if (name.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                serviceResponse.setBaseModelAttributes(setBaseAttributes(
-                        false, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
-            }
-            serviceResponse.setUrl(name);
+            healthCheck.getBaseModelAttributes().ifPresent(serviceResponse::setBaseModelAttributes);
+            healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
+            serviceResponse.setUrl(url.get());
         } else {
-            PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
+            PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(
+                    penaltyReferenceStartsWith);
             if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
-                serviceResponse.setUrl(REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath());
+                serviceResponse.setUrl(REDIRECT_URL_PREFIX
+                        + penaltyConfigurationProperties.getUnscheduledServiceDownPath());
             } else {
                 var enterDetails = new EnterDetails();
                 enterDetails.setPenaltyReferenceName(penaltyReference.name());
                 serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
-                serviceResponse.setBaseModelAttributes(setBaseAttributes(
-                        true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
+                serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
             }
         }
 
@@ -105,32 +101,37 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
     @Override
     public PPSServiceResponse postEnterDetails(
-            EnterDetails enterDetails, boolean hasBindingErrors, Class<?> clazz) throws ServiceException {
+            EnterDetails enterDetails, boolean hasBindingErrors, Class<?> clazz)
+            throws ServiceException {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         if (hasBindingErrors) {
-            serviceResponse.setBaseModelAttributes(setBaseAttributes(
-                    true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
+            serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
         } else {
             String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
-            String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
-            List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef);
+            String companyNumber = companyService.appendToCompanyNumber(
+                    enterDetails.getCompanyNumber().toUpperCase());
+            List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
+                    companyNumber, penaltyRef);
             getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef, clazz)
                     .ifPresentOrElse(serviceResponse::setUrl, () -> {
-                        String code = "details.penalty-details-not-found-error." + enterDetails.getPenaltyReferenceName();
-                        serviceResponse.setErrorRequestMsg(messageSource.getMessage(code, null, UK));
-                        serviceResponse.setBaseModelAttributes(setBaseAttributes(
-                                true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
+                        String code = "details.penalty-details-not-found-error."
+                                + enterDetails.getPenaltyReferenceName();
+                        serviceResponse.setErrorRequestMsg(
+                                messageSource.getMessage(code, null, UK));
+                        serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
                     });
         }
 
         return serviceResponse;
     }
 
-    private Optional<String> getPostDetailsRedirectPath(List<FinancialPenalty> penaltyAndCosts, String companyNumber, String penaltyRef, Class<?> clazz) {
+    private Optional<String> getPostDetailsRedirectPath(List<FinancialPenalty> penaltyAndCosts,
+            String companyNumber, String penaltyRef, Class<?> clazz) {
         if (penaltyAndCosts.size() > 1) {
             String msg = String.format(
-                    "Online payment unavailable as there is not a single payable penalty. There are %s penalty and costs for company number %s and penalty reference: %s",
+                    "Online payment unavailable as there is not a single payable penalty. "
+                            + "There are %s penalty and costs for company number %s and penalty reference: %s",
                     penaltyAndCosts.size(), companyNumber, penaltyRef);
             return logAndGetRedirectUrl(msg, ONLINE_PAYMENT_UNAVAILABLE, companyNumber, penaltyRef);
         }
@@ -139,14 +140,17 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
                 .toList();
         if (payablePenalties.isEmpty()) {
-            String msg = String.format("No payable penalties for company number %s and penalty ref %s", companyNumber, penaltyRef);
+            String msg = String.format(
+                    "No payable penalties for company number %s and penalty ref %s", companyNumber,
+                    penaltyRef);
             return logAndGetRedirectUrl(msg, null, companyNumber, penaltyRef);
         }
 
         var payablePenalty = payablePenalties.getFirst();
         if (CLOSED_PENDING_ALLOCATION == payablePenalty.getPayableStatus()) {
             String msg = PAYABLE_PENALTY + payablePenalty.getId() + " is closed pending allocation";
-            return logAndGetRedirectUrl(msg, PENALTY_PAYMENT_IN_PROGRESS, companyNumber, penaltyRef);
+            return logAndGetRedirectUrl(msg, PENALTY_PAYMENT_IN_PROGRESS, companyNumber,
+                    penaltyRef);
         }
         if (TRUE.equals(payablePenalty.getPaid())) {
             String msg = PAYABLE_PENALTY + payablePenalty.getId() + " is paid";
@@ -158,42 +162,48 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
         }
         if (CLOSED == payablePenalty.getPayableStatus()
                 || !payablePenalty.getOriginalAmount().equals(payablePenalty.getOutstanding())) {
-            String msg = String.format("Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
-                    payablePenalty.getId(), payablePenalty.getPayableStatus(), payablePenalty.getType(),
-                    payablePenalty.getOriginalAmount().toString(), payablePenalty.getOutstanding().toString());
+            String msg = String.format(
+                    "Payable penalty %s payable status is %s, type is %s, original amount is %s, outstanding amount is %s",
+                    payablePenalty.getId(), payablePenalty.getPayableStatus(),
+                    payablePenalty.getType(),
+                    payablePenalty.getOriginalAmount().toString(),
+                    payablePenalty.getOutstanding().toString());
             return logAndGetRedirectUrl(msg, ONLINE_PAYMENT_UNAVAILABLE, companyNumber, penaltyRef);
         }
 
-        LOGGER.debug(String.format("Penalty %s is payable, payableStatus: %s, isPaid: %s, isDca: %s",
-                penaltyRef, payablePenalty.getPayableStatus(), payablePenalty.getPaid(), payablePenalty.getDca()));
+        LOGGER.debug(
+                String.format("Penalty %s is payable, payableStatus: %s, isPaid: %s, isDca: %s",
+                        penaltyRef, payablePenalty.getPayableStatus(), payablePenalty.getPaid(),
+                        payablePenalty.getDca()));
 
-        return Optional.of(navigatorService.getNextControllerRedirect(clazz, companyNumber, penaltyRef));
+        return Optional.of(
+                navigatorService.getNextControllerRedirect(clazz, companyNumber, penaltyRef));
     }
 
     private String urlGenerator(String companyNumber, String penaltyRef) {
         return "/pay-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
     }
 
-    private String setBackLink() {
+    private String getBackLink() {
         if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
             return penaltyConfigurationProperties.getRefStartsWithPath();
         }
         return penaltyConfigurationProperties.getStartPath();
     }
 
-    private Map<String, String> setBaseAttributes(boolean withBackLink, String signOutPath, String backLinkPath) {
+    private Map<String, String> createBaseAttributesUpdate() {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put(SIGN_OUT_URL_ATTR, signOutPath);
-        if (withBackLink) {
-            attributes.put(BACK_LINK_URL_ATTR, backLinkPath);
-        }
+        attributes.put(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
+        attributes.put(BACK_LINK_URL_ATTR, getBackLink());
         return attributes;
     }
 
-    private Optional<String> logAndGetRedirectUrl(String msg, String redirectEndPoint, String companyNumber, String penaltyRef) {
+    private Optional<String> logAndGetRedirectUrl(String msg, String redirectEndPoint,
+            String companyNumber, String penaltyRef) {
         LOGGER.info(msg);
         return StringUtils.isEmpty(redirectEndPoint)
                 ? Optional.empty()
-                : Optional.of(UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber, penaltyRef) + redirectEndPoint);
+                : Optional.of(UrlBasedViewResolver.REDIRECT_URL_PREFIX + urlGenerator(companyNumber,
+                        penaltyRef) + redirectEndPoint);
     }
 }

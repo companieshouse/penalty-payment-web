@@ -38,7 +38,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
@@ -108,7 +108,7 @@ class ViewPenaltiesControllerTest {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, penaltyTestData.customerCode());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
-        modelAttributes.put(PENALTY_REF_NAME_ATTR,
+        modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
                 PenaltyUtils.getPenaltyReferenceType(penaltyTestData.penaltyRef()).name());
         modelAttributes.put(REASON_ATTR, penaltyTestData.reasonForPenalty());
         modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
@@ -128,7 +128,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
                 .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
-                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, penaltyTestData.name()));
+                .andExpect(model().attribute(PENALTY_REFERENCE_NAME_ATTR, penaltyTestData.name()));
 
         verify(mockViewPenaltiesService).viewPenalties(penaltyTestData.customerCode(),
                 penaltyTestData.penaltyRef());

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.MESSAGE;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
@@ -112,7 +111,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
                 financeHealthcheck = new FinanceHealthcheck();
-                financeHealthcheck.setMessage(new JSONObject(ex.getContent()).get(MESSAGE).toString());
+                financeHealthcheck.setMessage(new JSONObject(ex.getContent()).get("message").toString());
                 financeHealthcheck.setMaintenanceEndTime(new JSONObject(ex.getContent()).get("maintenance_end_time").toString());
 
                 return financeHealthcheck;

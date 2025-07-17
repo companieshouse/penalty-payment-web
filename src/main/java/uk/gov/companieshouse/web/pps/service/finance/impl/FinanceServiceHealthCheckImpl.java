@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.MESSAGE;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.DATE_STR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
@@ -49,7 +49,8 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
             FinanceHealthcheck financeHealthcheck = penaltyPaymentService.checkFinanceSystemAvailableTime();
             if (financeHealthcheck.getMessage()
                     .equals(FinanceHealthcheckStatus.HEALTHY.getStatus())) {
-                serviceResponse.setUrl(getHealthy(startId, financeHealthcheck.getMessage()));
+                getHealthy(startId, financeHealthcheck.getMessage()).ifPresent(
+                        serviceResponse::setUrl);
                 return serviceResponse;
             } else if (financeHealthcheck.getMessage()
                     .equals(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus())) {
@@ -84,13 +85,13 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
         return serviceResponse;
     }
 
-    private String getHealthy(Integer startId, String message) {
+    private Optional<String> getHealthy(Integer startId, String message) {
         LOGGER.debug("Financial health check: " + message);
         if (Objects.nonNull(startId) && startId == 0) {
-            return "";
+            return Optional.empty();
         }
 
-        return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getGovUkPayPenaltyUrl();
+        return Optional.of(REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getGovUkPayPenaltyUrl());
     }
 
     private PPSServiceResponse getRedirectPath(FinanceHealthcheck financeHealthcheck,
@@ -124,7 +125,7 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     }
 
     private Map<String, Object> createModelUpdate(String time) {
-        return Map.of(MESSAGE, time);
+        return Map.of(DATE_STR, time);
     }
 
     private Map<String, String> createBaseModelUpdate() {

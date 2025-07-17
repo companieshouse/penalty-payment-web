@@ -39,6 +39,7 @@ import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.BACK_LINK_MODEL_ATTR;
@@ -78,8 +79,6 @@ class EnterDetailsControllerTest {
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
-
-    private static final String PENALTY_REFERENCE_NAME_ATTRIBUTE = "penaltyReferenceName";
 
     private static final String NEXT_CONTROLLER_PATH = REDIRECT_URL_PREFIX + "/nextControllerPath";
 
@@ -187,7 +186,7 @@ class EnterDetailsControllerTest {
                 .thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, penaltyReferenceName)
+                        .param(PENALTY_REFERENCE_NAME_ATTR, penaltyReferenceName)
                         .param(COMPANY_NUMBER_ATTR, companyNumber)
                         .param(PENALTY_REF_ATTR, penaltyRef))
                 .andExpect(status().is3xxRedirection())
@@ -203,7 +202,7 @@ class EnterDetailsControllerTest {
         when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
@@ -222,7 +221,7 @@ class EnterDetailsControllerTest {
         when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
                         .param(COMPANY_NUMBER_ATTR, COMPANY_NUMBER)
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().isOk())
@@ -240,20 +239,20 @@ class EnterDetailsControllerTest {
                 .thenThrow(new ServiceException("Failed to get penalties", new Exception()));
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTRIBUTE, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
                         .param(COMPANY_NUMBER_ATTR, COMPANY_NUMBER)
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
     }
 
-    private PPSServiceResponse buildServiceResponse(boolean backLink, boolean signoutLink) {
+    private PPSServiceResponse buildServiceResponse(boolean backLink, boolean signOutLink) {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         Map<String, String> baseAttributes = new HashMap<>();
         if (backLink) {
             baseAttributes.put(BACK_LINK_URL_ATTR, BACK_LINK_URL);
         }
-        if (signoutLink) {
+        if (signOutLink) {
             baseAttributes.put(SIGN_OUT_URL_ATTR, SIGN_OUT_URL);
         }
         if (!baseAttributes.isEmpty()) {

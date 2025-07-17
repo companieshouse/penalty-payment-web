@@ -32,11 +32,9 @@ import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPE
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 
 @Service
@@ -79,11 +77,9 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         if (url.isPresent()) {
-            var name = url.get();
-            if (name.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath()));
-            }
-            serviceResponse.setUrl(name);
+            healthCheck.getBaseModelAttributes().ifPresent(serviceResponse::setBaseModelAttributes);
+            healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
+            serviceResponse.setUrl(url.get());
         } else {
             Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef,
                     companyNumber);
@@ -182,7 +178,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyRef);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR,
+        modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
                 PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
         modelAttributes.put(REASON_ATTR, payablePenalty.getReason());
         modelAttributes.put(AMOUNT_ATTR,

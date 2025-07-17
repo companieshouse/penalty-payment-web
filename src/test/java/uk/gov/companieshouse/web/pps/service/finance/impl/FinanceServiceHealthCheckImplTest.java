@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.MESSAGE;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.DATE_STR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.GOV_UK_PAY_PENALTY_URL;
@@ -113,7 +113,7 @@ class FinanceServiceHealthCheckImplTest {
         assertEquals("pps/serviceUnavailable", result.getUrl().get());
 
         assertTrue( result.getModelAttributes().isPresent());
-        assertTrue(result.getModelAttributes().get().containsKey(MESSAGE));
+        assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
         assertEquals(1, result.getModelAttributes().get().size());
 
         assertTrue( result.getBaseModelAttributes().isPresent());
@@ -194,7 +194,7 @@ class FinanceServiceHealthCheckImplTest {
         assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
 
         assertTrue( result.getModelAttributes().isPresent());
-        assertTrue(result.getModelAttributes().get().containsKey(MESSAGE));
+        assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
         assertEquals(1, result.getModelAttributes().get().size());
 
         assertTrue( result.getBaseModelAttributes().isPresent());

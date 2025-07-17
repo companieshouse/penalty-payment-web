@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.viewpenalty.impl;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +47,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
@@ -55,6 +57,7 @@ import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.OVERSEAS_ENTITY_ID;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.ROE_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_AMOUNT;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
@@ -105,8 +108,8 @@ class ViewPenaltiesServiceImplTest {
     void getPenaltyRefStartsWithHealthCheckReturningServiceUnavailable() throws ServiceException {
         PPSServiceResponse healthCheck = new PPSServiceResponse();
         healthCheck.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
+        healthCheck.setBaseModelAttributes(Map.of(SIGN_OUT_URL_ATTR, SIGN_OUT_PATH));
 
-        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(PPSTestUtility.SIGN_OUT_PATH);
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
         PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER, PENALTY_REF);
@@ -165,7 +168,7 @@ class ViewPenaltiesServiceImplTest {
         assertThat(serviceResponse.getModelAttributes().get().toString(),
                 containsString(PENALTY_REF_ATTR));
         assertThat(serviceResponse.getModelAttributes().get().toString(),
-                containsString(PENALTY_REF_NAME_ATTR));
+                containsString(PENALTY_REFERENCE_NAME_ATTR));
         assertThat(serviceResponse.getModelAttributes().get().toString(),
                 containsString(REASON_ATTR));
         assertThat(serviceResponse.getModelAttributes().get().toString(),

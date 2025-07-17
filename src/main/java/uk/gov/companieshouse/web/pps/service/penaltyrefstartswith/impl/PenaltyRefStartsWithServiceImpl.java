@@ -20,8 +20,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Service
 public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithService {
@@ -53,11 +51,9 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         if (url.isPresent()) {
-            var name = url.get();
-            if (name.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                serviceResponse.setBaseModelAttributes(Map.of(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath()));
-            }
-            serviceResponse.setUrl(name);
+            healthCheck.getBaseModelAttributes().ifPresent(serviceResponse::setBaseModelAttributes);
+            healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
+            serviceResponse.setUrl(url.get());
         } else {
             LOGGER.debug(
                     String.format("Available penalty reference types: %s",availablePenaltyReference));

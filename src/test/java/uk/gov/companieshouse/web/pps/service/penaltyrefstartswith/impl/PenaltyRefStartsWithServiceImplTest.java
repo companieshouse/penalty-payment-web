@@ -13,10 +13,10 @@ import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.Boolean.TRUE;
@@ -32,6 +32,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_U
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
@@ -150,8 +151,8 @@ class PenaltyRefStartsWithServiceImplTest {
     void getPenaltyRefStartsWithHealthCheckReturningServiceUnavailable() {
         PPSServiceResponse healthCheck = new PPSServiceResponse();
         healthCheck.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
+        healthCheck.setBaseModelAttributes(Map.of(SIGN_OUT_URL_ATTR, SIGN_OUT_PATH));
 
-        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(PPSTestUtility.SIGN_OUT_PATH);
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
         when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
