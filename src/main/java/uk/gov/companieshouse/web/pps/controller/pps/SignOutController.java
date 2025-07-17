@@ -13,11 +13,11 @@ import uk.gov.companieshouse.web.pps.annotation.NextController;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
@@ -54,17 +54,10 @@ public class SignOutController extends BaseController {
         }
 
         LOGGER.debug("Processing sign out");
-        Optional.ofNullable(signOutService.resolveBackLink(request))
-                .ifPresentOrElse(
-                        backLink -> {
-                            model.addAttribute(BACK_LINK, backLink);
-                            LOGGER.info("Referer is " + backLink);
-                        },
-                        () -> {
-                            model.addAttribute(BACK_LINK, "/pay-penalty/");
-                            LOGGER.info("Refer is sign-out or missing - fallback applied");
-                        }
-                );
+        PPSServiceResponse response = signOutService.resolveBackLink(request);
+        String backLink = response.getUrl().orElse("/pay-penalty/");
+        model.addAttribute(BACK_LINK, backLink);
+        LOGGER.info("Backlink resolved to: " + backLink);
 
         addPhaseBannerToModel(model, signOutService.getSurveyLink());
         return getTemplateName();

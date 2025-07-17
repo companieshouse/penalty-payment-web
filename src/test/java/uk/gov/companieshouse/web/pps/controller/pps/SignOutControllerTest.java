@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
@@ -65,7 +66,8 @@ class SignOutControllerTest {
     void getRequestSuccess() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(null);
+        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class)))
+                .thenReturn(new PPSServiceResponse());
 
         mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
@@ -76,9 +78,12 @@ class SignOutControllerTest {
     @Test
     @DisplayName("GET Sign out - success with referer backlink")
     void getPreviousReferer() throws Exception {
+        PPSServiceResponse response = new PPSServiceResponse();
+        response.setUrl(PREVIOUS_PATH);
+
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(PREVIOUS_PATH);
+        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(response);
 
         mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
                 .andExpect(status().isOk())
@@ -91,7 +96,8 @@ class SignOutControllerTest {
     void getCheckSignOutIsReferer() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(null); // emulate self-referer
+        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class)))
+                .thenReturn(new PPSServiceResponse());
 
         mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", SIGN_OUT_PATH))
                 .andExpect(status().isOk())

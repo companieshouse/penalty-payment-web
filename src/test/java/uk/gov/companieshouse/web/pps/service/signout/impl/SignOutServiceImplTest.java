@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 class SignOutServiceImplTest {
 
@@ -59,10 +59,21 @@ class SignOutServiceImplTest {
         when(mockAllowlistChecker.checkSignOutIsReferer("/previous")).thenReturn(false);
         when(request.getSession()).thenReturn(session);
 
-        String result = service.resolveBackLink(request);
+        PPSServiceResponse response = service.resolveBackLink(request);
 
-        assertEquals("/previous", result);
+        assertTrue(response.getUrl().isPresent());
+        assertEquals("/previous", response.getUrl().get());
         verify(session).setAttribute("url_prior_signout", "/previous");
+    }
+
+    @Test
+    void testResolveBackLink_withEmptyReferer() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Referer")).thenReturn(null);
+
+        PPSServiceResponse response = service.resolveBackLink(request);
+
+        assertTrue(response.getUrl().isEmpty());
     }
 
     @Test
