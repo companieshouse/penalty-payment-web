@@ -18,6 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.pps.OnlinePaymentUnavailableController.ONLINE_PAYMENT_UNAVAILABLE_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.BACK_LINK_MODEL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -34,12 +37,8 @@ class OnlinePaymentUnavailableControllerTest {
     @Mock
     private SessionService mockSessionService;
 
-    private static final String VALID_COMPANY_NUMBER = "12345678";
-    private static final String VALID_PENALTY_REF = "A4444444";
-
-    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/pay-penalty/company/" + VALID_COMPANY_NUMBER + "/penalty/" + VALID_PENALTY_REF + "/online-payment-unavailable";
-
-    private static final String BACK_LINK_MODEL_ATTR = "backLink";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/pay-penalty/company/" + COMPANY_NUMBER
+            + "/penalty/" + PENALTY_REF + "/online-payment-unavailable";
 
     @BeforeEach
     public void setup() {

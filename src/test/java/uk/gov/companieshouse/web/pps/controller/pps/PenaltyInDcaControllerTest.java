@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +38,6 @@ class PenaltyInDcaControllerTest {
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
-
-    private static final String COMPANY_NUMBER = "12345678";
-    private static final String PENALTY_REF = "A4444444";
 
     private static final String PENALTY_IN_DCA_PATH = "/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + PENALTY_REF + "/penalty-in-dca";
 

@@ -17,7 +17,6 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import java.util.Optional;
 
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @NextController(PenaltyRefStartsWithController.class)
@@ -48,10 +47,7 @@ public class StartController extends BaseController {
         serviceResponse.getModelAttributes()
                 .ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-        serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
-                addBaseAttributesWithoutBackUrlToModel(
-                        model,
-                        serviceResponse.getBaseModelAttributes().get().get(SIGN_OUT_URL_ATTR)));
+        configureBaseAttributes(serviceResponse, model);
 
         return serviceResponse.getUrl().orElse(navigatorService.getNextControllerRedirect(this.getClass()));
     }

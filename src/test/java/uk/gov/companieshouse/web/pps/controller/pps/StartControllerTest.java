@@ -30,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.GOV_UK_PAY_PENALTY_URL;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -50,6 +52,12 @@ class StartControllerTest {
     @Mock
     private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
 
+    private static final String LEGACY_START_PATH = "/late-filing-penalty";
+    private static final String LEGACY_START_PATH_PARAM = "/late-filing-penalty?start=0";
+    private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
+    private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
+    private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/late-filing-penalty/ref-starts-with";
+
     @BeforeEach
     void setup() {
         StartController controller = new StartController(
@@ -59,14 +67,6 @@ class StartControllerTest {
                 mockFinanceServiceHealthCheck);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).setViewResolvers(viewResolver()).build();
     }
-
-    private static final String LEGACY_START_PATH = "/late-filing-penalty";
-    private static final String LEGACY_START_PATH_PARAM = "/late-filing-penalty?start=0";
-    private static final String PAY_PENALTY_START_PATH = "/pay-penalty";
-    private static final String PAY_PENALTY_START_PATH_PARAM = "/pay-penalty?start=0";
-    private static final String PENALTY_REF_STARTS_WITH_PATH = REDIRECT_URL_PREFIX + "/late-filing-penalty/ref-starts-with";
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
-    private static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
 
     @Test
     @DisplayName("Get start page - redirect to GOV UK Pay Penalty - Start now page")

@@ -22,14 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.UnscheduledServiceDownController.UNSCHEDULED_SERVICE_DOWN_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UnscheduledServiceDownControllerTest {
 
     private MockMvc mockMvc;
-
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @Mock
     private NavigatorService mockNavigatorService;

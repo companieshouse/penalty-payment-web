@@ -12,6 +12,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -53,6 +54,7 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
     private final NavigatorService navigatorService;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final PenaltyPaymentService penaltyPaymentService;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     public PenaltyDetailsServiceImpl(
             CompanyService companyService,
@@ -60,25 +62,31 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
             MessageSource messageSource,
             NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            PenaltyPaymentService penaltyPaymentService) {
+            PenaltyPaymentService penaltyPaymentService,
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
         this.companyService = companyService;
         this.featureFlagChecker = featureFlagChecker;
         this.messageSource = messageSource;
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.penaltyPaymentService = penaltyPaymentService;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
     }
 
     @Override
-    public PPSServiceResponse getEnterDetails(
-            String penaltyReferenceStartsWith, String healthCheckRedirect) throws IllegalArgumentException {
+    public PPSServiceResponse getEnterDetails(String penaltyReferenceStartsWith)
+            throws IllegalArgumentException {
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable();
+        var url = healthCheck.getUrl();
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        if (StringUtils.isNotBlank(healthCheckRedirect)) {
-            if (healthCheckRedirect.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                setBaseAttributes(serviceResponse, false);
+        if (url.isPresent()) {
+            var name = url.get();
+            if (name.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
+                serviceResponse.setBaseModelAttributes(setBaseAttributes(
+                        false, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
             }
-            serviceResponse.setUrl(healthCheckRedirect);
+            serviceResponse.setUrl(name);
         } else {
             PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(penaltyReferenceStartsWith);
             if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
@@ -87,7 +95,8 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
                 var enterDetails = new EnterDetails();
                 enterDetails.setPenaltyReferenceName(penaltyReference.name());
                 serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
-                setBaseAttributes(serviceResponse, true);
+                serviceResponse.setBaseModelAttributes(setBaseAttributes(
+                        true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
             }
         }
 
@@ -100,7 +109,8 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         if (hasBindingErrors) {
-            setBaseAttributes(serviceResponse, true);
+            serviceResponse.setBaseModelAttributes(setBaseAttributes(
+                    true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
         } else {
             String penaltyRef = enterDetails.getPenaltyRef().toUpperCase();
             String companyNumber = companyService.appendToCompanyNumber(enterDetails.getCompanyNumber().toUpperCase());
@@ -109,7 +119,8 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
                     .ifPresentOrElse(serviceResponse::setUrl, () -> {
                         String code = "details.penalty-details-not-found-error." + enterDetails.getPenaltyReferenceName();
                         serviceResponse.setErrorRequestMsg(messageSource.getMessage(code, null, UK));
-                        setBaseAttributes(serviceResponse, true);
+                        serviceResponse.setBaseModelAttributes(setBaseAttributes(
+                                true, penaltyConfigurationProperties.getSignOutPath(), setBackLink()));
                     });
         }
 
@@ -170,13 +181,13 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
         return penaltyConfigurationProperties.getStartPath();
     }
 
-    private void setBaseAttributes(PPSServiceResponse serviceResponse, boolean withBackLink) {
+    private Map<String, String> setBaseAttributes(boolean withBackLink, String signOutPath, String backLinkPath) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
+        attributes.put(SIGN_OUT_URL_ATTR, signOutPath);
         if (withBackLink) {
-            attributes.put(BACK_LINK_URL_ATTR, setBackLink());
+            attributes.put(BACK_LINK_URL_ATTR, backLinkPath);
         }
-        serviceResponse.setBaseModelAttributes(attributes);
+        return attributes;
     }
 
     private Optional<String> logAndGetRedirectUrl(String msg, String redirectEndPoint, String companyNumber, String penaltyRef) {

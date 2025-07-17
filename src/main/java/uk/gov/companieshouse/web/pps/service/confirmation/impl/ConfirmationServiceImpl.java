@@ -25,6 +25,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAM
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Service
@@ -37,7 +38,6 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     private final CompanyService companyService;
     private final PayablePenaltyService payablePenaltyService;
 
-    static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
     static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
     static final String PAYMENT_DATE_ATTR = "paymentDate";
     static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";

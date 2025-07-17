@@ -27,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PAYABLE_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,12 +58,6 @@ class PayablePenaltyServiceImplTest {
     private ApiResponse<PayableFinancialPenalties> payableFinancialPenaltiesApiResponse;
 
     private PayablePenaltyService payablePenaltyService;
-
-    private static final String COMPANY_NUMBER = "12345678";
-
-    private static final String PENALTY_REF = "A1234567";
-
-    private static final String PAYABLE_REF = "EXAMPLE1234";
 
     private static final Integer AMOUNT = 750;
 

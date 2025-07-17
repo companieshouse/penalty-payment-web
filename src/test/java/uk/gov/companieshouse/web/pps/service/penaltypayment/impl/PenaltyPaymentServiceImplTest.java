@@ -42,6 +42,8 @@ import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLO
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.OTHER_TYPE;
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
@@ -75,9 +77,6 @@ class PenaltyPaymentServiceImplTest {
 
     private PenaltyPaymentService penaltyPaymentService;
 
-    private static final String COMPANY_NUMBER = "12345678";
-
-    private static final String PENALTY_REF = "A9876543";
     private static final String PENALTY_REF_TWO = "A0000001";
 
     private static final String GET_FINANCIAL_PENALTIES_LATE_FILING_URI =

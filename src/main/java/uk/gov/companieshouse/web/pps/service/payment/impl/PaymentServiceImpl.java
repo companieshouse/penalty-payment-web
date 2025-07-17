@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
-
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
@@ -20,6 +18,8 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import java.util.Arrays;
 import java.util.UUID;
+
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {

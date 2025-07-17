@@ -33,7 +33,9 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyPaidController.PENALTY_PAID_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.BACK_LINK_MODEL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.CS_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
@@ -63,14 +65,11 @@ class PenaltyPaidControllerTest {
     @Mock
     private SessionService mockSessionService;
 
-    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER
-            + "/penalty/" + PENALTY_REF + "/penalty-paid";
-
-    private static final String BACK_LINK_MODEL_ATTR = "backLink";
-    private static final String PENALTY_REF_ATTR = "penaltyRef";
-
     @Mock
     private PenaltyPaidService mockPenaltyPaidService;
+
+    private static final String PENALTY_PAID_PATH = "/pay-penalty/company/" + COMPANY_NUMBER
+            + "/penalty/" + PENALTY_REF + "/penalty-paid";
 
     @BeforeEach
     void setup() {

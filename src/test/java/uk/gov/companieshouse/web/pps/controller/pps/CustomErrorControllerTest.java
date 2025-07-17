@@ -12,6 +12,7 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +25,6 @@ class CustomErrorControllerTest {
     @Mock
     private HttpServletRequest httpServletRequest;
 
-    private static final String REDIRECT_PATH = "redirect:";
     private static final String PAGE_NOT_FOUND_PATH = "/pay-penalty/page-not-found";
 
     private static final int ERROR_CODE_NOT_FOUND = 404;
@@ -38,7 +38,7 @@ class CustomErrorControllerTest {
         when(mockPenaltyConfigurationProperties.getPageNotFoundPath()).thenReturn(PAGE_NOT_FOUND_PATH);
         when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(ERROR_CODE_NOT_FOUND);
 
-        assertEquals(REDIRECT_PATH + PAGE_NOT_FOUND_PATH, controller.handleError(httpServletRequest));
+        assertEquals(REDIRECT_URL_PREFIX + PAGE_NOT_FOUND_PATH, controller.handleError(httpServletRequest));
     }
 
     @Test
@@ -50,6 +50,6 @@ class CustomErrorControllerTest {
                 UNSCHEDULED_SERVICE_DOWN_PATH);
         when(httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).thenReturn(ERROR_CODE_SERVICE_UNAVAILABLE);
 
-        assertEquals(REDIRECT_PATH + UNSCHEDULED_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, controller.handleError(httpServletRequest));
     }
 }
