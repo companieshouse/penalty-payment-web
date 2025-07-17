@@ -8,6 +8,7 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -44,15 +45,15 @@ public class SignOutServiceImpl implements SignOutService {
         PPSServiceResponse response = new PPSServiceResponse();
         String referer = request.getHeader("Referer");
         if (StringUtils.isBlank(referer)) {
-            response.setUrl(null);
             return response;
         }
         String allowedUrl = allowlistChecker.checkURL(referer);
         if (allowlistChecker.checkSignOutIsReferer(allowedUrl)) {
-            response.setUrl(null);
             return response;
         }
-        request.getSession().setAttribute("url_prior_signout", allowedUrl);
+        Map<String, Object> sessionAttrs = new HashMap<>();
+        sessionAttrs.put("url_prior_signout", allowedUrl);
+        response.setSessionAttributes(sessionAttrs);
         response.setUrl(allowedUrl);
         return response;
     }

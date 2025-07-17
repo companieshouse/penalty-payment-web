@@ -54,18 +54,24 @@ public class SignOutController extends BaseController {
         }
 
         LOGGER.debug("Processing sign out");
-        PPSServiceResponse response = signOutService.resolveBackLink(request);
-        String backLink = response.getUrl().orElse("/pay-penalty/");
-        model.addAttribute(BACK_LINK, backLink);
-        LOGGER.info("Backlink resolved to: " + backLink);
+        PPSServiceResponse serviceResponse = signOutService.resolveBackLink(request);
 
+        serviceResponse.getSessionAttributes()
+                .ifPresent(attrs -> attrs.forEach(request.getSession()::setAttribute));
+
+        serviceResponse.getUrl()
+                .ifPresentOrElse(
+                        backLink -> model.addAttribute(BACK_LINK, backLink),
+                        () -> model.addAttribute(BACK_LINK, "/pay-penalty/")
+                );
+
+        LOGGER.info("Backlink resolved to: " + model.getAttribute(BACK_LINK));
         addPhaseBannerToModel(model, signOutService.getSurveyLink());
         return getTemplateName();
     }
 
     @PostMapping
     public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        LOGGER.debug("Processing sign out POST");
         String radioValue = request.getParameter("radio");
         String priorUrl = (String) request.getSession().getAttribute("url_prior_signout");
 

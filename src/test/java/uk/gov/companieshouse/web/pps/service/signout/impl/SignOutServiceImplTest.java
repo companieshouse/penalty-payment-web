@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class SignOutServiceImplTest {
@@ -63,7 +62,11 @@ class SignOutServiceImplTest {
 
         assertTrue(response.getUrl().isPresent());
         assertEquals("/previous", response.getUrl().get());
-        verify(session).setAttribute("url_prior_signout", "/previous");
+
+        assertTrue(response.getSessionAttributes().isPresent());
+        Map<String, Object> sessionAttributes = response.getSessionAttributes().get();
+        assertEquals(1, sessionAttributes.size());
+        assertEquals("/previous", sessionAttributes.get("url_prior_signout"));
     }
 
     @Test
