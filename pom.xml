@@ -25,6 +25,7 @@
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
         <api-sdk-java.version>6.3.0</api-sdk-java.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.5.3</spring-boot-dependencies.version>
@@ -162,6 +163,11 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-java</artifactId>
             <version>${api-sdk-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <!-- Security dependencies -->
         <dependency>
