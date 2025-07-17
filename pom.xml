@@ -42,6 +42,8 @@
         <system-stubs.version>2.1.7</system-stubs.version>
         <!-- CVE-2025-48924 -->
         <commons-lang3.version>3.18.0</commons-lang3.version>
+        <!-- CVE-2025-53864 -->
+        <nimbus-jose-jwt.version>10.3.1</nimbus-jose-jwt.version>
 
         <!-- sonar config -->
         <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
@@ -82,6 +84,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus-jose-jwt.version}</version>
         </dependency>
         <!--end transitive dependencies-->
 
@@ -131,12 +138,6 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>java-session-handler</artifactId>
             <version>${java-session-handler.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.nimbusds</groupId>
-                    <artifactId>nimbus-jose-jwt</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -147,12 +148,6 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>web-security-java</artifactId>
             <version>${web-security-java.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.nimbusds</groupId>
-                    <artifactId>nimbus-jose-jwt</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
