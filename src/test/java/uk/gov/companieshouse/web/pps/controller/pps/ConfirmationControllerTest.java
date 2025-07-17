@@ -146,7 +146,7 @@ class ConfirmationControllerTest {
         modelAttributes.put(PAYMENT_DATE_ATTR, PenaltyUtils.getPaymentDateDisplay());
         modelAttributes.put(PENALTY_AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(20));
 
-        return new PPSServiceResponse("", "", baseModelAttributes, modelAttributes);
+        return new PPSServiceResponse("", "", baseModelAttributes, modelAttributes, Collections.emptyMap());
     }
 
 
@@ -155,7 +155,7 @@ class ConfirmationControllerTest {
             + "redirect")
     void getRequestStatusIsCancelled() throws Exception {
         PPSServiceResponse response = new PPSServiceResponse(RESUME_URL_PATH, "",
-                Collections.emptyMap(), Collections.emptyMap());
+                Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
 
         when(mockConfirmationService.getConfirmationUrl(COMPANY_NUMBER, LFP_PENALTY_REF,
                 PAYABLE_REF, STATE, CANCELLED.label)).thenReturn(response);
@@ -176,7 +176,7 @@ class ConfirmationControllerTest {
                 PAID.label;
         String url = REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH;
         PPSServiceResponse response = new PPSServiceResponse(url, errMsg,
-                Collections.emptyMap(), Collections.emptyMap());
+                Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
 
         when(mockConfirmationService.getConfirmationUrl(COMPANY_NUMBER, LFP_PENALTY_REF,
                 PAYABLE_REF, STATE, CANCELLED.label)).thenReturn(response);
