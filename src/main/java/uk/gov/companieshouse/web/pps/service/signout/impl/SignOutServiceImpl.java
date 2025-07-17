@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
@@ -39,17 +40,21 @@ public class SignOutServiceImpl implements SignOutService {
     }
 
     @Override
-    public String resolveBackLink(HttpServletRequest request) {
+    public PPSServiceResponse resolveBackLink(HttpServletRequest request) {
+        PPSServiceResponse response = new PPSServiceResponse();
         String referer = request.getHeader("Referer");
         if (StringUtils.isBlank(referer)) {
-            return null;
+            response.setUrl(null);
+            return response;
         }
         String allowedUrl = allowlistChecker.checkURL(referer);
         if (allowlistChecker.checkSignOutIsReferer(allowedUrl)) {
-            return null;
+            response.setUrl(null);
+            return response;
         }
         request.getSession().setAttribute("url_prior_signout", allowedUrl);
-        return allowedUrl;
+        response.setUrl(allowedUrl);
+        return response;
     }
 
     @Override
