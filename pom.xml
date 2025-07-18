@@ -125,13 +125,6 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>java-session-handler</artifactId>
             <version>${java-session-handler.version}</version>
-          <exclusions>
-            <exclusion>
-              <!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
-              <groupId>commons-lang</groupId>
-              <artifactId>commons-lang</artifactId>
-            </exclusion>
-          </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -155,12 +148,6 @@
             <version>${mockito-junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.sonarsource.scanner.maven</groupId>-->
-<!--            <artifactId>sonar-maven-plugin</artifactId>-->
-<!--            <version>${sonar-maven-plugin.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>sdk-manager-java</artifactId>
