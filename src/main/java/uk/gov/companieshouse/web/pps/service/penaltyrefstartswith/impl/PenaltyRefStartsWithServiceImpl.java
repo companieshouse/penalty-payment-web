@@ -1,23 +1,25 @@
 package uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.impl;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
 
 @Service
 public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithService {
@@ -27,12 +29,15 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
 
     private final List<PenaltyReference> availablePenaltyReference;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     public PenaltyRefStartsWithServiceImpl(
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker
+            FeatureFlagChecker featureFlagChecker,
+            FinanceServiceHealthCheck financeServiceHealthCheck
     ) {
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
         availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
                 .stream()
                 .filter(featureFlagChecker::isPenaltyRefEnabled)
@@ -41,15 +46,24 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
 
     @Override
     public PPSServiceResponse viewPenaltyRefStartsWith() {
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-        LOGGER.debug(
-                String.format("Available penalty reference types: %s", availablePenaltyReference));
-        if (availablePenaltyReference.size() == 1) {
-            return setUpEnterDetails();
-        }
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable();
+        var url = healthCheck.getUrl();
 
-        serviceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
-        serviceResponse.setBaseModelAttributes(setBackUrl());
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        if (url.isPresent()) {
+            healthCheck.getBaseModelAttributes().ifPresent(serviceResponse::setBaseModelAttributes);
+            healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
+            serviceResponse.setUrl(url.get());
+        } else {
+            LOGGER.debug(
+                    String.format("Available penalty reference types: %s",availablePenaltyReference));
+            if (availablePenaltyReference.size() == 1) {
+                return setUpEnterDetails();
+            }
+
+            serviceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
+            serviceResponse.setBaseModelAttributes(setBackUrl());
+        }
 
         return serviceResponse;
     }

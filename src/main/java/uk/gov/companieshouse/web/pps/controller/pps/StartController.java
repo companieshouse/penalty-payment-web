@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,10 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+
+import java.util.Optional;
 
 import static uk.gov.companieshouse.web.pps.controller.pps.PenaltyRefStartsWithController.PENALTY_REF_STARTS_WITH_TEMPLATE_NAME;
 
@@ -40,12 +42,14 @@ public class StartController extends BaseController {
     @GetMapping
     public String getStart(@RequestParam("start") Optional<Integer> startId, Model model) {
         Integer startIdValue = startId.orElse(1);
-        String viewName = financeServiceHealthCheck.checkIfAvailableAtStart(startIdValue,
-        navigatorService.getNextControllerRedirect(this.getClass()), model);
-        if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-            addBaseAttributesWithoutBackUrlToModel(model, penaltyConfigurationProperties.getSignedOutUrl());
-        }
-        return viewName;
+        PPSServiceResponse serviceResponse = financeServiceHealthCheck.checkIfAvailableAtStart(startIdValue);
+
+        serviceResponse.getModelAttributes()
+                .ifPresent(attributes -> addAttributesToModel(model, attributes));
+
+        configureBaseAttributes(serviceResponse, model);
+
+        return serviceResponse.getUrl().orElse(navigatorService.getNextControllerRedirect(this.getClass()));
     }
 
     @PostMapping

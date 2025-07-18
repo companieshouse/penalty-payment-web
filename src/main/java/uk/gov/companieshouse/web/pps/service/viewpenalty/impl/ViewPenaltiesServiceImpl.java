@@ -1,20 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.viewpenalty.impl;
 
-import static java.lang.Boolean.FALSE;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_NAME_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
-import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
@@ -26,6 +11,7 @@ import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.company.CompanyService;
+import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.payment.PaymentService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PayablePenaltyService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
@@ -34,6 +20,22 @@ import uk.gov.companieshouse.web.pps.service.viewpenalty.ViewPenaltiesService;
 import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.lang.Boolean.FALSE;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
+import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 
 @Service
 public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
@@ -47,6 +49,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
     private final PenaltyPaymentService penaltyPaymentService;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final FeatureFlagChecker featureFlagChecker;
+    private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     public ViewPenaltiesServiceImpl(
             PayablePenaltyService payablePenaltyService,
@@ -54,7 +57,8 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
             CompanyService companyService,
             PenaltyPaymentService penaltyPaymentService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker) {
+            FeatureFlagChecker featureFlagChecker,
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
 
         this.payablePenaltyService = payablePenaltyService;
         this.paymentService = paymentService;
@@ -62,57 +66,65 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         this.companyService = companyService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.featureFlagChecker = featureFlagChecker;
+        this.financeServiceHealthCheck = financeServiceHealthCheck;
     }
 
     @Override
     public PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef)
             throws IllegalArgumentException, ServiceException {
-        PPSServiceResponse ppsServiceResponse = new PPSServiceResponse();
-        Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef,
-                companyNumber);
+        var healthCheck = financeServiceHealthCheck.checkIfAvailable();
+        var url = healthCheck.getUrl();
 
-        if (penaltyReference.isEmpty()) {
-            return setServiceDownUrl(ppsServiceResponse);
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        if (url.isPresent()) {
+            healthCheck.getBaseModelAttributes().ifPresent(serviceResponse::setBaseModelAttributes);
+            healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
+            serviceResponse.setUrl(url.get());
+        } else {
+            Optional<PenaltyReference> penaltyReference = getPenaltyReference(penaltyRef,
+                    companyNumber);
+
+            if (penaltyReference.isEmpty()) {
+                return setServiceDownUrl(serviceResponse);
+            }
+            setBackUrl(serviceResponse, penaltyReference.get());
+
+            List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
+                    companyNumber, penaltyRef);
+
+            LOGGER.debug(String.format(
+                    "Checking if online payment for penalty %s is available for company number %s",
+                    penaltyRef, companyNumber));
+
+            // User can only pay for a penalty with no associated legal costs
+            if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
+                return setServiceDownUrl(serviceResponse);
+            }
+
+            Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts,
+                    penaltyRef);
+            if (payablePenaltyOptional.isEmpty()) {
+                loggingPenaltyRefNoOpenPenalty(companyNumber, penaltyRef);
+                return setServiceDownUrl(serviceResponse);
+            }
+
+            FinancialPenalty payablePenalty = payablePenaltyOptional.get();
+            if (!isOutstandingAmountMatch(payablePenalty)) {
+                return setServiceDownUrl(serviceResponse);
+            }
+
+            setModelForViewPenalties(serviceResponse, companyNumber, penaltyRef, payablePenalty);
+
+            LOGGER.debug(
+                    String.format(
+                            "Online payment for penalty %s is available for company number %s",
+                            penaltyRef, companyNumber));
         }
-        setBackUrl(ppsServiceResponse, penaltyReference.get());
-
-        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
-                companyNumber, penaltyRef);
-
-        LOGGER.debug(String.format(
-                "Checking if online payment for penalty %s is available for company number %s",
-                penaltyRef, companyNumber));
-
-        // User can only pay for a penalty with no associated legal costs
-        if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
-            return setServiceDownUrl(ppsServiceResponse);
-        }
-
-        Optional<FinancialPenalty> payablePenaltyOptional = getOpenPenalty(penaltyAndCosts,
-                penaltyRef);
-        if (payablePenaltyOptional.isEmpty()) {
-            loggingPenaltyRefNoOpenPenalty(companyNumber, penaltyRef);
-            return setServiceDownUrl(ppsServiceResponse);
-        }
-
-        FinancialPenalty payablePenalty = payablePenaltyOptional.get();
-        if (!isOutstandingAmountMatch(payablePenalty)) {
-            return setServiceDownUrl(ppsServiceResponse);
-        }
-
-        setModelForViewPenalties(ppsServiceResponse, companyNumber, penaltyRef, payablePenalty);
-
-        LOGGER.debug(
-                String.format("Online payment for penalty %s is available for company number %s",
-                        penaltyRef, companyNumber));
-
-        return ppsServiceResponse;
+        return serviceResponse;
     }
 
     @Override
-    public String postPenalties(
-            String companyNumber,
-            String penaltyRef) throws ServiceException {
+    public String postPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
 
@@ -166,7 +178,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, companyProfileApi.getCompanyName());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyRef);
-        modelAttributes.put(PENALTY_REF_NAME_ATTR,
+        modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
                 PenaltyUtils.getPenaltyReferenceType(penaltyRef).name());
         modelAttributes.put(REASON_ATTR, payablePenalty.getReason());
         modelAttributes.put(AMOUNT_ATTR,
@@ -232,10 +244,10 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         serviceResponse.setBaseModelAttributes(baseModelAttributes);
     }
 
-    private PPSServiceResponse setServiceDownUrl(PPSServiceResponse ppsServiceResponse) {
+    private PPSServiceResponse setServiceDownUrl(PPSServiceResponse serviceResponse) {
         String redirectPathUnscheduledServiceDown = REDIRECT_URL_PREFIX +
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
-        ppsServiceResponse.setUrl(redirectPathUnscheduledServiceDown);
-        return ppsServiceResponse;
+        serviceResponse.setUrl(redirectPathUnscheduledServiceDown);
+        return serviceResponse;
     }
 }

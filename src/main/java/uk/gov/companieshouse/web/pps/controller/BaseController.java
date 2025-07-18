@@ -2,16 +2,21 @@ package uk.gov.companieshouse.web.pps.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
+import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.Map;
+
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 public abstract class BaseController {
 
@@ -27,7 +32,6 @@ public abstract class BaseController {
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
     public static final String PHASE_BANNER_LINK_ATTR = "phaseBannerLink";
-    public static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
     protected final NavigatorService navigatorService;
     protected final SessionService sessionService;
@@ -96,5 +100,25 @@ public abstract class BaseController {
         for (Map.Entry<String, Object> itr : attributes.entrySet()) {
             model.addAttribute(itr.getKey(), itr.getValue());
         }
+    }
+
+    protected void configureBaseAttributes(PPSServiceResponse serviceResponse, Model model) {
+        serviceResponse.getBaseModelAttributes().ifPresent(attributes -> {
+            if (attributes.containsKey(BACK_LINK_URL_ATTR) && attributes.containsKey(SIGN_OUT_URL_ATTR)) {
+                addBaseAttributesToModel(model, attributes.get(BACK_LINK_URL_ATTR), attributes.get(SIGN_OUT_URL_ATTR));
+            } else if (attributes.containsKey(SIGN_OUT_URL_ATTR)) {
+                addBaseAttributesWithoutBackUrlToModel(model, SIGN_OUT_URL_ATTR);
+            }
+        });
+    }
+
+    protected boolean handleBindingResult(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
+            }
+            return true;
+        }
+        return false;
     }
 }

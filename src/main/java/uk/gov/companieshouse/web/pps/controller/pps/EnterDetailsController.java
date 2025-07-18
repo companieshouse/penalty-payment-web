@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
-import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
@@ -25,7 +23,6 @@ import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.ENTER_DETAILS_MODEL_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @NextController(ViewPenaltiesController.class)
@@ -35,7 +32,6 @@ public class EnterDetailsController extends BaseController {
     static final String ENTER_DETAILS_TEMPLATE_NAME = "pps/details";
 
     private final EnterDetailsValidator enterDetailsValidator;
-    private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final PenaltyDetailsService penaltyDetailsService;
 
     public EnterDetailsController(
@@ -43,11 +39,9 @@ public class EnterDetailsController extends BaseController {
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             EnterDetailsValidator enterDetailsValidator,
-            FinanceServiceHealthCheck financeServiceHealthCheck,
             PenaltyDetailsService penaltyDetailsService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
         this.enterDetailsValidator = enterDetailsValidator;
-        this.financeServiceHealthCheck = financeServiceHealthCheck;
         this.penaltyDetailsService = penaltyDetailsService;
     }
 
@@ -58,10 +52,8 @@ public class EnterDetailsController extends BaseController {
 
     @GetMapping
     public String getEnterDetails(@RequestParam("ref-starts-with") String penaltyReferenceStartsWith, Model model, HttpServletRequest request) {
-        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
         try {
-            PPSServiceResponse serviceResponse = penaltyDetailsService
-                    .getEnterDetails(penaltyReferenceStartsWith, healthCheck.orElse(""));
+            PPSServiceResponse serviceResponse = penaltyDetailsService.getEnterDetails(penaltyReferenceStartsWith);
 
             serviceResponse.getModelAttributes().ifPresent(attributes -> addAttributesToModel(model, attributes));
             configureBaseAttributes(serviceResponse, model);
@@ -91,26 +83,6 @@ public class EnterDetailsController extends BaseController {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
-    }
-
-    private void configureBaseAttributes(PPSServiceResponse serviceResponse, Model model) {
-        serviceResponse.getBaseModelAttributes().ifPresent(attributes -> {
-            if (attributes.containsKey(BACK_LINK_URL_ATTR) && attributes.containsKey(SIGN_OUT_URL_ATTR)) {
-                addBaseAttributesToModel(model, attributes.get(BACK_LINK_URL_ATTR), attributes.get(SIGN_OUT_URL_ATTR));
-            } else if (attributes.containsKey(SIGN_OUT_URL_ATTR)) {
-                addBaseAttributesWithoutBackUrlToModel(model, SIGN_OUT_URL_ATTR);
-            }
-        });
-    }
-
-    private boolean handleBindingResult(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                LOGGER.error(error.getObjectName() + " - " + error.getDefaultMessage());
-            }
-            return true;
-        }
-        return false;
     }
 
 }

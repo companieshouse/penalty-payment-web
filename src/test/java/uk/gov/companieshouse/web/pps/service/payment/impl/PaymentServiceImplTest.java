@@ -32,6 +32,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.CS_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -78,14 +82,6 @@ class PaymentServiceImplTest {
     private static final String JOURNEY_LINK = "journey";
 
     private static final String JOURNEY_URL = "journeyUrl";
-
-    private static final String PAYMENT_STATE = "payment_state";
-
-    private static final String COMPANY_NUMBER = "12345678";
-
-    private static final String PENALTY_REF = "A0531369";
-
-    private static final String PENALTY_REF_SANCTIONS = "P0531369";
 
     @BeforeEach
     void setUp() {
@@ -139,7 +135,7 @@ class PaymentServiceImplTest {
         when(links.get(JOURNEY_LINK)).thenReturn(JOURNEY_URL);
 
         String journeyUrl = mockPaymentService.createPaymentSession(
-                payableFinancialPenaltySession, COMPANY_NUMBER, PENALTY_REF_SANCTIONS);
+                payableFinancialPenaltySession, COMPANY_NUMBER, CS_PENALTY_REF);
 
         assertEquals(JOURNEY_URL, journeyUrl);
 

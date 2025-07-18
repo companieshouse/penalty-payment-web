@@ -9,6 +9,5 @@ public interface PenaltyRefStartsWithService {
 
     PPSServiceResponse postPenaltyRefStartsWithError();
 
-    PPSServiceResponse postPenaltyRefStartsWithNext(
-            PenaltyReferenceChoice penaltyReferenceChoice);
+    PPSServiceResponse postPenaltyRefStartsWithNext(PenaltyReferenceChoice penaltyReferenceChoice);
 }

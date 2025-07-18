@@ -28,6 +28,8 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -44,8 +46,6 @@ class NavigatorServiceTests {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    private static final String COMPANY_NUMBER = "companyNumber";
-    private static final String PENALTY_REF = "penaltyRef";
     private static final String COMPANY_LFP_ID = "companyLfpId";
 
     @BeforeEach

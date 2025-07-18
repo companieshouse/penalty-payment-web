@@ -24,9 +24,18 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PAYMENT_STATE;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.service.confirmation.impl.ConfirmationServiceImpl.PAYMENT_DATE_ATTR;
+import static uk.gov.companieshouse.web.pps.service.confirmation.impl.ConfirmationServiceImpl.PENALTY_AMOUNT_ATTR;
+import static uk.gov.companieshouse.web.pps.service.confirmation.impl.ConfirmationServiceImpl.REASON_FOR_PENALTY_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PAYABLE_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 import static uk.gov.companieshouse.web.pps.util.PaymentStatus.CANCELLED;
 import static uk.gov.companieshouse.web.pps.util.PaymentStatus.PAID;
@@ -50,19 +59,7 @@ class ConfirmationServiceImplTest {
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
-    private static final String COMPANY_NUMBER = "12345678";
-    private static final String LFP_PENALTY_REF = "A1234567";
-    private static final String PAYABLE_REF = "PR_123456";
-
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
-
     private static final String STATE = "state";
-    private static final String PAYMENT_STATE = "payment_state";
-
-    private static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
-    private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
-    private static final String PAYMENT_DATE_ATTR = "paymentDate";
-    private static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
 
     @Test
     @DisplayName("Empty URL returned on success")
@@ -92,7 +89,8 @@ class ConfirmationServiceImplTest {
         assertTrue(result.getModelAttributes().get().containsKey(COMPANY_NUMBER_ATTR));
         assertTrue(result.getModelAttributes().get().containsKey(PENALTY_AMOUNT_ATTR));
         assertEquals(VALID_LATE_FILING_REASON, result.getModelAttributes().get().get(REASON_FOR_PENALTY_ATTR));
-        assertEquals(LATE_FILING.name(), result.getModelAttributes().get().get(PENALTY_REF_NAME_ATTR));
+        assertEquals(LATE_FILING.name(), result.getModelAttributes().get().get(
+                PENALTY_REFERENCE_NAME_ATTR));
 
         assertTrue(result.getBaseModelAttributes().get().containsKey(SIGN_OUT_URL_ATTR));
     }
@@ -130,7 +128,8 @@ class ConfirmationServiceImplTest {
         assertTrue(result.getModelAttributes().get().containsKey(COMPANY_NUMBER_ATTR));
         assertTrue(result.getModelAttributes().get().containsKey(PENALTY_AMOUNT_ATTR));
         assertEquals(VALID_LATE_FILING_REASON, result.getModelAttributes().get().get(REASON_FOR_PENALTY_ATTR));
-        assertEquals(LATE_FILING.name(), result.getModelAttributes().get().get(PENALTY_REF_NAME_ATTR));
+        assertEquals(LATE_FILING.name(), result.getModelAttributes().get().get(
+                PENALTY_REFERENCE_NAME_ATTR));
 
         assertTrue(result.getBaseModelAttributes().get().containsKey(SIGN_OUT_URL_ATTR));
     }

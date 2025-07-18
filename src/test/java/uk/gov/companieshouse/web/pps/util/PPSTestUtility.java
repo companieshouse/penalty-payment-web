@@ -40,14 +40,15 @@ public class PPSTestUtility {
     public static final String DATE = "2018-12-12";
     public static final String DATE_TIME = "2024-12-12T12:00:00.000Z";
 
-    public static final String VALID_PENALTY_REF = "A0000007";
     public static final String VALID_LATE_FILING_REASON = "Late filing of accounts";
     public static final String VALID_CS_REASON = "Failure to file a confirmation statement";
     public static final String VALID_ROE_REASON = "Failure to update the Register of Overseas Entities";
 
-
-    public static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
+    public static final String GOV_UK_PAY_PENALTY_URL = "https://www.gov.uk/pay-penalty-companies-house";
     public static final String SIGN_OUT_PATH = "/sign-out";
+    public static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
+
+    public static final String BACK_LINK_MODEL_ATTR = "backLink";
 
     private PPSTestUtility() {
         throw new IllegalAccessError("Utility class");
@@ -84,7 +85,7 @@ public class PPSTestUtility {
         payableFinancialPenalties.setPayment(payment);
 
         TransactionPayableFinancialPenalty payablePenalty = new TransactionPayableFinancialPenalty();
-        payablePenalty.setPenaltyRef(VALID_PENALTY_REF);
+        payablePenalty.setPenaltyRef(PENALTY_REF);
         payablePenalty.setAmount(VALID_AMOUNT);
         payablePenalty.setType(PENALTY_TYPE);
         payablePenalty.setMadeUpDate(DATE);

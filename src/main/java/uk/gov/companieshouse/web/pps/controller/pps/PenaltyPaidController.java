@@ -15,7 +15,6 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Controller
 @RequestMapping("/pay-penalty/company/{companyNumber}/penalty/{penaltyRef}/penalty-paid")
@@ -52,10 +51,7 @@ public class PenaltyPaidController extends BaseController {
             serviceResponse.getModelAttributes()
                     .ifPresent(attributes -> addAttributesToModel(model, attributes));
 
-            serviceResponse.getBaseModelAttributes()
-                    .ifPresent(attributes -> addBaseAttributesToModel(
-                            model, attributes.get(BACK_LINK_ATTR),
-                            attributes.get(SIGN_OUT_URL_ATTR)));
+            configureBaseAttributes(serviceResponse, model);
 
         } catch (ServiceException ex) {
             LOGGER.errorRequest(request, ex.getMessage(), ex);

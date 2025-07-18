@@ -33,17 +33,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.CONFIRMATION_PAGE_TEMPLATE_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NAME;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.CS_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.OVERSEAS_ENTITY_ID;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PAYABLE_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.ROE_PENALTY_REF;
-import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NAME;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
@@ -83,14 +84,12 @@ class ConfirmationControllerTest {
             "/pay-penalty/company/" + OVERSEAS_ENTITY_ID + "/penalty/" + ROE_PENALTY_REF
                     + "/payable/" + PAYABLE_REF + "/confirmation";
 
-    private static final String RESUME_URL_PATH =
-            "redirect:/pay-penalty/company/" + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF
-                    + "/view-penalties";
+    private static final String RESUME_URL_PATH = REDIRECT_URL_PREFIX + "/pay-penalty/company/"
+            + COMPANY_NUMBER + "/penalty/" + LFP_PENALTY_REF + "/view-penalties";
 
     private static final String REF = "ref";
     private static final String STATE = "state";
 
-    private static final String PENALTY_REF_NAME_ATTR = "penaltyReferenceName";
     private static final String REASON_FOR_PENALTY_ATTR = "reasonForPenalty";
     private static final String PAYMENT_DATE_ATTR = "paymentDate";
     private static final String PENALTY_AMOUNT_ATTR = "penaltyAmount";
@@ -129,7 +128,7 @@ class ConfirmationControllerTest {
                 .andExpect(model().attributeExists(PAYMENT_DATE_ATTR))
                 .andExpect(model().attribute(REASON_FOR_PENALTY_ATTR,
                         penaltyTestData.reasonForPenalty()))
-                .andExpect(model().attribute(PENALTY_REF_NAME_ATTR, penaltyTestData.name()))
+                .andExpect(model().attribute(PENALTY_REFERENCE_NAME_ATTR, penaltyTestData.name()))
                 .andExpect(model().attributeExists(PENALTY_AMOUNT_ATTR));
     }
 
@@ -138,7 +137,7 @@ class ConfirmationControllerTest {
 
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
-        modelAttributes.put(PENALTY_REF_NAME_ATTR,
+        modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
                 PenaltyUtils.getPenaltyReferenceType(penaltyTestData.penaltyRef()).name());
         modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NAME);
         modelAttributes.put(COMPANY_NUMBER_ATTR, penaltyTestData.customerCode());

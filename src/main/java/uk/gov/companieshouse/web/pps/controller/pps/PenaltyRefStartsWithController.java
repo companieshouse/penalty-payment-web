@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
-
 import jakarta.validation.Valid;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,7 +13,6 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.BaseController;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.ServiceConstants;
-import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
@@ -24,24 +20,22 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 
 import java.util.List;
 
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
+
 @Controller
 @RequestMapping("/pay-penalty/ref-starts-with")
 public class PenaltyRefStartsWithController extends BaseController {
 
     static final String PENALTY_REF_STARTS_WITH_TEMPLATE_NAME = "pps/penaltyRefStartsWith";
 
-
-    private final FinanceServiceHealthCheck financeServiceHealthCheck;
     private final PenaltyRefStartsWithService penaltyRefStartsWithService;
 
     public PenaltyRefStartsWithController(
             NavigatorService navigatorService,
             SessionService sessionService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FinanceServiceHealthCheck financeServiceHealthCheck,
             PenaltyRefStartsWithService penaltyRefStartsWithService) {
         super(navigatorService, sessionService, penaltyConfigurationProperties);
-        this.financeServiceHealthCheck = financeServiceHealthCheck;
         this.penaltyRefStartsWithService = penaltyRefStartsWithService;
     }
 
@@ -52,24 +46,9 @@ public class PenaltyRefStartsWithController extends BaseController {
 
     @GetMapping
     public String getPenaltyRefStartsWith(Model model) {
-
-        var healthCheck = financeServiceHealthCheck.checkIfAvailable(model);
-        if (healthCheck.isPresent()) {
-            String viewName = healthCheck.get();
-            if (viewName.equals(SERVICE_UNAVAILABLE_VIEW_NAME)) {
-                addBaseAttributesWithoutBackUrlToModel(model,
-                        penaltyConfigurationProperties.getSignedOutUrl());
-            }
-            return viewName;
-        }
-
         PPSServiceResponse serviceResponse = penaltyRefStartsWithService.viewPenaltyRefStartsWith();
 
-        serviceResponse.getBaseModelAttributes().ifPresent(attributes ->
-                addBaseAttributesToModel(model,
-                        serviceResponse.getBaseModelAttributes().get()
-                                .get(ServiceConstants.BACK_LINK_URL_ATTR),
-                        penaltyConfigurationProperties.getSignOutPath()));
+        configureBaseAttributes(serviceResponse, model);
 
         serviceResponse.getModelAttributes()
                 .ifPresent(attributes -> addAttributesToModel(model, attributes));

@@ -11,12 +11,11 @@ import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GlobalExceptionHandlerTest {
-
-    private static final String UNSCHEDULED_SERVICE_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
 
     @Mock
     private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
