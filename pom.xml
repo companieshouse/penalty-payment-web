@@ -15,7 +15,7 @@
     </parent>
     <properties>
         <java.version>21</java.version>
-        <structured-logging.version>3.0.24</structured-logging.version>
+        <structured-logging.version>3.0.36</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>3.0.33</common-web-java.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
