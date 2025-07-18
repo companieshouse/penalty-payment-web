@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.web.pps.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;

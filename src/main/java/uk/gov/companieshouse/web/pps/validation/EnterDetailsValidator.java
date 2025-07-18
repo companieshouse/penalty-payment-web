@@ -1,6 +1,6 @@
 package uk.gov.companieshouse.web.pps.validation;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
@@ -39,7 +39,7 @@ public class EnterDetailsValidator {
         if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
             String key = "enterDetails.companyNumber.notValid." + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(companyNumberField, companyNumberField, bundle.getString(key));
-        } else if (StringUtils.contains(enterDetails.getCompanyNumber(), " ")) {
+        } else if (StringUtils.containsAny(enterDetails.getCompanyNumber(), " ")) {
             String key = "enterDetails.companyNumber.noSpaces." + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(companyNumberField, companyNumberField, bundle.getString(key));
         } else {
@@ -60,7 +60,7 @@ public class EnterDetailsValidator {
 
         if (StringUtils.isBlank(penaltyRef)) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField, bundle.getString("enterDetails.penaltyRef.notEmpty"));
-        } else if (StringUtils.contains(penaltyRef, " ")) {
+        } else if (StringUtils.containsAny(penaltyRef, " ")) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField, bundle.getString("enterDetails.penaltyRef.noSpaces"));
         } else {
             String regex = switch (PenaltyReference.valueOf(penaltyReferenceName)) {
