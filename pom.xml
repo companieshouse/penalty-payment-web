@@ -15,9 +15,9 @@
     </parent>
     <properties>
         <java.version>21</java.version>
-        <structured-logging.version>3.0.24</structured-logging.version>
+        <structured-logging.version>3.0.36</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
-        <common-web-java.version>3.0.33</common-web-java.version>
+        <common-web-java.version>3.0.40</common-web-java.version>
         <java-session-handler.version>4.1.7</java-session-handler.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <web-security-java.version>3.1.5</web-security-java.version>
@@ -40,6 +40,8 @@
         <maven-plugin>3.5.2</maven-plugin>
         <jib-maven-plugin>3.5.3</jib-maven-plugin>
         <system-stubs.version>2.1.7</system-stubs.version>
+        <!-- CVE-2025-48924 -->
+        <commons-lang3.version>3.18.0</commons-lang3.version>
 
         <!-- sonar config -->
         <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
@@ -75,6 +77,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <!--end transitive dependencies-->
 
@@ -124,6 +131,12 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>java-session-handler</artifactId>
             <version>${java-session-handler.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.nimbusds</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -134,6 +147,12 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>web-security-java</artifactId>
             <version>${web-security-java.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.nimbusds</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
