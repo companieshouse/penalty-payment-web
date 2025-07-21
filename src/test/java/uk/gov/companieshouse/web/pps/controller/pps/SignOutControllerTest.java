@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,8 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIGN_OUT_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,8 +68,7 @@ class SignOutControllerTest {
     void getRequestSuccess() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class)))
-                .thenReturn(new PPSServiceResponse());
+        when(mockSignOutService.resolveBackLink(nullable(String.class))).thenReturn(new PPSServiceResponse());
 
         mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
@@ -83,9 +84,9 @@ class SignOutControllerTest {
 
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class))).thenReturn(response);
+        when(mockSignOutService.resolveBackLink(anyString())).thenReturn(response);
 
-        mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", PREVIOUS_PATH))
+        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, PREVIOUS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK))
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
@@ -96,10 +97,10 @@ class SignOutControllerTest {
     void getCheckSignOutIsReferer() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
-        when(mockSignOutService.resolveBackLink(any(HttpServletRequest.class)))
+        when(mockSignOutService.resolveBackLink(anyString()))
                 .thenReturn(new PPSServiceResponse());
 
-        mockMvc.perform(get(SIGN_OUT_PATH).header("Referer", SIGN_OUT_PATH))
+        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, SIGN_OUT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
     }
@@ -109,7 +110,7 @@ class SignOutControllerTest {
     void noSuccessGet() throws Exception {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(false);
-        when(mockSignOutService.getUnscheduledDownPath()).thenReturn(UNSCHEDULED_DOWN_PATH);
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_DOWN_PATH);
 
         mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_DOWN_PATH))
@@ -130,14 +131,14 @@ class SignOutControllerTest {
     @DisplayName("POST Sign out - no selected with referer")
     void postRequestRadioNoWithValidReferer() throws Exception {
         HashMap<String, Object> sessionAttrs = new HashMap<>();
-        sessionAttrs.put("url_prior_signout", PREVIOUS_PATH);
+        sessionAttrs.put(URL_PRIOR_SIGNOUT, PREVIOUS_PATH);
 
         when(mockSignOutService.determineRedirect("no", PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
         mockMvc.perform(post(SIGN_OUT_PATH)
-                        .header("Referer", PREVIOUS_PATH)
+                        .header(REFERER, PREVIOUS_PATH)
                         .sessionAttrs(sessionAttrs)
-                        .param("url_prior_signout", PREVIOUS_PATH)
+                        .param(URL_PRIOR_SIGNOUT, PREVIOUS_PATH)
                         .param(RADIO, "no"))
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
     }

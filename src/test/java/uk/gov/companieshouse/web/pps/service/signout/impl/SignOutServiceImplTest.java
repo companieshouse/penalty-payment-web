@@ -16,24 +16,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
 
 class SignOutServiceImplTest {
 
     private SignOutServiceImpl service;
     private AllowlistChecker mockAllowlistChecker;
-    private PenaltyConfigurationProperties mockConfig;
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @BeforeEach
     void setUp() {
         mockAllowlistChecker = mock(AllowlistChecker.class);
-        mockConfig = mock(PenaltyConfigurationProperties.class);
-        service = new SignOutServiceImpl(mockAllowlistChecker, mockConfig);
+        mockPenaltyConfigurationProperties = mock(PenaltyConfigurationProperties.class);
+        service = new SignOutServiceImpl(mockAllowlistChecker, mockPenaltyConfigurationProperties);
     }
 
     @Test
     void testIsUserSignedInTrue() {
         Map<String, Object> session = new HashMap<>();
-        session.put("signin_info", new Object());
+        session.put(SIGN_IN_INFO, new Object());
         assertTrue(service.isUserSignedIn(session));
     }
 
@@ -43,22 +46,16 @@ class SignOutServiceImplTest {
     }
 
     @Test
-    void testGetUnscheduledDownPath() {
-        when(mockConfig.getUnscheduledServiceDownPath()).thenReturn("/down");
-        assertEquals("/down", service.getUnscheduledDownPath());
-    }
-
-    @Test
     void testResolveBackLink_withValidReferer() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpSession session = mock(HttpSession.class);
 
-        when(request.getHeader("Referer")).thenReturn("/previous");
+        when(request.getHeader(REFERER)).thenReturn("/previous");
         when(mockAllowlistChecker.checkURL("/previous")).thenReturn("/previous");
         when(mockAllowlistChecker.checkSignOutIsReferer("/previous")).thenReturn(false);
         when(request.getSession()).thenReturn(session);
 
-        PPSServiceResponse response = service.resolveBackLink(request);
+        PPSServiceResponse response = service.resolveBackLink(request.getHeader(REFERER));
 
         assertTrue(response.getUrl().isPresent());
         assertEquals("/previous", response.getUrl().get());
@@ -66,22 +63,22 @@ class SignOutServiceImplTest {
         assertTrue(response.getSessionAttributes().isPresent());
         Map<String, Object> sessionAttributes = response.getSessionAttributes().get();
         assertEquals(1, sessionAttributes.size());
-        assertEquals("/previous", sessionAttributes.get("url_prior_signout"));
+        assertEquals("/previous", sessionAttributes.get(URL_PRIOR_SIGNOUT));
     }
 
     @Test
     void testResolveBackLink_withEmptyReferer() {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader("Referer")).thenReturn(null);
+        when(request.getHeader(REFERER)).thenReturn(null);
 
-        PPSServiceResponse response = service.resolveBackLink(request);
+        PPSServiceResponse response = service.resolveBackLink(request.getHeader(REFERER));
 
         assertTrue(response.getUrl().isEmpty());
     }
 
     @Test
     void testDetermineRedirect_yes() {
-        when(mockConfig.getSignedOutUrl()).thenReturn("/account");
+        when(mockPenaltyConfigurationProperties.getSignedOutUrl()).thenReturn("/account");
         assertEquals("/account/signout", service.determineRedirect("yes", null));
     }
 
@@ -92,7 +89,7 @@ class SignOutServiceImplTest {
 
     @Test
     void testDetermineRedirect_null() {
-        when(mockConfig.getSignOutPath()).thenReturn("/pay-penalty/sign-out");
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn("/pay-penalty/sign-out");
         assertEquals("/pay-penalty/sign-out", service.determineRedirect(null, null));
     }
 }

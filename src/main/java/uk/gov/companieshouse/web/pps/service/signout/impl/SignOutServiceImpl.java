@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.web.pps.service.signout.impl;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
@@ -8,42 +7,31 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.service.signout.SignOutService;
 import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
 
 @Service
 public class SignOutServiceImpl implements SignOutService {
 
     private final AllowlistChecker allowlistChecker;
-    private final PenaltyConfigurationProperties config;
-
-    private static final String SIGN_IN_KEY = "signin_info";
+    private final PenaltyConfigurationProperties penaltyConfigurationProperties;
 
     public SignOutServiceImpl(AllowlistChecker allowlistChecker,
-                              PenaltyConfigurationProperties config) {
+                              PenaltyConfigurationProperties penaltyConfigurationProperties) {
         this.allowlistChecker = allowlistChecker;
-        this.config = config;
+        this.penaltyConfigurationProperties = penaltyConfigurationProperties;
     }
 
     @Override
     public boolean isUserSignedIn(Map<String, Object> sessionData) {
-        return sessionData != null && sessionData.containsKey(SIGN_IN_KEY);
+        return sessionData != null && sessionData.containsKey(SIGN_IN_INFO);
     }
 
     @Override
-    public String getUnscheduledDownPath() {
-        return config.getUnscheduledServiceDownPath();
-    }
-
-    @Override
-    public String getSurveyLink() {
-        return config.getSurveyLink();
-    }
-
-    @Override
-    public PPSServiceResponse resolveBackLink(HttpServletRequest request) {
+    public PPSServiceResponse resolveBackLink(String referer) {
         PPSServiceResponse response = new PPSServiceResponse();
-        String referer = request.getHeader("Referer");
         if (StringUtils.isBlank(referer)) {
             return response;
         }
@@ -51,25 +39,27 @@ public class SignOutServiceImpl implements SignOutService {
         if (allowlistChecker.checkSignOutIsReferer(allowedUrl)) {
             return response;
         }
-        Map<String, Object> sessionAttrs = new HashMap<>();
-        sessionAttrs.put("url_prior_signout", allowedUrl);
-        response.setSessionAttributes(sessionAttrs);
+        response.setSessionAttributes(createSessionAttributes(allowedUrl));
         response.setUrl(allowedUrl);
         return response;
+    }
+
+    private Map<String, Object> createSessionAttributes(String allowedUrl){
+        return Map.of(URL_PRIOR_SIGNOUT, allowedUrl);
     }
 
     @Override
     public String determineRedirect(String radioValue, String priorUrl) {
         if (StringUtils.isEmpty(radioValue)) {
-            return config.getSignOutPath();
+            return penaltyConfigurationProperties.getSignOutPath();
         }
         if ("yes".equalsIgnoreCase(radioValue)) {
-            return config.getSignedOutUrl() + "/signout";
+            return penaltyConfigurationProperties.getSignedOutUrl() + "/signout";
         }
         if ("no".equalsIgnoreCase(radioValue)) {
-            return StringUtils.defaultIfEmpty(priorUrl, config.getPayPenaltyPath());
+            return StringUtils.defaultIfEmpty(priorUrl, penaltyConfigurationProperties.getPayPenaltyPath());
         }
-        return config.getPayPenaltyPath();
+        return penaltyConfigurationProperties.getPayPenaltyPath();
     }
 
 }

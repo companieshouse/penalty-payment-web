@@ -19,6 +19,10 @@ public class ServiceConstants {
 
     public static final String SERVICE_UNAVAILABLE_VIEW_NAME = "pps/serviceUnavailable";
 
+    public static final String URL_PRIOR_SIGNOUT = "url_prior_signout";
+    public static final String REFERER = "Referer";
+    public static final String SIGN_IN_INFO = "signin_info";
+
     private ServiceConstants() {
         throw new IllegalAccessError("Constants class");
     }

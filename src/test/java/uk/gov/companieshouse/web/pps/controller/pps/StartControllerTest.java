@@ -173,7 +173,7 @@ class StartControllerTest {
     private static PPSServiceResponse getPpsServiceResponse(String url) {
         return new PPSServiceResponse(
                 url, "",
-                Collections.emptyMap(), Collections.emptyMap());
+                Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
     }
 
     private void configureNextController() {

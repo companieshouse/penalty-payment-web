@@ -20,6 +20,8 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import java.util.Map;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
 
 @Controller
 @NextController(StartController.class)
@@ -50,11 +52,11 @@ public class SignOutController extends BaseController {
         Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
         if (!signOutService.isUserSignedIn(sessionData)) {
             LOGGER.info("No session data present: " + sessionData);
-            return REDIRECT_URL_PREFIX + signOutService.getUnscheduledDownPath();
+            return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }
 
         LOGGER.debug("Processing sign out");
-        PPSServiceResponse serviceResponse = signOutService.resolveBackLink(request);
+        PPSServiceResponse serviceResponse = signOutService.resolveBackLink(request.getHeader(REFERER));
 
         serviceResponse.getSessionAttributes()
                 .ifPresent(attrs -> attrs.forEach(request.getSession()::setAttribute));
@@ -66,14 +68,14 @@ public class SignOutController extends BaseController {
                 );
 
         LOGGER.info("Backlink resolved to: " + model.getAttribute(BACK_LINK));
-        addPhaseBannerToModel(model, signOutService.getSurveyLink());
+        addPhaseBannerToModel(model, penaltyConfigurationProperties.getSurveyLink());
         return getTemplateName();
     }
 
     @PostMapping
     public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String radioValue = request.getParameter("radio");
-        String priorUrl = (String) request.getSession().getAttribute("url_prior_signout");
+        String priorUrl = (String) request.getSession().getAttribute(URL_PRIOR_SIGNOUT);
 
         if (StringUtils.isEmpty(radioValue)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);
