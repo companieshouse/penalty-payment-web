@@ -10,7 +10,7 @@ import uk.gov.companieshouse.web.pps.validation.AllowlistChecker;
 import java.util.Map;
 
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGN_OUT;
 
 @Service
 public class SignOutServiceImpl implements SignOutService {
@@ -35,17 +35,20 @@ public class SignOutServiceImpl implements SignOutService {
         if (StringUtils.isBlank(referer)) {
             return response;
         }
+
         String allowedUrl = allowlistChecker.checkURL(referer);
         if (allowlistChecker.checkSignOutIsReferer(allowedUrl)) {
             return response;
         }
+
         response.setSessionAttributes(createSessionAttributes(allowedUrl));
         response.setUrl(allowedUrl);
+
         return response;
     }
 
     private Map<String, Object> createSessionAttributes(String allowedUrl){
-        return Map.of(URL_PRIOR_SIGNOUT, allowedUrl);
+        return Map.of(URL_PRIOR_SIGN_OUT, allowedUrl);
     }
 
     @Override

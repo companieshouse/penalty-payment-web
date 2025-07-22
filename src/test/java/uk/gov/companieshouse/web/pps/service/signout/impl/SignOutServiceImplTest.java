@@ -18,7 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_PATH;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGN_OUT;
 
 class SignOutServiceImplTest {
 
@@ -63,7 +64,7 @@ class SignOutServiceImplTest {
         assertTrue(response.getSessionAttributes().isPresent());
         Map<String, Object> sessionAttributes = response.getSessionAttributes().get();
         assertEquals(1, sessionAttributes.size());
-        assertEquals("/previous", sessionAttributes.get(URL_PRIOR_SIGNOUT));
+        assertEquals("/previous", sessionAttributes.get(URL_PRIOR_SIGN_OUT));
     }
 
     @Test
@@ -89,7 +90,7 @@ class SignOutServiceImplTest {
 
     @Test
     void testDetermineRedirect_null() {
-        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn("/pay-penalty/sign-out");
-        assertEquals("/pay-penalty/sign-out", service.determineRedirect(null, null));
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+        assertEquals(SIGN_OUT_PATH, service.determineRedirect(null, null));
     }
 }

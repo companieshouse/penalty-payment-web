@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGN_OUT;
 
 @Controller
 @NextController(StartController.class)
@@ -75,7 +75,7 @@ public class SignOutController extends BaseController {
     @PostMapping
     public RedirectView postSignOut(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String radioValue = request.getParameter("radio");
-        String priorUrl = (String) request.getSession().getAttribute(URL_PRIOR_SIGNOUT);
+        String priorUrl = (String) request.getSession().getAttribute(URL_PRIOR_SIGN_OUT);
 
         if (StringUtils.isEmpty(radioValue)) {
             redirectAttributes.addFlashAttribute("errorMessage", true);

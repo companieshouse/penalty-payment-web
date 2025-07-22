@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIGN_OUT_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGNOUT;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_PATH;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGN_OUT;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -39,13 +40,17 @@ class SignOutControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock private NavigatorService mockNavigatorService;
-    @Mock private SessionService mockSessionService;
-    @Mock private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
-    @Mock private SignOutService mockSignOutService;
-    @Mock private Map<String, Object> sessionData;
+    @Mock
+    private NavigatorService mockNavigatorService;
+    @Mock
+    private SessionService mockSessionService;
+    @Mock
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+    @Mock
+    private SignOutService mockSignOutService;
+    @Mock
+    private Map<String, Object> sessionData;
 
-    private static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
     private static final String SIGNED_OUT_URL = System.getProperty("ACCOUNT_LOCAL_URL");
     private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String UNSCHEDULED_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
@@ -131,14 +136,14 @@ class SignOutControllerTest {
     @DisplayName("POST Sign out - no selected with referer")
     void postRequestRadioNoWithValidReferer() throws Exception {
         HashMap<String, Object> sessionAttrs = new HashMap<>();
-        sessionAttrs.put(URL_PRIOR_SIGNOUT, PREVIOUS_PATH);
+        sessionAttrs.put(URL_PRIOR_SIGN_OUT, PREVIOUS_PATH);
 
         when(mockSignOutService.determineRedirect("no", PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
         mockMvc.perform(post(SIGN_OUT_PATH)
                         .header(REFERER, PREVIOUS_PATH)
                         .sessionAttrs(sessionAttrs)
-                        .param(URL_PRIOR_SIGNOUT, PREVIOUS_PATH)
+                        .param(URL_PRIOR_SIGN_OUT, PREVIOUS_PATH)
                         .param(RADIO, "no"))
                 .andExpect(redirectedUrl(PREVIOUS_PATH));
     }
