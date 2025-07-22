@@ -74,6 +74,8 @@ class EnterDetailsControllerTest {
 
     private static final String BACK_LINK_URL = "/pay-penalty/ref-starts-with";
 
+    private static final String SIGN_OUT_URL = "/pay-penalty/sign-out";
+
     private static final String TEMPLATE_NAME_MODEL_ATTR = "templateName";
 
     private static final String ENTER_DETAILS_MODEL_ATTR = "enterDetails";
@@ -251,7 +253,7 @@ class EnterDetailsControllerTest {
             baseAttributes.put(BACK_LINK_URL_ATTR, BACK_LINK_URL);
         }
         if (signOutLink) {
-            baseAttributes.put(SIGN_OUT_URL_ATTR, "/pay-penalty/sign-out");
+            baseAttributes.put(SIGN_OUT_URL_ATTR, SIGN_OUT_URL);
         }
         if (!baseAttributes.isEmpty()) {
             serviceResponse.setBaseModelAttributes(baseAttributes);

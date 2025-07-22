@@ -51,6 +51,7 @@ class SignOutControllerTest {
     private Map<String, Object> sessionData;
 
     private static final String SIGNED_OUT_URL = System.getProperty("ACCOUNT_LOCAL_URL");
+    private static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
     private static final String PREVIOUS_PATH = "/pay-penalty/enter-details";
     private static final String UNSCHEDULED_DOWN_PATH = "/pay-penalty/unscheduled-service-down";
     private static final String BACK_LINK = "backLink";
@@ -74,7 +75,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(nullable(String.class))).thenReturn(new PPSServiceResponse());
 
-        mockMvc.perform(get("/pay-penalty/sign-out"))
+        mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK))
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
@@ -90,7 +91,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(anyString())).thenReturn(response);
 
-        mockMvc.perform(get("/pay-penalty/sign-out").header(REFERER, PREVIOUS_PATH))
+        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, PREVIOUS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK))
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
@@ -104,7 +105,7 @@ class SignOutControllerTest {
         when(mockSignOutService.resolveBackLink(anyString()))
                 .thenReturn(new PPSServiceResponse());
 
-        mockMvc.perform(get("/pay-penalty/sign-out").header(REFERER, "/pay-penalty/sign-out"))
+        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, SIGN_OUT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
     }
@@ -116,7 +117,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(false);
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_DOWN_PATH);
 
-        mockMvc.perform(get("/pay-penalty/sign-out"))
+        mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_DOWN_PATH))
                 .andExpect(status().is3xxRedirection());
     }
@@ -126,7 +127,7 @@ class SignOutControllerTest {
     void postRequestRadioYes() throws Exception {
         when(mockSignOutService.determineRedirect("yes", null)).thenReturn(SIGNED_OUT_URL + "/signout");
 
-        mockMvc.perform(post("/pay-penalty/sign-out")
+        mockMvc.perform(post(SIGN_OUT_PATH)
                         .param(RADIO, "yes"))
                 .andExpect(redirectedUrl(SIGNED_OUT_URL + "/signout"));
     }
@@ -139,7 +140,7 @@ class SignOutControllerTest {
 
         when(mockSignOutService.determineRedirect("no", PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
-        mockMvc.perform(post("/pay-penalty/sign-out")
+        mockMvc.perform(post(SIGN_OUT_PATH)
                         .header(REFERER, PREVIOUS_PATH)
                         .sessionAttrs(sessionAttrs)
                         .param(URL_PRIOR_SIGN_OUT, PREVIOUS_PATH)
@@ -150,10 +151,10 @@ class SignOutControllerTest {
     @Test
     @DisplayName("POST Sign out - no radio selected")
     void postRequestRadioNull() throws Exception {
-        when(mockSignOutService.determineRedirect(null, null)).thenReturn("/pay-penalty/sign-out");
+        when(mockSignOutService.determineRedirect(null, null)).thenReturn(SIGN_OUT_PATH);
 
-        mockMvc.perform(post("/pay-penalty/sign-out"))
-                .andExpect(redirectedUrl("/pay-penalty/sign-out"))
+        mockMvc.perform(post(SIGN_OUT_PATH))
+                .andExpect(redirectedUrl(SIGN_OUT_PATH))
                 .andExpect(flash().attributeExists("errorMessage"));
     }
 }
