@@ -15,16 +15,18 @@
     </parent>
     <properties>
         <java.version>21</java.version>
-        <structured-logging.version>3.0.24</structured-logging.version>
+        <structured-logging.version>3.0.36</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
-        <common-web-java.version>3.0.33</common-web-java.version>
-        <java-session-handler.version>4.1.7</java-session-handler.version>
+        <common-web-java.version>3.0.41</common-web-java.version>
+        <java-session-handler.version>4.1.8</java-session-handler.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <web-security-java.version>3.1.5</web-security-java.version>
+        <!-- CVE-2025-48924 -->
+        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <web-security-java.version>3.1.6</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.10</sdk-manager-java.version>
-        <api-sdk-java.version>6.3.0</api-sdk-java.version>
+        <api-sdk-java.version>6.3.4</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.5.3</spring-boot-dependencies.version>
@@ -42,7 +44,7 @@
         <system-stubs.version>2.1.7</system-stubs.version>
 
         <!-- sonar config -->
-        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
         <sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
         <sonar.login></sonar.login>
         <sonar.password></sonar.password>
@@ -75,6 +77,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <!--end transitive dependencies-->
 
