@@ -41,7 +41,6 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUM
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.BACK_LINK_MODEL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
@@ -252,7 +251,7 @@ class EnterDetailsControllerTest {
             baseAttributes.put(BACK_LINK_URL_ATTR, BACK_LINK_URL);
         }
         if (signOutLink) {
-            baseAttributes.put(SIGN_OUT_URL_ATTR, SIGN_OUT_PATH);
+            baseAttributes.put(SIGN_OUT_URL_ATTR, "/pay-penalty/sign-out");
         }
         if (!baseAttributes.isEmpty()) {
             serviceResponse.setBaseModelAttributes(baseAttributes);

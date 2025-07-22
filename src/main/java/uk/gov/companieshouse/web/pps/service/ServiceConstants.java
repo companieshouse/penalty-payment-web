@@ -21,7 +21,6 @@ public class ServiceConstants {
 
     public static final String REFERER = "Referer";
     public static final String SIGN_IN_INFO = "signin_info";
-    public static final String SIGN_OUT_PATH = "/pay-penalty/sign-out";
     public static final String URL_PRIOR_SIGN_OUT = "url_prior_signout";
 
     private ServiceConstants() {

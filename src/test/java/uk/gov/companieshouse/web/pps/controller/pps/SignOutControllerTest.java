@@ -31,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.controller.pps.SignOutController.SIGN_OUT_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REFERER;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.URL_PRIOR_SIGN_OUT;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,7 +74,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(nullable(String.class))).thenReturn(new PPSServiceResponse());
 
-        mockMvc.perform(get(SIGN_OUT_PATH))
+        mockMvc.perform(get("/pay-penalty/sign-out"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK))
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
@@ -91,7 +90,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(anyString())).thenReturn(response);
 
-        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, PREVIOUS_PATH))
+        mockMvc.perform(get("/pay-penalty/sign-out").header(REFERER, PREVIOUS_PATH))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists(BACK_LINK))
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
@@ -105,7 +104,7 @@ class SignOutControllerTest {
         when(mockSignOutService.resolveBackLink(anyString()))
                 .thenReturn(new PPSServiceResponse());
 
-        mockMvc.perform(get(SIGN_OUT_PATH).header(REFERER, SIGN_OUT_PATH))
+        mockMvc.perform(get("/pay-penalty/sign-out").header(REFERER, "/pay-penalty/sign-out"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(SIGN_OUT_TEMPLATE_NAME));
     }
@@ -117,7 +116,7 @@ class SignOutControllerTest {
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(false);
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_DOWN_PATH);
 
-        mockMvc.perform(get(SIGN_OUT_PATH))
+        mockMvc.perform(get("/pay-penalty/sign-out"))
                 .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_DOWN_PATH))
                 .andExpect(status().is3xxRedirection());
     }
@@ -127,7 +126,7 @@ class SignOutControllerTest {
     void postRequestRadioYes() throws Exception {
         when(mockSignOutService.determineRedirect("yes", null)).thenReturn(SIGNED_OUT_URL + "/signout");
 
-        mockMvc.perform(post(SIGN_OUT_PATH)
+        mockMvc.perform(post("/pay-penalty/sign-out")
                         .param(RADIO, "yes"))
                 .andExpect(redirectedUrl(SIGNED_OUT_URL + "/signout"));
     }
@@ -140,7 +139,7 @@ class SignOutControllerTest {
 
         when(mockSignOutService.determineRedirect("no", PREVIOUS_PATH)).thenReturn(PREVIOUS_PATH);
 
-        mockMvc.perform(post(SIGN_OUT_PATH)
+        mockMvc.perform(post("/pay-penalty/sign-out")
                         .header(REFERER, PREVIOUS_PATH)
                         .sessionAttrs(sessionAttrs)
                         .param(URL_PRIOR_SIGN_OUT, PREVIOUS_PATH)
@@ -151,10 +150,10 @@ class SignOutControllerTest {
     @Test
     @DisplayName("POST Sign out - no radio selected")
     void postRequestRadioNull() throws Exception {
-        when(mockSignOutService.determineRedirect(null, null)).thenReturn(SIGN_OUT_PATH);
+        when(mockSignOutService.determineRedirect(null, null)).thenReturn("/pay-penalty/sign-out");
 
-        mockMvc.perform(post(SIGN_OUT_PATH))
-                .andExpect(redirectedUrl(SIGN_OUT_PATH))
+        mockMvc.perform(post("/pay-penalty/sign-out"))
+                .andExpect(redirectedUrl("/pay-penalty/sign-out"))
                 .andExpect(flash().attributeExists("errorMessage"));
     }
 }
