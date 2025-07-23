@@ -64,7 +64,7 @@ public class SignOutController extends BaseController {
         serviceResponse.getUrl()
                 .ifPresentOrElse(
                         backLink -> model.addAttribute(BACK_LINK, backLink),
-                        () -> model.addAttribute(BACK_LINK, "/pay-penalty/")
+                        () -> model.addAttribute(BACK_LINK, penaltyConfigurationProperties.getPayPenaltyPath() + "/")
                 );
 
         LOGGER.info("Backlink resolved to: " + model.getAttribute(BACK_LINK));
