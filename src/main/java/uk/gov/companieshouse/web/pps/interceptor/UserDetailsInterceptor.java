@@ -12,12 +12,13 @@ import uk.gov.companieshouse.web.pps.session.SessionService;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
+
 @Component
 public class UserDetailsInterceptor implements AsyncHandlerInterceptor {
 
     private static final String USER_EMAIL = "userEmail";
 
-    private static final String SIGN_IN_KEY = "signin_info";
     private static final String USER_PROFILE_KEY = "user_profile";
     private static final String EMAIL_KEY = "email";
 
@@ -39,7 +40,7 @@ public class UserDetailsInterceptor implements AsyncHandlerInterceptor {
                 && !isViewRedirectUrlPrefixed(modelAndView)))) {
 
             Map<String, Object> sessionData = sessionService.getSessionDataFromContext();
-            Map<String, Object> signInInfo = (Map<String, Object>) sessionData.get(SIGN_IN_KEY);
+            Map<String, Object> signInInfo = (Map<String, Object>) sessionData.get(SIGN_IN_INFO);
             if (signInInfo != null) {
                 Map<String, Object> userProfile = (Map<String, Object>) signInInfo
                         .get(USER_PROFILE_KEY);

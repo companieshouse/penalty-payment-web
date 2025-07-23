@@ -21,13 +21,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
 
 @ExtendWith(MockitoExtension.class)
 class UserDetailsInterceptorTests {
 
     private static final String USER_EMAIL = "userEmail";
 
-    private static final String SIGN_IN_KEY = "signin_info";
     private static final String USER_PROFILE_KEY = "user_profile";
     private static final String EMAIL_KEY = "email";
 
@@ -61,7 +61,7 @@ class UserDetailsInterceptorTests {
         signInInfo.put(USER_PROFILE_KEY, userProfile);
 
         Map<String, Object> sessionData = new HashMap<>();
-        sessionData.put(SIGN_IN_KEY, signInInfo);
+        sessionData.put(SIGN_IN_INFO, signInInfo);
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.GET.toString());
@@ -81,7 +81,7 @@ class UserDetailsInterceptorTests {
         signInInfo.put(USER_PROFILE_KEY, userProfile);
 
         Map<String, Object> sessionData = new HashMap<>();
-        sessionData.put(SIGN_IN_KEY, signInInfo);
+        sessionData.put(SIGN_IN_INFO, signInInfo);
 
         when(sessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.POST.toString());

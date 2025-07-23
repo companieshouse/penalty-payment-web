@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 
@@ -52,7 +53,7 @@ class PenaltyUtilsTest {
         String email = "test@gmail.com";
         Map<String, Object> userProfile = Map.of("email", email);
         Map<String, Object> signInInfo = Map.of("user_profile", userProfile);
-        SessionService sessionService = () -> Map.of("signin_info", signInInfo);
+        SessionService sessionService = () -> Map.of(SIGN_IN_INFO, signInInfo);
         assertEquals(email, PenaltyUtils.getLoginEmail(sessionService.getSessionDataFromContext()));
     }
 
@@ -65,7 +66,7 @@ class PenaltyUtilsTest {
     @Test
     void testGetLoginEmailSuccessful_NullUserProfile() {
         Map<String, Object> signInInfo = Map.of("id", "test");
-        SessionService sessionService = () -> Map.of("signin_info", signInInfo);
+        SessionService sessionService = () -> Map.of(SIGN_IN_INFO, signInInfo);
         assertEquals("", PenaltyUtils.getLoginEmail(sessionService.getSessionDataFromContext()));
     }
 

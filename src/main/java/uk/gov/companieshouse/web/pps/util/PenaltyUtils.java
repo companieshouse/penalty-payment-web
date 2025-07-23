@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
+
 public final class PenaltyUtils {
 
     private static final DecimalFormat AMOUNT_FORMATTER = new DecimalFormat("#,###");
@@ -20,7 +22,7 @@ public final class PenaltyUtils {
     }
 
     public static String getLoginEmail(final Map<String, Object> sessionData) {
-        Map<?, ?> signInInfo = (Map<?, ?>) sessionData.get("signin_info");
+        Map<?, ?> signInInfo = (Map<?, ?>) sessionData.get(SIGN_IN_INFO);
         if (signInInfo != null) {
             Map<?, ?> userProfile = (Map<?, ?>) signInInfo.get("user_profile");
             if (userProfile != null && userProfile.get("email") != null) {

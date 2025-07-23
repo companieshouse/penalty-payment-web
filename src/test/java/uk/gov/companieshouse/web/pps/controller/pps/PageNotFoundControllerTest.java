@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static uk.gov.companieshouse.web.pps.controller.BaseController.USER_BAR_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.PageNotFoundController.PAGE_NOT_FOUND_TEMPLATE_NAME;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -55,7 +56,7 @@ class PageNotFoundControllerTest {
     void getRequestSuccess() throws Exception {
 
         when(mockSessionService.getSessionDataFromContext()).thenReturn(
-                Map.of("signin_info",
+                Map.of(SIGN_IN_INFO,
                         Map.of("user_profile",
                                 Map.of("email", "test@example.com"))));
 

@@ -15,6 +15,7 @@ public class PenaltyConfigurationProperties {
     private String refStartsWithPath;
     private String enterDetailsPath;
     private String unscheduledServiceDownPath;
+    private String payPenaltyPath;
     private String signOutPath;
     private String surveyLink;
     private String serviceBannerLink;
@@ -55,6 +56,10 @@ public class PenaltyConfigurationProperties {
     public void setUnscheduledServiceDownPath(String unscheduledServiceDownPath) {
         this.unscheduledServiceDownPath = unscheduledServiceDownPath;
     }
+
+    public String getPayPenaltyPath() { return payPenaltyPath; }
+
+    public void setPayPenaltyPath(String payPenaltyPath) { this.payPenaltyPath = payPenaltyPath; }
 
     public String getSignOutPath() {
         return signOutPath;

@@ -11,16 +11,18 @@ public class PPSServiceResponse {
     private String errorRequestMsg;
     private Map<String, String> baseModelAttributes;
     private Map<String, Object> modelAttributes;
+    private Map<String, Object> sessionAttributes;
 
     public PPSServiceResponse() {
     }
 
     public PPSServiceResponse(String url, String errorRequestMsg,
-            Map<String, String> baseModelAttributes, Map<String, Object> modelAttributes) {
+            Map<String, String> baseModelAttributes, Map<String, Object> modelAttributes, Map<String, Object> sessionAttributes) {
         this.url = url;
         this.errorRequestMsg = errorRequestMsg;
         this.baseModelAttributes = baseModelAttributes;
         this.modelAttributes = modelAttributes;
+        this.sessionAttributes = sessionAttributes;
     }
 
     public Optional<String> getUrl() {
@@ -53,5 +55,13 @@ public class PPSServiceResponse {
 
     public void setModelAttributes(Map<String, Object> modelAttributes) {
         this.modelAttributes = modelAttributes;
+    }
+
+    public Optional<Map<String, Object>> getSessionAttributes() {
+        return sessionAttributes == null ? Optional.empty() : Optional.of(sessionAttributes);
+    }
+
+    public void setSessionAttributes(Map<String, Object> sessionAttributes) {
+        this.sessionAttributes = sessionAttributes;
     }
 }
