@@ -74,6 +74,7 @@ class SignOutControllerTest {
         when(mockSessionService.getSessionDataFromContext()).thenReturn(sessionData);
         when(mockSignOutService.isUserSignedIn(sessionData)).thenReturn(true);
         when(mockSignOutService.resolveBackLink(nullable(String.class))).thenReturn(new PPSServiceResponse());
+        when(mockPenaltyConfigurationProperties.getPayPenaltyPath()).thenReturn("/pay-penalty");
 
         mockMvc.perform(get(SIGN_OUT_PATH))
                 .andExpect(status().isOk())
