@@ -107,7 +107,7 @@ public abstract class BaseController {
             if (attributes.containsKey(BACK_LINK_URL_ATTR) && attributes.containsKey(SIGN_OUT_URL_ATTR)) {
                 addBaseAttributesToModel(model, attributes.get(BACK_LINK_URL_ATTR), attributes.get(SIGN_OUT_URL_ATTR));
             } else if (attributes.containsKey(SIGN_OUT_URL_ATTR)) {
-                addBaseAttributesWithoutBackUrlToModel(model, SIGN_OUT_URL_ATTR);
+                addBaseAttributesWithoutBackUrlToModel(model, attributes.get(SIGN_OUT_URL_ATTR));
             }
         });
     }
