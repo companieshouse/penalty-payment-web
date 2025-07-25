@@ -1,14 +1,19 @@
 package uk.gov.companieshouse.web.pps.util;
 
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.DISABLED;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
+import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 
 public final class PenaltyUtils {
 
@@ -45,6 +50,13 @@ public final class PenaltyUtils {
         // Get the first character of the penalty reference
         String refStartsWith = penaltyRef.strip().substring(0, 1).toUpperCase();
         return PenaltyReference.fromStartsWith(refStartsWith);
+    }
+
+    public static boolean penaltyTypeDisabled(List<FinancialPenalty> penalties, String penaltyRef) {
+        return penalties.stream().anyMatch(penalty ->
+                PENALTY_TYPE.equals(penalty.getType()) // is a penalty
+                        && Objects.equals(penalty.getId(), penaltyRef) // is target penalty
+                        && DISABLED.equals(penalty.getPayableStatus())); // is disabled
     }
 }
 
