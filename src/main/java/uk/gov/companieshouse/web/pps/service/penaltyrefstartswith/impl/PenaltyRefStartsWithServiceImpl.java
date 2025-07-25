@@ -20,7 +20,6 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 
 @Service
 public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithService {
@@ -120,7 +119,6 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     private Map<String, String> setBackUrl() {
         Map<String, String> baseModelAttributes = new HashMap<>();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, penaltyConfigurationProperties.getStartPath());
-        baseModelAttributes.put(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
         return baseModelAttributes;
     }
 }
