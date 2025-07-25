@@ -43,6 +43,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
 
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
+    private static final String ONLINE_PAYMENT_UNAVAILABLE = "online-payment-unavailable";
 
     private final PayablePenaltyService payablePenaltyService;
     private final PaymentService paymentService;
@@ -97,6 +98,11 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
                     "Checking if online payment for penalty %s is available for company number %s",
                     penaltyRef, companyNumber));
 
+            if (PenaltyUtils.penaltyTypeDisabled(penaltyAndCosts, penaltyRef)) {
+                serviceResponse.setUrl(buildOnlinePaymentUnavailablePath(companyNumber, penaltyRef));
+                return serviceResponse;
+            }
+
             // User can only pay for a penalty with no associated legal costs
             if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
                 return setServiceDownUrl(serviceResponse);
@@ -135,6 +141,10 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         LOGGER.debug(String.format(
                 "Checking if online payment for penalty %s is available for company number %s",
                 penaltyRef, companyNumber));
+
+        if (PenaltyUtils.penaltyTypeDisabled(penaltyAndCosts, penaltyRef)) {
+            return buildOnlinePaymentUnavailablePath(companyNumber, penaltyRef);
+        }
 
         if (isPenaltyRefMultiplePenalty(penaltyAndCosts, companyNumber, penaltyRef)) {
             return redirectPathUnscheduledServiceDown;
@@ -251,5 +261,10 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
                 penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         serviceResponse.setUrl(redirectPathUnscheduledServiceDown);
         return serviceResponse;
+    }
+
+    private String buildOnlinePaymentUnavailablePath(String companyNumber, String penaltyRef) {
+        return String.format("%s/pay-penalty/company/%s/penalty/%s/%s",
+                UrlBasedViewResolver.REDIRECT_URL_PREFIX, companyNumber, penaltyRef, ONLINE_PAYMENT_UNAVAILABLE);
     }
 }
