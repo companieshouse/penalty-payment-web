@@ -35,6 +35,7 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAM
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 
 @Service
@@ -241,6 +242,7 @@ public class ViewPenaltiesServiceImpl implements ViewPenaltiesService {
         String redirectBackUrl = penaltyConfigurationProperties.getEnterDetailsPath()
                 + "?ref-starts-with=" + penaltyReference.getStartsWith();
         baseModelAttributes.put(BACK_LINK_URL_ATTR, redirectBackUrl);
+        baseModelAttributes.put(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
         serviceResponse.setBaseModelAttributes(baseModelAttributes);
     }
 
