@@ -102,6 +102,7 @@ class ViewPenaltiesServiceImplTest {
 
     private static final String MOCK_PAYMENTS_URL = "pay.companieshouse/payments/987654321987654321/pay";
     private static final String SUMMARY_FALSE_PARAMETER = "?summary=false";
+    private static final String ONLINE_PAYMENT_UNAVAILABLE_PATH = "/pay-penalty/company/%s/penalty/%s/online-payment-unavailable";
 
     @Test
     @DisplayName("Get viewPenaltyRefStartWith - health check returning service unavailable")
@@ -112,7 +113,8 @@ class ViewPenaltiesServiceImplTest {
 
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
-        PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER, PENALTY_REF);
+        PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                PENALTY_REF);
 
         assertEquals(Optional.of(SERVICE_UNAVAILABLE_VIEW_NAME), serviceResponse.getUrl());
         assertTrue(serviceResponse.getBaseModelAttributes().isPresent());
@@ -130,7 +132,8 @@ class ViewPenaltiesServiceImplTest {
 
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
-        PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER, PENALTY_REF);
+        PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                PENALTY_REF);
 
         assertEquals(Optional.of(REDIRECT_URL_PREFIX), serviceResponse.getUrl());
 
@@ -305,6 +308,29 @@ class ViewPenaltiesServiceImplTest {
         assertEquals(setMockUnscheduledErrorServiceResponse().getUrl(), serviceResponse.getUrl());
     }
 
+    @Test
+    @DisplayName("View Penalty - penalty type disabled")
+    void viewPenaltiesPenaltyTypeDisabled() throws Exception {
+        when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+
+        List<FinancialPenalty> mockPenalties = new ArrayList<>();
+        mockPenalties.add(
+                PPSTestUtility.disabledFinancialPenalty(CS_PENALTY_REF,
+                        now().minusYears(1).toString()));
+
+        configureFeatureFlag(CS_PENALTY_REF, TRUE);
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                CS_PENALTY_REF)).thenReturn(mockPenalties);
+
+        PPSServiceResponse serviceResponse = viewPenaltiesService.viewPenalties(COMPANY_NUMBER,
+                CS_PENALTY_REF);
+
+        assertEquals(
+                Optional.of(REDIRECT_URL_PREFIX + String.format(ONLINE_PAYMENT_UNAVAILABLE_PATH,
+                        COMPANY_NUMBER, CS_PENALTY_REF)),
+                serviceResponse.getUrl());
+    }
+
     @ParameterizedTest
     @MethodSource("penaltyTestDataProvider")
     @DisplayName("Post Penalty - successful")
@@ -385,6 +411,25 @@ class ViewPenaltiesServiceImplTest {
                 LFP_PENALTY_REF);
 
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, serviceResponse);
+    }
+
+    @Test
+    @DisplayName("Post Penalty - disabled penalty")
+    void postPenaltiesDisabledPenalty() throws Exception {
+
+        List<FinancialPenalty> mockPenalties = new ArrayList<>();
+        mockPenalties.add(
+                PPSTestUtility.disabledFinancialPenalty(CS_PENALTY_REF,
+                        now().minusYears(1).toString()));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER,
+                CS_PENALTY_REF)).thenReturn(mockPenalties);
+
+        String serviceResponse = viewPenaltiesService.postPenalties(COMPANY_NUMBER,
+                CS_PENALTY_REF);
+
+        assertEquals(REDIRECT_URL_PREFIX + String.format(ONLINE_PAYMENT_UNAVAILABLE_PATH,
+                COMPANY_NUMBER, CS_PENALTY_REF), serviceResponse);
     }
 
     @Test

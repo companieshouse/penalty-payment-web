@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
+import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.DISABLED;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
 
 public class PPSTestUtility {
@@ -187,6 +188,22 @@ public class PPSTestUtility {
         financialPenalty.setMadeUpDate(madeUpDate);
         financialPenalty.setReason("Test reason");
         financialPenalty.setPayableStatus(CLOSED);
+
+        return financialPenalty;
+    }
+
+    public static FinancialPenalty disabledFinancialPenalty(String id, String madeUpDate) {
+        FinancialPenalty financialPenalty = new FinancialPenalty();
+        financialPenalty.setId(id);
+        financialPenalty.setPaid(false);
+        financialPenalty.setDca(false);
+        financialPenalty.setOriginalAmount(VALID_AMOUNT);
+        financialPenalty.setOutstanding(VALID_AMOUNT);
+        financialPenalty.setType(PENALTY_TYPE);
+        financialPenalty.setDueDate(DATE);
+        financialPenalty.setMadeUpDate(madeUpDate);
+        financialPenalty.setReason("Test reason");
+        financialPenalty.setPayableStatus(DISABLED);
 
         return financialPenalty;
     }

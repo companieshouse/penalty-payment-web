@@ -386,6 +386,20 @@ class PenaltyDetailsServiceImplTest {
         assertRedirect(serviceResponse, ONLINE_PAYMENT_UNAVAILABLE_PATH, COMPANY_NUMBER);
     }
 
+    @Test
+    @DisplayName("Post Details failure - penalty is disabled")
+    void postDetailsWhenPenaltyIsDisabled() throws Exception {
+
+        configureAppendCompanyNumber(COMPANY_NUMBER);
+        configurePenaltyDisabled();
+
+        PPSServiceResponse serviceResponse = penaltyDetailsService
+                .postEnterDetails(
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        enterDetailsControllerClass);
+
+        assertRedirect(serviceResponse, ONLINE_PAYMENT_UNAVAILABLE_PATH, COMPANY_NUMBER);
+    }
 
     @ParameterizedTest
     @CsvSource({
@@ -482,6 +496,16 @@ class PenaltyDetailsServiceImplTest {
 
         when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
                 .thenReturn(partialPaidFinancialPenalty);
+    }
+
+    private void configurePenaltyDisabled()
+            throws ServiceException {
+        List<FinancialPenalty> disabledFinancialPenalty = new ArrayList<>();
+        disabledFinancialPenalty.add(PPSTestUtility.disabledFinancialPenalty(PENALTY_REF,
+                now().minusYears(1).toString()));
+
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+                .thenReturn(disabledFinancialPenalty);
     }
 
     private void assertRedirect(PPSServiceResponse serviceResponse, String expectedRedirectUrl,
