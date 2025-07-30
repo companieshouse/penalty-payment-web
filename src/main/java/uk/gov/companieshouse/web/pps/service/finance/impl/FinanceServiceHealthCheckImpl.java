@@ -115,7 +115,7 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
 
     private Optional<String> getParsedDateTime(final String endTime) {
         DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        DateFormat displayDateFormat = new SimpleDateFormat("h:mm a z 'on' EEEE d MMMM yyyy");
+        DateFormat displayDateFormat = new SimpleDateFormat("h:mm a 'on' EEEE d MMMM yyyy");
         try {
             return Optional.of(displayDateFormat.format(inputDateFormat.parse(endTime)));
         } catch (ParseException ex) {
