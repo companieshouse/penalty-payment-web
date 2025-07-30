@@ -240,4 +240,23 @@ class FinanceServiceHealthCheckImplTest {
         assertFalse( result.getBaseModelAttributes().isPresent());
 
     }
+
+    @Test
+    @DisplayName("Health Check for other pages - null maintenance end time")
+    void healthCheckOtherNullMaintenanceEndTime() throws Exception {
+        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+
+        mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
+        mockFinancialHealthCheck.setMaintenanceEndTime(null);
+
+        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
+        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+
+        PPSServiceResponse result = financeServiceHealthCheck.checkIfAvailable();
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
+
+        assertFalse( result.getModelAttributes().isPresent());
+    }
 }
