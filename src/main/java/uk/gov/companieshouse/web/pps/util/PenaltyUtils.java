@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.DISABLED;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_IN_INFO;
@@ -55,7 +54,7 @@ public final class PenaltyUtils {
     public static boolean penaltyTypeDisabled(List<FinancialPenalty> penalties, String penaltyRef) {
         return penalties.stream().anyMatch(penalty ->
                 PENALTY_TYPE.equals(penalty.getType()) // is a penalty
-                        && Objects.equals(penalty.getId(), penaltyRef) // is target penalty
+                        && penaltyRef.equals(penalty.getId()) // is target penalty
                         && DISABLED.equals(penalty.getPayableStatus())); // is disabled
     }
 }
