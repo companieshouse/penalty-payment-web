@@ -42,6 +42,7 @@ class FinanceServiceHealthCheckImplTest {
 
     private static final String MAINTENANCE_END_TIME = "2001-02-03T04:05:06-00:00";
     private static final String ERROR_MAINTENANCE_END_TIME = "0000-99-99";
+    private static final String TEST_BRITISH_SUMMER_TIME = "2025-08-01T15:30:00+01:00";
 
     @Test
     @DisplayName("Health Check for start pages - healthy redirect reference start with")
@@ -110,7 +111,7 @@ class FinanceServiceHealthCheckImplTest {
         var result = financeServiceHealthCheck.checkIfAvailableAtStart(0);
 
         assertTrue( result.getUrl().isPresent());
-        assertEquals("pps/serviceUnavailable", result.getUrl().get());
+        assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
 
         assertTrue( result.getModelAttributes().isPresent());
         assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
@@ -258,5 +259,31 @@ class FinanceServiceHealthCheckImplTest {
         assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
 
         assertFalse( result.getModelAttributes().isPresent());
+    }
+
+    @Test
+    @DisplayName("Test timezone conversation for BST against GMT/UTC") {
+        void testTimezoneConversionForBST() throws Exception {
+            FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+
+            mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
+            mockFinancialHealthCheck.setMaintenanceEndTime(TEST_BRITISH_SUMMER_TIME);
+
+            when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+            when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+
+            var result = financeServiceHealthCheck.checkIfAvailable();
+
+            assertTrue( result.getUrl().isPresent());
+            assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
+
+            assertTrue(result.getModelAttributes().isPresent());
+            assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
+
+            String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
+            assertTrue(displayDateFormat.contains("3:30 PM"));
+            assertTrue(displayDateFormat.contains("Friday"));
+            assertTrue(displayDateFormat.contains("1 August 2025"));
+        }
     }
 }

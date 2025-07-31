@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.DATE_STR;
@@ -116,6 +117,8 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     private Optional<String> getParsedDateTime(final String endTime) {
         DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         DateFormat displayDateFormat = new SimpleDateFormat("h:mm a 'on' EEEE d MMMM yyyy");
+        displayDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+
         try {
             return Optional.of(displayDateFormat.format(inputDateFormat.parse(endTime)));
         } catch (ParseException ex) {
