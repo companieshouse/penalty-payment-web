@@ -262,7 +262,7 @@ class FinanceServiceHealthCheckImplTest {
     }
 
     @Test
-    @DisplayName("Test timezone conversation for BST against GMT/UTC") {
+    @DisplayName("Test timezone conversation for BST against GMT/UTC")
         void testTimezoneConversionForBST() throws Exception {
             FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
 
