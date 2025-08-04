@@ -15,7 +15,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 @Component
 public class EnterDetailsValidator {
 
-    private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z0-9]{8}|\\d{1,8})$";
+    private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z]{2}\\d{6}|\\d{1,8})$";
     private static final String OVERSEAS_ENTITY_ID_REGEX = "^[Oo][Ee]\\d{6}$";
     private static final String LATE_FILING_PENALTY_REF_REGEX = "^[Aa]\\d{7}$";
     private static final String SANCTIONS_PENALTY_REF_REGEX = "^[Pp]\\d{7}$";
@@ -37,22 +37,36 @@ public class EnterDetailsValidator {
         String companyNumberField = "companyNumber";
         String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
 
+        // company number is empty
         if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
             String key =
                     "enterDetails.companyNumber.notValid." + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(companyNumberField, companyNumberField,
                     bundle.getString(key));
-        } else if (StringUtils.containsAny(enterDetails.getCompanyNumber(), " ")) {
+        }
+        // company number less than 8 characters
+        else if (enterDetails.getCompanyNumber().length() < 8) {
             String key =
-                    "enterDetails.companyNumber.noSpaces." + enterDetails.getPenaltyReferenceName();
+                    "enterDetails.companyNumber.lessCharacters."
+                            + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(companyNumberField, companyNumberField,
                     bundle.getString(key));
-        } else {
+        }
+        // company number contains non alphanumeric characters
+        else if (!StringUtils.isAlphanumeric(enterDetails.getCompanyNumber())) {
+            String key =
+                    "enterDetails.companyNumber.nonAlphanumeric."
+                            + enterDetails.getPenaltyReferenceName();
+            bindingResult.rejectValue(companyNumberField, companyNumberField,
+                    bundle.getString(key));
+        }
+        // company number in incorrect format
+        else {
             String regex = SANCTIONS_ROE.name().equals(penaltyReferenceName)
                     ? OVERSEAS_ENTITY_ID_REGEX
                     : COMPANY_NUMBER_REGEX;
             if (!enterDetails.getCompanyNumber().matches(regex)) {
-                String key = "enterDetails.companyNumber.notValid."
+                String key = "enterDetails.companyNumber.incorrectFormat."
                         + enterDetails.getPenaltyReferenceName();
                 bindingResult.rejectValue(companyNumberField, companyNumberField,
                         bundle.getString(key));
@@ -66,21 +80,28 @@ public class EnterDetailsValidator {
         String penaltyRefField = "penaltyRef";
         String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
 
+        // penalty reference is empty
         if (StringUtils.isBlank(penaltyRef)) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField,
                     bundle.getString("enterDetails.penaltyRef.notEmpty"));
-        } else if (StringUtils.containsAny(penaltyRef, " ")) {
+        }
+        // penalty reference less than 8 characters
+        else if (penaltyRef.length() < 8) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString("enterDetails.penaltyRef.noSpaces"));
-        } else {
+                    bundle.getString("enterDetails.penaltyRef.lessCharacters"));
+        }
+        // penalty reference in incorrect format
+        else {
             String regex = switch (PenaltyReference.valueOf(penaltyReferenceName)) {
                 case LATE_FILING -> LATE_FILING_PENALTY_REF_REGEX;
                 case SANCTIONS -> SANCTIONS_PENALTY_REF_REGEX;
                 case SANCTIONS_ROE -> SANCTIONS_ROE_PENALTY_REF_REGEX;
             };
             if (!penaltyRef.matches(regex)) {
+                String key = "enterDetails.penaltyRef.incorrectFormat."
+                        + enterDetails.getPenaltyReferenceName();
                 bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                        bundle.getString("enterDetails.penaltyRef.notValid"));
+                        bundle.getString(key));
             }
         }
     }
