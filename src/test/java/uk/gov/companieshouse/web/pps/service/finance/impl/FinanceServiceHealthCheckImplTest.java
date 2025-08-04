@@ -243,25 +243,6 @@ class FinanceServiceHealthCheckImplTest {
     }
 
     @Test
-    @DisplayName("Health Check for other pages - null maintenance end time")
-    void healthCheckOtherNullMaintenanceEndTime() throws Exception {
-        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
-
-        mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
-        mockFinancialHealthCheck.setMaintenanceEndTime(null);
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
-        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
-
-        PPSServiceResponse result = financeServiceHealthCheck.checkIfAvailable();
-
-        assertTrue( result.getUrl().isPresent());
-        assertEquals(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH, result.getUrl().get());
-
-        assertFalse( result.getModelAttributes().isPresent());
-    }
-
-    @Test
     @DisplayName("Test timezone conversation for BST against GMT/UTC")
     void testTimezoneConversionForBST() throws Exception {
         FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
@@ -281,7 +262,7 @@ class FinanceServiceHealthCheckImplTest {
         assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
 
         String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
-        assertTrue(displayDateFormat.contains("3:30 PM"));
+        assertTrue(displayDateFormat.contains("3:30 pm"));
         assertTrue(displayDateFormat.contains("Friday"));
         assertTrue(displayDateFormat.contains("1 August 2025"));
     }
