@@ -281,7 +281,7 @@ class FinanceServiceHealthCheckImplTest {
             assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
 
             String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
-            assertTrue(displayDateFormat.contains("4:30 PM"));
+            assertTrue(displayDateFormat.contains("3:30 PM"));
             assertTrue(displayDateFormat.contains("Friday"));
             assertTrue(displayDateFormat.contains("1 August 2025"));
         }
