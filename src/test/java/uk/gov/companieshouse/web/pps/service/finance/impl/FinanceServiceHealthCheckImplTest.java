@@ -40,9 +40,8 @@ class FinanceServiceHealthCheckImplTest {
 
     private static final String UNKNOWN_STATUS = "Unknown";
 
-    private static final String MAINTENANCE_END_TIME = "2001-02-03T04:05:06-00:00";
+    private static final String MAINTENANCE_END_TIME = "2001-08-03T04:05:06-00:00";
     private static final String ERROR_MAINTENANCE_END_TIME = "0000-99-99";
-    private static final String TEST_BRITISH_SUMMER_TIME = "2025-08-01T15:30:00+01:00";
 
     @Test
     @DisplayName("Health Check for start pages - healthy redirect reference start with")
@@ -248,7 +247,7 @@ class FinanceServiceHealthCheckImplTest {
         FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
 
         mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
-        mockFinancialHealthCheck.setMaintenanceEndTime(TEST_BRITISH_SUMMER_TIME);
+        mockFinancialHealthCheck.setMaintenanceEndTime(MAINTENANCE_END_TIME);
 
         when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
         when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
@@ -262,8 +261,8 @@ class FinanceServiceHealthCheckImplTest {
         assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
 
         String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
-        assertTrue(displayDateFormat.contains("3:30 pm"));
+        assertTrue(displayDateFormat.contains("5:05 am"));
         assertTrue(displayDateFormat.contains("Friday"));
-        assertTrue(displayDateFormat.contains("1 August 2025"));
+        assertTrue(displayDateFormat.contains("3 August 2001"));
     }
 }
