@@ -263,27 +263,26 @@ class FinanceServiceHealthCheckImplTest {
 
     @Test
     @DisplayName("Test timezone conversation for BST against GMT/UTC")
-        void testTimezoneConversionForBST() throws Exception {
-            FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+    void testTimezoneConversionForBST() throws Exception {
+        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
 
-            mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
-            mockFinancialHealthCheck.setMaintenanceEndTime(TEST_BRITISH_SUMMER_TIME);
+        mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
+        mockFinancialHealthCheck.setMaintenanceEndTime(TEST_BRITISH_SUMMER_TIME);
 
-            when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
-            when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
 
-            var result = financeServiceHealthCheck.checkIfAvailable();
+        var result = financeServiceHealthCheck.checkIfAvailable();
 
-            assertTrue( result.getUrl().isPresent());
-            assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
 
-            assertTrue(result.getModelAttributes().isPresent());
-            assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
+        assertTrue(result.getModelAttributes().isPresent());
+        assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
 
-            String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
-            assertTrue(displayDateFormat.contains("3:30 PM"));
-            assertTrue(displayDateFormat.contains("Friday"));
-            assertTrue(displayDateFormat.contains("1 August 2025"));
-        }
+        String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
+        assertTrue(displayDateFormat.contains("3:30 PM"));
+        assertTrue(displayDateFormat.contains("Friday"));
+        assertTrue(displayDateFormat.contains("1 August 2025"));
     }
 }
