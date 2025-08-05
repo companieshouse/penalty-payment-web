@@ -37,10 +37,10 @@ class EnterDetailsValidatorTest {
             "AB123456,P1234567,SANCTIONS",
             "OE123456,U1234567,SANCTIONS_ROE"
     })
-    void isValidWhenRefStart(String companyId, String penaltyRef, String referenceName) {
+    void isValidWhenRefStart(String companyNumber, String penaltyRef, String referenceName) {
         enterDetails.setPenaltyReferenceName(referenceName);
         enterDetails.setPenaltyRef(penaltyRef);
-        enterDetails.setCompanyNumber(companyId);
+        enterDetails.setCompanyNumber(companyNumber);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
@@ -55,9 +55,9 @@ class EnterDetailsValidatorTest {
             " ,Enter the company number",
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
-    void isNotValidForLateFilingCompanyIdCheck(String companyId, String errorMessage) {
+    void isNotValidForLateFilingCompanyNumberCheck(String companyNumber, String errorMessage) {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setCompanyNumber(companyId);
+        enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("A1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
@@ -75,9 +75,9 @@ class EnterDetailsValidatorTest {
             " ,Enter the company number",
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
-    void isNotValidForSanctionsCompanyIdCheck(String companyId, String errorMessage) {
+    void isNotValidForSanctionsCompanyNumberCheck(String companyNumber, String errorMessage) {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setCompanyNumber(companyId);
+        enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("P1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
@@ -116,8 +116,8 @@ class EnterDetailsValidatorTest {
             "X1234567, Penalty reference must only contain the letter P and numbers,SANCTIONS",
             "X1234567, Penalty reference must only contain the letter U and numbers,SANCTIONS_ROE"
     })
-    void isNotValidForPenaltyReferenceCheck(String penaltyRef, String errorMessage, String referenceName) {
-        enterDetails.setPenaltyReferenceName(referenceName);
+    void isNotValidForPenaltyReferenceCheck(String penaltyRef, String errorMessage, String penaltyReferenceName) {
+        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         enterDetails.setCompanyNumber("12345678");
         enterDetails.setPenaltyRef(penaltyRef);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
