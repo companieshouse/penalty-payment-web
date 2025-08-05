@@ -40,7 +40,7 @@ class FinanceServiceHealthCheckImplTest {
 
     private static final String UNKNOWN_STATUS = "Unknown";
 
-    private static final String MAINTENANCE_END_TIME = "2001-02-03T04:05:06-00:00";
+    private static final String MAINTENANCE_END_TIME = "2001-08-03T04:05:06Z";
     private static final String ERROR_MAINTENANCE_END_TIME = "0000-99-99";
 
     @Test
@@ -110,7 +110,7 @@ class FinanceServiceHealthCheckImplTest {
         var result = financeServiceHealthCheck.checkIfAvailableAtStart(0);
 
         assertTrue( result.getUrl().isPresent());
-        assertEquals("pps/serviceUnavailable", result.getUrl().get());
+        assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
 
         assertTrue( result.getModelAttributes().isPresent());
         assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
@@ -239,5 +239,28 @@ class FinanceServiceHealthCheckImplTest {
         assertFalse(result.getErrorRequestMsg().isPresent());
         assertFalse( result.getBaseModelAttributes().isPresent());
 
+    }
+
+    @Test
+    @DisplayName("Test timezone conversion for BST against GMT/UTC")
+    void testTimezoneConversionForBST() throws Exception {
+        FinanceHealthcheck mockFinancialHealthCheck = new FinanceHealthcheck();
+
+        mockFinancialHealthCheck.setMessage(FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus());
+        mockFinancialHealthCheck.setMaintenanceEndTime(MAINTENANCE_END_TIME);
+
+        when(mockPenaltyPaymentService.checkFinanceSystemAvailableTime()).thenReturn(mockFinancialHealthCheck);
+        when(mockPenaltyConfigurationProperties.getSignOutPath()).thenReturn(SIGN_OUT_PATH);
+
+        var result = financeServiceHealthCheck.checkIfAvailable();
+
+        assertTrue( result.getUrl().isPresent());
+        assertEquals(SERVICE_UNAVAILABLE_VIEW_NAME, result.getUrl().get());
+
+        assertTrue(result.getModelAttributes().isPresent());
+        assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
+
+        String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
+        assertEquals("5:05 am on Friday 3 August 2001", displayDateFormat);
     }
 }
