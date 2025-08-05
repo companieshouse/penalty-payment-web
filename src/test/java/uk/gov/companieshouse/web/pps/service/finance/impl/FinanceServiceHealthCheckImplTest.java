@@ -40,7 +40,7 @@ class FinanceServiceHealthCheckImplTest {
 
     private static final String UNKNOWN_STATUS = "Unknown";
 
-    private static final String MAINTENANCE_END_TIME = "2001-08-03T04:05:06-00:00";
+    private static final String MAINTENANCE_END_TIME = "2001-08-03T04:05:06Z";
     private static final String ERROR_MAINTENANCE_END_TIME = "0000-99-99";
 
     @Test
@@ -261,8 +261,6 @@ class FinanceServiceHealthCheckImplTest {
         assertTrue(result.getModelAttributes().get().containsKey(DATE_STR));
 
         String displayDateFormat = (String) result.getModelAttributes().get().get(DATE_STR);
-        assertTrue(displayDateFormat.contains("5:05 am"));
-        assertTrue(displayDateFormat.contains("Friday"));
-        assertTrue(displayDateFormat.contains("3 August 2001"));
+        assertEquals("5:05 am on Friday 3 August 2001", displayDateFormat);
     }
 }

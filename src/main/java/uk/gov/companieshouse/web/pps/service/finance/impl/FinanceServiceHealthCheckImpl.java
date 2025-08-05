@@ -13,6 +13,7 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -117,13 +118,11 @@ public class FinanceServiceHealthCheckImpl implements FinanceServiceHealthCheck 
     }
 
     private Optional<String> getParsedDateTime(final String endTime) {
-
+        DateTimeFormatter inputDateFormat = DateTimeFormatter.ofPattern("h:mm a 'on' EEEE d MMMM yyyy", Locale.UK);
         try {
-            Instant instant = Instant.parse(endTime);
-            ZonedDateTime displayDateFormat = instant.atZone(ZoneId.of("Europe/London"));
-            DateTimeFormatter inputDateFormat = DateTimeFormatter.ofPattern("h:mm a 'on' EEEE d MMMM yyyy", Locale.UK);
-
-            return Optional.of(displayDateFormat.format(inputDateFormat));
+            return Optional.of(OffsetDateTime.parse(endTime)
+                    .atZoneSameInstant(ZoneId.of("Europe/London"))
+                    .format(inputDateFormat));
         } catch (DateTimeParseException ex) {
             LOGGER.error(ex.getMessage(), ex);
             return Optional.empty();
