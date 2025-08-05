@@ -38,7 +38,7 @@ public class EnterDetailsValidator {
         String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
 
         // company number is empty
-        if (enterDetails.getCompanyNumber() == null || enterDetails.getCompanyNumber().isEmpty()) {
+        if (StringUtils.isEmpty(enterDetails.getCompanyNumber())) {
             String key =
                     "enterDetails.companyNumber.notValid." + enterDetails.getPenaltyReferenceName();
             bindingResult.rejectValue(companyNumberField, companyNumberField,
