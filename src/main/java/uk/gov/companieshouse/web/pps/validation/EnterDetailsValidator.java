@@ -44,6 +44,13 @@ public class EnterDetailsValidator {
             bindingResult.rejectValue(companyNumberField, companyNumberField,
                     bundle.getString(key));
         }
+        // company number contains space
+        else if (StringUtils.containsAny(enterDetails.getCompanyNumber(), " ")) {
+            String key =
+                    "enterDetails.companyNumber.noSpaces." + enterDetails.getPenaltyReferenceName();
+            bindingResult.rejectValue(companyNumberField, companyNumberField,
+                    bundle.getString(key));
+        }
         // company number less than 8 characters
         else if (enterDetails.getCompanyNumber().length() < 8) {
             String key =
@@ -83,12 +90,25 @@ public class EnterDetailsValidator {
         // penalty reference is empty
         if (StringUtils.isBlank(penaltyRef)) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString("enterDetails.penaltyRef.notEmpty"));
+                    bundle.getString("enterDetails.penaltyRef.notValid"));
+        }
+        // penalty reference contains space
+        else if (StringUtils.containsAny(penaltyRef, " ")) {
+            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
+                    bundle.getString("enterDetails.penaltyRef.noSpaces"));
         }
         // penalty reference less than 8 characters
         else if (penaltyRef.length() < 8) {
             bindingResult.rejectValue(penaltyRefField, penaltyRefField,
                     bundle.getString("enterDetails.penaltyRef.lessCharacters"));
+        }
+        // penalty reference contains non alphanumeric characters
+        else if (!StringUtils.isAlphanumeric(enterDetails.getPenaltyRef())) {
+            String key =
+                    "enterDetails.penaltyRef.nonAlphanumeric."
+                            + enterDetails.getPenaltyReferenceName();
+            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
+                    bundle.getString(key));
         }
         // penalty reference in incorrect format
         else {
@@ -98,10 +118,8 @@ public class EnterDetailsValidator {
                 case SANCTIONS_ROE -> SANCTIONS_ROE_PENALTY_REF_REGEX;
             };
             if (!penaltyRef.matches(regex)) {
-                String key = "enterDetails.penaltyRef.incorrectFormat."
-                        + enterDetails.getPenaltyReferenceName();
                 bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                        bundle.getString(key));
+                        bundle.getString("enterDetails.penaltyRef.incorrectFormat"));
             }
         }
     }

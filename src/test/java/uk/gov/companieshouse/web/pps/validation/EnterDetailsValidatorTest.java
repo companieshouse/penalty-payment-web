@@ -50,6 +50,7 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
+            "AB1234 567,Company number must not include spaces",
             "AB12345,Company number must be 8 characters",
             "AB12345!,Company number must only contain numbers and letters",
             " ,Enter the company number",
@@ -70,6 +71,7 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
+            "AB1234 567,Company number must not include spaces",
             "AB12345,Company number must be 8 characters",
             "AB12345!,Company number must only contain numbers and letters",
             " ,Enter the company number",
@@ -90,6 +92,7 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
+            "OE1234 567,Overseas entity ID must not include spaces",
             "OE12345,Overseas entity ID must be 8 characters",
             "OE12345!,Overseas entity ID must only contain numbers and letters",
             " ,Enter the overseas entity ID",
@@ -112,9 +115,10 @@ class EnterDetailsValidatorTest {
     @CsvSource({
             "A123456,Penalty reference must be 8 characters,LATE_FILING",
             " ,Enter the penalty reference,LATE_FILING",
-            "X1234567, Penalty reference must only contain the letter A and numbers,LATE_FILING",
-            "X1234567, Penalty reference must only contain the letter P and numbers,SANCTIONS",
-            "X1234567, Penalty reference must only contain the letter U and numbers,SANCTIONS_ROE"
+            "X1234567, Enter your penalty reference exactly as shown on your penalty letter,LATE_FILING",
+            "1234567!, Penalty reference must only contain the letter A followed by 7 numbers,LATE_FILING",
+            "1234567!, Penalty reference must only contain the letter P followed by 7 numbers,SANCTIONS",
+            "1234567!, Penalty reference must only contain the letter U followed by 7 numbers,SANCTIONS_ROE"
     })
     void isNotValidForPenaltyReferenceCheck(String penaltyRef, String errorMessage, String penaltyReferenceName) {
         enterDetails.setPenaltyReferenceName(penaltyReferenceName);
