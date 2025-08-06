@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.web.pps.validation;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -32,11 +31,16 @@ class EnterDetailsValidatorTest {
         testValidator = new EnterDetailsValidator();
     }
 
-    @Test
-    void isValidWhenRefStartsWithLateFiling() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setPenaltyRef("A1234567");
-        enterDetails.setCompanyNumber("12345678");
+    @ParameterizedTest
+    @CsvSource({
+            "AB123456,A1234567,LATE_FILING",
+            "AB123456,P1234567,SANCTIONS",
+            "OE123456,U1234567,SANCTIONS_ROE"
+    })
+    void isValidWhenRefStart(String companyNumber, String penaltyRef, String referenceName) {
+        enterDetails.setPenaltyReferenceName(referenceName);
+        enterDetails.setPenaltyRef(penaltyRef);
+        enterDetails.setCompanyNumber(companyNumber);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
@@ -44,78 +48,17 @@ class EnterDetailsValidatorTest {
         assertFalse(bindingResult.hasErrors());
     }
 
-    @Test
-    void isNotValidWhenPenaltyRefIsMissingForLateFiling() {
+    @ParameterizedTest
+    @CsvSource({
+            "AB1234 567,Company number must not include spaces",
+            "AB12345,Company number must be 8 characters",
+            "AB12345!,Company number must only contain numbers and letters",
+            " ,Enter the company number",
+            "X12345678, Enter the company number exactly as shown on your penalty notice"
+    })
+    void isNotValidForLateFilingCompanyNumberCheck(String companyNumber, String errorMessage) {
         enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setPenaltyRef("");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter the penalty reference",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
-    }
-
-    @Test
-    void isNotValidWhenPenaltyRefIsNotValidForLateFiling() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setPenaltyRef("A123456");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter your penalty reference exactly as shown on your penalty letter",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
-    }
-
-    @Test
-    void isValidWhenRefStartsWithSanctions() {
-        enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setPenaltyRef("P1234567");
-        enterDetails.setCompanyNumber("12345678");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertFalse(bindingResult.hasErrors());
-    }
-
-    @Test
-    void isNotValidWhenPenaltyRefIsMissingForSanctions() {
-        enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setPenaltyRef("");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter the penalty reference",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
-    }
-
-    @Test
-    void isNotValidWhenPenaltyRefIsNotValidForSanctions() {
-        enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setPenaltyRef("PN1234567");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
-
-        testValidator.isValid(enterDetails, bindingResult);
-
-        assertTrue(bindingResult.hasErrors());
-        assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Enter your penalty reference exactly as shown on your penalty letter",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
-    }
-
-    @Test
-    void isNotValidWhenCompanyNumberContainsSpaces() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
-        enterDetails.setCompanyNumber("1234 567");
+        enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("A1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
@@ -123,34 +66,39 @@ class EnterDetailsValidatorTest {
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(COMPANY_NUMBER_FIELD));
-        assertEquals("Company number must not include spaces",
-                Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD)).getDefaultMessage());
+        assertEquals(errorMessage, Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD)).getDefaultMessage());
     }
 
-    @Test
-    void isNotValidWhenCompanyNumberIsEmpty() {
+    @ParameterizedTest
+    @CsvSource({
+            "AB1234 567,Company number must not include spaces",
+            "AB12345,Company number must be 8 characters",
+            "AB12345!,Company number must only contain numbers and letters",
+            " ,Enter the company number",
+            "X12345678, Enter the company number exactly as shown on your penalty notice"
+    })
+    void isNotValidForSanctionsCompanyNumberCheck(String companyNumber, String errorMessage) {
         enterDetails.setPenaltyReferenceName(SANCTIONS.name());
-        enterDetails.setCompanyNumber("");
+        enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("P1234567");
-        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails,
-                ENTER_DETAILS_MODEL);
+        BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(COMPANY_NUMBER_FIELD));
-        assertEquals("Enter the company number",
-                Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD))
-                        .getDefaultMessage());
+        assertEquals(errorMessage, Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD)).getDefaultMessage());
     }
 
     @ParameterizedTest
     @CsvSource({
             "OE1234 567,Overseas entity ID must not include spaces",
+            "OE12345,Overseas entity ID must be 8 characters",
+            "OE12345!,Overseas entity ID must only contain numbers and letters",
             " ,Enter the overseas entity ID",
-            "X12345678, Enter the overseas entity ID"
+            "X12345678, Enter the overseas entity ID exactly as shown on your penalty notice"
     })
-    void isNotValidWhenOverseasEntityIdContainsSpaces(String oeId, String errorMessage) {
+    void isNotValidForOverseasEntityIdCheck(String oeId, String errorMessage) {
         enterDetails.setPenaltyReferenceName(SANCTIONS_ROE.name());
         enterDetails.setCompanyNumber(oeId);
         enterDetails.setPenaltyRef("U1234567");
@@ -163,18 +111,25 @@ class EnterDetailsValidatorTest {
         assertEquals(errorMessage, Objects.requireNonNull(bindingResult.getFieldError(COMPANY_NUMBER_FIELD)).getDefaultMessage());
     }
 
-    @Test
-    void isNotValidWhenPenaltyRefContainsSpaces() {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
+    @ParameterizedTest
+    @CsvSource({
+            "A123456,Penalty reference must be 8 characters,LATE_FILING",
+            " ,Enter the penalty reference,LATE_FILING",
+            "X1234567, Enter your penalty reference exactly as shown on your penalty letter,LATE_FILING",
+            "1234567!, Penalty reference must only contain the letter A followed by 7 numbers,LATE_FILING",
+            "1234567!, Penalty reference must only contain the letter P followed by 7 numbers,SANCTIONS",
+            "1234567!, Penalty reference must only contain the letter U followed by 7 numbers,SANCTIONS_ROE"
+    })
+    void isNotValidForPenaltyReferenceCheck(String penaltyRef, String errorMessage, String penaltyReferenceName) {
+        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
         enterDetails.setCompanyNumber("12345678");
-        enterDetails.setPenaltyRef("A123 456");
+        enterDetails.setPenaltyRef(penaltyRef);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
 
         assertTrue(bindingResult.hasErrors());
         assertEquals(1, bindingResult.getFieldErrorCount(PENALTY_REF_FIELD));
-        assertEquals("Penalty reference must not include spaces",
-                Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
+        assertEquals(errorMessage, Objects.requireNonNull(bindingResult.getFieldError(PENALTY_REF_FIELD)).getDefaultMessage());
     }
 }
