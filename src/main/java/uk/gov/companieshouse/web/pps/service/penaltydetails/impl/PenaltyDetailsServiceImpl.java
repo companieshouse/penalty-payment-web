@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -128,6 +129,10 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
     private Optional<String> getPostDetailsRedirectPath(List<FinancialPenalty> penaltyAndCosts,
             String companyNumber, String penaltyRef, Class<?> clazz) {
+        if (PenaltyUtils.penaltyTypeDisabled(penaltyAndCosts, penaltyRef)) {
+            String msg = String.format("Online payment unavailable for penalty type, company number %s and penalty reference: %s", companyNumber, penaltyRef);
+            return logAndGetRedirectUrl(msg, ONLINE_PAYMENT_UNAVAILABLE, companyNumber, penaltyRef);
+        }
         if (penaltyAndCosts.size() > 1) {
             String msg = String.format(
                     "Online payment unavailable as there is not a single payable penalty. "
