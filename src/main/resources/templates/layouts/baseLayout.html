@@ -35,6 +35,7 @@
     </script>
 </head>
 <body class="govuk-template__body govuk-template--rebranded app-body-class">
+<nav role="navigation" class="content">
 
 <!-- templateName set by TemplateNameInterceptor and used in piwik-enable.js below for piwik/matomo event ids -->
 <div id="templateName" th:attr="data-id=${templateName},data-metadata=${metadata}" hidden></div>
@@ -71,5 +72,6 @@
 
 <script th:src="@{{cdnUrl}/javascripts/app/cookie-consent/cookie-consent-1.0.0.js(cdnUrl=${@environment.getProperty('cdn.url')})}" type="text/javascript"></script>
 <script th:src="@{{cdnUrl}/javascripts/app/cookie-consent/matomo-only-cookie-consent.js(cdnUrl=${@environment.getProperty('cdn.url')})}" type="text/javascript"></script>
+</nav>
 </body>
 </html>
