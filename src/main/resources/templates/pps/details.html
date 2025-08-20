@@ -9,7 +9,7 @@
 </head>
 
 <div id="enter-details" layout:fragment="content">
-    <form id="enterdetails" th:action="@{''}" th:object="${enterDetails}" method="post" class="form">
+    <form id="enterdetails" th:action="@{'/pay-penalty/enter-details'}" th:object="${enterDetails}" method="post" class="form">
         <input type="hidden" th:field="*{penaltyReferenceName}" name="penaltyReferenceName"/>
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
