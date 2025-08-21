@@ -108,6 +108,9 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             String uri = FINANCE_HEALTHCHECK_URI.toString();
             financeHealthcheck = apiClient.financeHealthcheckResourceHandler().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
+            LOGGER.debug("content: " + ex.getContent());
+            LOGGER.debug("status message: " + ex.getStatusMessage());
+            LOGGER.debug("status code: " + ex.getStatusCode());
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
                 financeHealthcheck = new FinanceHealthcheck();
