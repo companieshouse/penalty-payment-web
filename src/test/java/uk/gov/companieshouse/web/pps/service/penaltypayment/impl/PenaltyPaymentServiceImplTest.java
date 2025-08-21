@@ -402,6 +402,38 @@ class PenaltyPaymentServiceImplTest {
                 penaltyPaymentService.checkFinanceSystemAvailableTime());
     }
 
+    @Test
+    @DisplayName("Get Finance Healthcheck - Error when formatting to JSON Object")
+    void getFinanceHealthcheckJsonObjectError()
+            throws ApiErrorResponseException, URIValidationException {
+        when(apiClient.financeHealthcheckResourceHandler()).thenReturn(
+                financeHealthcheckResourceHandler);
+
+        when(financeHealthcheckResourceHandler.get(GET_FINANCE_HEALTHCHECK_URI)).thenReturn(
+                financeHealthcheckGet);
+        when(financeHealthcheckGet.execute()).thenThrow(
+                new ApiErrorResponseException(serviceUnavailableJsonError()));
+
+        assertThrows(ServiceException.class, () ->
+                penaltyPaymentService.checkFinanceSystemAvailableTime());
+    }
+
+    @Test
+    @DisplayName("Get Finance Healthcheck - No Message Content")
+    void getFinanceHealthcheckNoMessageContent()
+            throws ApiErrorResponseException, URIValidationException {
+        when(apiClient.financeHealthcheckResourceHandler()).thenReturn(
+                financeHealthcheckResourceHandler);
+
+        when(financeHealthcheckResourceHandler.get(GET_FINANCE_HEALTHCHECK_URI)).thenReturn(
+                financeHealthcheckGet);
+        when(financeHealthcheckGet.execute()).thenThrow(
+                new ApiErrorResponseException(serviceUnavailableNoMessageContent()));
+
+        assertThrows(ServiceException.class, () ->
+                penaltyPaymentService.checkFinanceSystemAvailableTime());
+    }
+
     public static HttpResponseException.Builder serviceUnavailablePlannedMaintenance() {
         HttpHeaders headers = new HttpHeaders();
         HttpResponseException.Builder response =
@@ -411,6 +443,23 @@ class PenaltyPaymentServiceImplTest {
                         + FinanceHealthcheckStatus.UNHEALTHY_PLANNED_MAINTENANCE.getStatus()
                         + "\",\"maintenance_end_time\":\"" + MAINTENANCE_END_TIME + "\"}");
 
+        return response;
+    }
+
+    public static HttpResponseException.Builder serviceUnavailableJsonError() {
+        HttpHeaders headers = new HttpHeaders();
+        HttpResponseException.Builder response =
+                new HttpResponseException.Builder(503, "message: Service Temporarily Unavailable", headers);
+        response.setContent("Service Temporarily Unavailable");
+        return response;
+    }
+
+    public static HttpResponseException.Builder serviceUnavailableNoMessageContent() {
+        HttpHeaders headers = new HttpHeaders();
+        HttpResponseException.Builder response =
+                new HttpResponseException.Builder(503, "message: Service Temporarily Unavailable", headers);
+        response.setContent(
+                "{\"maintenance_end_time\":\"" + MAINTENANCE_END_TIME + "\"}");
         return response;
     }
 }

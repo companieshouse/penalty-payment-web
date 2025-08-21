@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
@@ -111,12 +112,16 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
         } catch (ApiErrorResponseException ex) {
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
-                JSONObject exceptionContent = new JSONObject(ex.getContent());
-                if (exceptionContent.has(MESSAGE_JSON_OBJECT_KEY) && !exceptionContent.isNull(MESSAGE_JSON_OBJECT_KEY)) {
-                    financeHealthcheck = new FinanceHealthcheck();
-                    financeHealthcheck.setMessage(exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString());
-                    financeHealthcheck.setMaintenanceEndTime(exceptionContent.get("maintenance_end_time").toString());
-                    return financeHealthcheck;
+                try {
+                    JSONObject exceptionContent = new JSONObject(ex.getContent());
+                    if (exceptionContent.has(MESSAGE_JSON_OBJECT_KEY) && !exceptionContent.isNull(MESSAGE_JSON_OBJECT_KEY)) {
+                        financeHealthcheck = new FinanceHealthcheck();
+                        financeHealthcheck.setMessage(exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString());
+                        financeHealthcheck.setMaintenanceEndTime(exceptionContent.get("maintenance_end_time").toString());
+                        return financeHealthcheck;
+                    }
+                } catch (JSONException je) {
+                    throw new ServiceException("Error retrieving Finance Healthcheck", ex);
                 }
             }
             throw new ServiceException("Error retrieving Finance Healthcheck", ex);
