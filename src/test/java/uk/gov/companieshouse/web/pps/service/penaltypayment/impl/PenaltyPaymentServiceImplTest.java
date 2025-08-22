@@ -434,6 +434,22 @@ class PenaltyPaymentServiceImplTest {
                 penaltyPaymentService.checkFinanceSystemAvailableTime());
     }
 
+    @Test
+    @DisplayName("Get Finance Healthcheck - Message Content Empty")
+    void getFinanceHealthcheckMessageContentEmpty()
+            throws ApiErrorResponseException, URIValidationException {
+        when(apiClient.financeHealthcheckResourceHandler()).thenReturn(
+                financeHealthcheckResourceHandler);
+
+        when(financeHealthcheckResourceHandler.get(GET_FINANCE_HEALTHCHECK_URI)).thenReturn(
+                financeHealthcheckGet);
+        when(financeHealthcheckGet.execute()).thenThrow(
+                new ApiErrorResponseException(serviceUnavailableMessageContentEmpty()));
+
+        assertThrows(ServiceException.class, () ->
+                penaltyPaymentService.checkFinanceSystemAvailableTime());
+    }
+
     public static HttpResponseException.Builder serviceUnavailablePlannedMaintenance() {
         HttpHeaders headers = new HttpHeaders();
         HttpResponseException.Builder response =
@@ -460,6 +476,15 @@ class PenaltyPaymentServiceImplTest {
                 new HttpResponseException.Builder(503, "message: Service Temporarily Unavailable", headers);
         response.setContent(
                 "{\"maintenance_end_time\":\"" + MAINTENANCE_END_TIME + "\"}");
+        return response;
+    }
+
+    public static HttpResponseException.Builder serviceUnavailableMessageContentEmpty() {
+        HttpHeaders headers = new HttpHeaders();
+        HttpResponseException.Builder response =
+                new HttpResponseException.Builder(503, "message: Service Temporarily Unavailable", headers);
+        response.setContent(
+                "{\"message\":,\"maintenance_end_time\":\"" + MAINTENANCE_END_TIME + "\"}");
         return response;
     }
 }

@@ -110,18 +110,21 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             String uri = FINANCE_HEALTHCHECK_URI.toString();
             financeHealthcheck = apiClient.financeHealthcheckResourceHandler().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
+            LOGGER.debug(String.format("Error status code: %d, Error message: %s", ex.getStatusCode(), ex.getMessage()));
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
+
                 try {
                     JSONObject exceptionContent = new JSONObject(ex.getContent());
-                    if (exceptionContent.has(MESSAGE_JSON_OBJECT_KEY) && !exceptionContent.isNull(MESSAGE_JSON_OBJECT_KEY)) {
+                    if (exceptionContent.has(MESSAGE_JSON_OBJECT_KEY)
+                            && !exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString().isBlank()) {
                         financeHealthcheck = new FinanceHealthcheck();
                         financeHealthcheck.setMessage(exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString());
                         financeHealthcheck.setMaintenanceEndTime(exceptionContent.get("maintenance_end_time").toString());
                         return financeHealthcheck;
                     }
                 } catch (JSONException je) {
-                    throw new ServiceException("Error retrieving Finance Healthcheck", ex);
+                    throw new ServiceException("Json content not being parsed/retrieved", ex);
                 }
             }
             throw new ServiceException("Error retrieving Finance Healthcheck", ex);
