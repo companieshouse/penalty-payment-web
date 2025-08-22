@@ -11,7 +11,7 @@
 </head>
 
 <div id="sign-out-details" layout:fragment="content">
-    <form th:action="@{''}" method="post" class="form" id="sign-out">
+    <form th:action="@{'/pay-penalty/sign-out'}" method="post" class="form" id="sign-out">
         <div th:if="${errorMessage} == true">
             <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-disable-auto-focus="true" data-module="govuk-error-summary">
                 <h2 class="govuk-error-summary__title" id="error-summary-title">
