@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
@@ -36,6 +37,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     public static final String PENALTY_TYPE = "penalty";
     public static final String OTHER_TYPE = "other";
 
+    private static final String MESSAGE_JSON_OBJECT_KEY = "message";
     private static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
     private final ApiClientService apiClientService;
@@ -108,19 +110,24 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             String uri = FINANCE_HEALTHCHECK_URI.toString();
             financeHealthcheck = apiClient.financeHealthcheckResourceHandler().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            LOGGER.debug("content: " + ex.getContent());
-            LOGGER.debug("status message: " + ex.getStatusMessage());
-            LOGGER.debug("status code: " + ex.getStatusCode());
+            LOGGER.debug(String.format("Error status code: %d, Error message: %s", ex.getStatusCode(), ex.getMessage()));
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
-                financeHealthcheck = new FinanceHealthcheck();
-                financeHealthcheck.setMessage(new JSONObject(ex.getContent()).get("message").toString());
-                financeHealthcheck.setMaintenanceEndTime(new JSONObject(ex.getContent()).get("maintenance_end_time").toString());
 
-                return financeHealthcheck;
-            } else {
-                throw new ServiceException("Error retrieving Finance Healthcheck", ex);
+                try {
+                    JSONObject exceptionContent = new JSONObject(ex.getContent());
+                    if (exceptionContent.has(MESSAGE_JSON_OBJECT_KEY)
+                            && !exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString().isBlank()) {
+                        financeHealthcheck = new FinanceHealthcheck();
+                        financeHealthcheck.setMessage(exceptionContent.get(MESSAGE_JSON_OBJECT_KEY).toString());
+                        financeHealthcheck.setMaintenanceEndTime(exceptionContent.get("maintenance_end_time").toString());
+                        return financeHealthcheck;
+                    }
+                } catch (JSONException je) {
+                    throw new ServiceException("Json content not being parsed/retrieved", ex);
+                }
             }
+            throw new ServiceException("Error retrieving Finance Healthcheck", ex);
 
         } catch (URIValidationException ex) {
             throw new ServiceException("Invalid URI for Finance Healthcheck", ex);
