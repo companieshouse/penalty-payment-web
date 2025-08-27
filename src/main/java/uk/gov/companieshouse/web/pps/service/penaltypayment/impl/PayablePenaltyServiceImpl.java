@@ -39,19 +39,21 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     @Override
     public PayableFinancialPenalties getPayableFinancialPenalties(String companyNumber, String payableRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         PayableFinancialPenalties payableFinancialPenalties;
 
         try {
             String uri = GET_PAYABLE_URI.expand(companyNumber, payableRef).toString();
-            LOGGER.debug(String.format("Sending request to API [%s] to fetch  payable financial penalties for company number %s and payable ref %s",
-                    uri, companyNumber, payableRef));
+            LOGGER.debug(String.format("[%s]: Sending request to API [%s] to fetch  payable financial penalties for company number %s and payable ref %s",
+                    requestId, uri, companyNumber, payableRef));
             payableFinancialPenalties = apiClient.payableFinancialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving payable financial penalties from API", ex);
+            throw new ServiceException(String.format("[%s]: Error retrieving payable financial penalties from API", requestId), ex);
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for payable financial penalties", ex);
+            throw new ServiceException(String.format("[%s]: Invalid URI for payable financial penalties", requestId), ex);
         }
-        LOGGER.debug(String.format("Successfully fetched payable financial penalties for company number %s and payable ref %s", companyNumber, payableRef));
+        LOGGER.debug(String.format("[%s]: Successfully fetched payable financial penalties for company number %s and payable ref %s",
+                requestId, companyNumber, payableRef));
 
         return payableFinancialPenalties;
     }
@@ -60,21 +62,22 @@ public class PayablePenaltyServiceImpl implements PayablePenaltyService {
     public PayableFinancialPenaltySession createPayableFinancialPenaltySession(String companyNumber, String penaltyRef, Integer amount)
             throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         ApiResponse<PayableFinancialPenaltySession> apiResponse;
 
         try {
             String uri = POST_PAYABLE_URI.expand(companyNumber, penaltyRef).toString();
             FinancialPenaltySession financialPenaltySession = generateFinancialPenaltySessionData(penaltyRef, amount);
-            LOGGER.debug(String.format("Sending request to API [%s] to create payable financial penalty session for company number %s, penalty ref %s and amount %d",
-                    uri, companyNumber, penaltyRef, amount));
+            LOGGER.debug(String.format("[%s]: Sending request to API [%s] to create payable financial penalty session for company number %s, penalty ref %s and amount %d",
+                    requestId, uri, companyNumber, penaltyRef, amount));
             apiResponse = apiClient.payableFinancialPenalty().create(uri, financialPenaltySession).execute();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error creating payable financial penalty session", ex);
+            throw new ServiceException(String.format("[%s]: Error creating payable financial penalty session", requestId), ex);
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for payable financial penalty", ex);
+            throw new ServiceException(String.format("[%s]: Invalid URI for payable financial penalty", requestId), ex);
         }
-        LOGGER.debug(String.format("Successfully created payable financial penalty session for company number %s, penalty ref %s and amount %d",
-                companyNumber, penaltyRef, amount));
+        LOGGER.debug(String.format("[%s]: Successfully created payable financial penalty session for company number %s, penalty ref %s and amount %d",
+                requestId, companyNumber, penaltyRef, amount));
 
         return apiResponse.getData();
     }

@@ -13,6 +13,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.handler.financialpenalty.payable.PayableFinancialPenaltyResourceHandler;
 import uk.gov.companieshouse.api.handler.financialpenalty.payable.request.PayableFinancialPenaltiesGet;
 import uk.gov.companieshouse.api.handler.financialpenalty.payable.request.PayableFinancialPenaltyCreate;
+import uk.gov.companieshouse.api.http.HttpClient;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenaltySession;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenalties;
@@ -38,6 +39,9 @@ class PayablePenaltyServiceImplTest {
 
     @Mock
     private ApiClient apiClient;
+
+    @Mock
+    private HttpClient httpClient;
 
     @Mock
     private ApiClientService apiClientService;
@@ -70,6 +74,8 @@ class PayablePenaltyServiceImplTest {
         payablePenaltyService = new PayablePenaltyServiceImpl(apiClientService);
 
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+        when(httpClient.getRequestId()).thenReturn("");
 
         when(apiClient.payableFinancialPenalty()).thenReturn(payableFinancialPenaltyResourceHandler);
     }
