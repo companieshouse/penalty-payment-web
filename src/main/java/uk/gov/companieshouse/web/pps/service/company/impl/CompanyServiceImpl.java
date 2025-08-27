@@ -42,18 +42,19 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyProfileApi getCompanyProfile(String companyNumber) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         CompanyProfileApi companyProfileApi;
 
         try {
             String uri = GET_COMPANY_URI.expand(companyNumber).toString();
-            LOGGER.debug(String.format("Getting company profile from %s for company number %s", uri, companyNumber));
+            LOGGER.debug(String.format("[%s]: Getting company profile from %s for company number %s", requestId, uri, companyNumber));
             companyProfileApi = apiClient.company().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving Company Details", ex);
+            throw new ServiceException(String.format("[%s]: Error retrieving Company Details", requestId), ex);
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Company Details", ex);
+            throw new ServiceException(String.format("[%s]: Invalid URI for Company Details", requestId), ex);
         }
-        LOGGER.debug(String.format("Successfully got company profile for company number %s", companyNumber));
+        LOGGER.debug(String.format("[%s]: Successfully got company profile for company number %s", requestId, companyNumber));
 
         return companyProfileApi;
     }

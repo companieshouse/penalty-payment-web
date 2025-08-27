@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.payment.impl;
 
 import org.springframework.stereotype.Service;
+import uk.gov.companieshouse.api.ApiClient;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
@@ -80,17 +81,21 @@ public class PaymentServiceImpl implements PaymentService {
         LOGGER.info("SESSION RESOURCE: " + paymentSessionApi.getResource());
         LOGGER.info("SESSION STATE: " + paymentSessionApi.getState());
 
+        ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
+
         try {
-            LOGGER.debug(String.format("Sending request to API to create payment session for company number %s amd penalty ref %s",
-                    companyNumber, penaltyRef));
-            ApiResponse<PaymentApi> apiResponse = apiClientService.getPublicApiClient()
-                    .payment().create(PAYMENT_URL, paymentSessionApi).execute();
-            LOGGER.debug(String.format("Successfully created payment session for company number %s and penalty ref %s", companyNumber, penaltyRef));
+            LOGGER.debug(String.format("[%s]: Sending request to API to create payment session for company number %s amd penalty ref %s",
+                    requestId, companyNumber, penaltyRef));
+            ApiResponse<PaymentApi> apiResponse = apiClient.payment().create(PAYMENT_URL, paymentSessionApi).execute();
+            LOGGER.debug(String.format("[%s]: Successfully created payment session for company number %s and penalty ref %s",
+                    requestId, companyNumber, penaltyRef));
 
             setPaymentStateOnSession(paymentState);
 
             return apiResponse.getData().getLinks().get(JOURNEY_LINK);
         } catch (ApiErrorResponseException e) {
+            LOGGER.info(String.format("[%s]: ", requestId));
             LOGGER.info("API RESPONSE HEADERS: " + e.getHeaders());
             LOGGER.info("API RESPONSE STACKTRACE: " + Arrays.toString(e.getStackTrace()));
             LOGGER.info("API RESPONSE DETAILS: " + e.getDetails());
