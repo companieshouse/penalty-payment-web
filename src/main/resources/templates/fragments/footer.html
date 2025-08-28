@@ -32,20 +32,37 @@
             <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
                 <h2 class="govuk-visually-hidden">Support links</h2>
                 <ul class="govuk-footer__inline-list">
-                    <li class="govuk-footer__inline-list-item"><a id="accessibility-statement-link" class="govuk-footer__link"
-                                                                  th:href="@{{chsUrl}/help/accessibility-statement(chsUrl=${@environment.getProperty('chs.url')})}"
-                                                                  target="_blank">Accessibility statement</a></li>
-                    <li class="govuk-footer__inline-list-item"><a id="policies-link" class="govuk-footer__link" href="http://resources.companieshouse.gov.uk/serviceInformation.shtml"
-                                                                  target="_blank">Policies</a></li>
-                    <li class="govuk-footer__inline-list-item"><a id="cookies-link" class="govuk-footer__link"
-                                                                  th:href="@{{chsUrl}/help/cookies(chsUrl=${@environment.getProperty('chs.url')})}">Cookies</a>
+                    <li class="govuk-footer__inline-list-item">
+                        <a id="accessibility-statement-link" class="govuk-footer__link"
+                           data-event-id="accessibility-statement-footer-link"
+                           th:href="@{{chsUrl}/help/accessibility-statement(chsUrl=${@environment.getProperty('chs.url')})}"
+                           data-th-text="#{label.footer.accessibility}" target="_blank"></a>
                     </li>
-                    <li class="govuk-footer__inline-list-item"><a id="contact-us-link" class="govuk-footer__link"
-                                                                  th:href="@{{chsUrl}/help/contact-us(chsUrl=${@environment.getProperty('chs.url')})}"
-                                                                  target="_blank">Contact us</a></li>
-                      <li class="govuk-footer__inline-list-item"><a id="developer-link" class="govuk-footer__link"
-                                                                  th:href="@{{developerUrl}/api/docs/(developerUrl=${@environment.getProperty('developer.url')})}"
-                                                                  target="_blank">Developers</a></li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a id="policies-link" class="govuk-footer__link"
+                           data-event-id="policies-footer-link"
+                           href="http://resources.companieshouse.gov.uk/serviceInformation.shtml"
+                           data-th-text="#{label.footer.policies}"
+                           target="_blank"></a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a id="cookies-link" class="govuk-footer__link"
+                           data-event-id="cookies-footer-link"
+                           th:href="@{{chsUrl}/help/cookies(chsUrl=${@environment.getProperty('chs.url')})}"
+                           data-th-text="#{label.footer.cookies}"></a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a id="contact-us-link" class="govuk-footer__link"
+                           data-event-id="contact-us-footer-link"
+                           th:href="@{{chsUrl}/help/contact-us(chsUrl=${@environment.getProperty('chs.url')})}"
+                           data-th-text="#{label.footer.contact}" target="_blank"></a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a id="developer-link" class="govuk-footer__link"
+                           data-event-id="developer-footer-link"
+                           th:href="@{{developerUrl}/api/docs/(developerUrl=${@environment.getProperty('developer.url')})}"
+                           data-th-text="#{label.footer.developers}" target="_blank"></a>
+                    </li>
                 </ul>
                 <p></p>
                 <span class="govuk-footer__inline-list-item">
@@ -65,7 +82,7 @@
                             fill="currentColor"
                             d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145" />
                     </svg>
-                    All content is available under the
+                    <span th:text="#{label.footer.allContentIsAvailableUnderThe}"></span>
                     <a class="govuk-footer__link"
                     href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
                        rel="license">Open Government Licence v3.0</a>, except where otherwise stated
@@ -73,6 +90,7 @@
             </div>
             <div class="govuk-footer__meta-item">
                 <a class="govuk-footer__link govuk-footer__copyright-logo"
+                   data-event-id="crown-copyright-footer-link"
                    href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
                    data-th-text="#{label.footer.crownCopyright}">
                 </a>
