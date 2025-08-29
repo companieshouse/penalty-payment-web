@@ -29,8 +29,8 @@
         <api-sdk-java.version>6.4.1</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.5.4</spring-boot-dependencies.version>
-        <spring-boot-maven-plugin.version>3.5.4</spring-boot-maven-plugin.version>
+        <spring-boot-dependencies.version>3.5.5</spring-boot-dependencies.version>
+        <spring-boot-maven-plugin.version>3.5.5</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
