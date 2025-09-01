@@ -33,8 +33,8 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AB123456,A1234567,LATE_FILING",
-            "AB123456,P1234567,SANCTIONS",
+            "SC123456,A1234567,LATE_FILING",
+            "SC123456,P1234567,SANCTIONS",
             "OE123456,U1234567,SANCTIONS_ROE"
     })
     void isValidWhenRefStart(String companyNumber, String penaltyRef, String referenceName) {
@@ -50,9 +50,9 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AB1234 567,Company number must not include spaces",
-            "AB12345,Company number must be 8 characters",
-            "AB12345!,Company number must only contain numbers and letters",
+            "SC1234 567,Company number must not include spaces",
+            "SC12345,Company number must be 8 characters",
+            "SC12345!,Company number must only contain numbers and letters",
             " ,Enter the company number",
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
@@ -71,9 +71,9 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AB1234 567,Company number must not include spaces",
-            "AB12345,Company number must be 8 characters",
-            "AB12345!,Company number must only contain numbers and letters",
+            "SC1234 567,Company number must not include spaces",
+            "SC12345,Company number must be 8 characters",
+            "SC12345!,Company number must only contain numbers and letters",
             " ,Enter the company number",
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
