@@ -60,6 +60,8 @@ public class PaymentServiceImpl implements PaymentService {
             String penaltyRef)
             throws ServiceException {
 
+        ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         String paymentState = UUID.randomUUID().toString();
 
         PaymentSessionApi paymentSessionApi = new PaymentSessionApi();
@@ -75,14 +77,11 @@ public class PaymentServiceImpl implements PaymentService {
         paymentSessionApi.setResource(apiUrl + payableFinancialPenaltySession.getLinks().get("self") + "/payment");
         paymentSessionApi.setReference(PENALTY_PAYMENT_REFERENCE_PREFIX + payableFinancialPenaltySession.getPayableRef());
         paymentSessionApi.setState(paymentState);
-        LOGGER.info("Creating payment session");
+        LOGGER.info(String.format("[%s]: Creating payment session", requestId));
         LOGGER.info("SESSION REDIRECT URI: " + paymentSessionApi.getRedirectUri());
         LOGGER.info("SESSION REFERENCE: " + paymentSessionApi.getReference());
         LOGGER.info("SESSION RESOURCE: " + paymentSessionApi.getResource());
         LOGGER.info("SESSION STATE: " + paymentSessionApi.getState());
-
-        ApiClient apiClient = apiClientService.getPublicApiClient();
-        String requestId = apiClient.getHttpClient().getRequestId();
 
         try {
             LOGGER.debug(String.format("[%s]: Sending request to API to create payment session for company number %s amd penalty ref %s",
