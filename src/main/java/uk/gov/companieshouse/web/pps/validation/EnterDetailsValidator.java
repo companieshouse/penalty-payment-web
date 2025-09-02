@@ -15,7 +15,7 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 @Component
 public class EnterDetailsValidator {
 
-    private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z]{2}\\d{6}|\\d{1,8})$";
+    private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z0-9]{8}|\\d{1,8})$";
     private static final String OVERSEAS_ENTITY_ID_REGEX = "^[Oo][Ee]\\d{6}$";
     private static final String LATE_FILING_PENALTY_REF_REGEX = "^[Aa]\\d{7}$";
     private static final String SANCTIONS_PENALTY_REF_REGEX = "^[Pp]\\d{7}$";
