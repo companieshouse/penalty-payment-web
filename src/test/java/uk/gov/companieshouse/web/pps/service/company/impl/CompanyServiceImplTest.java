@@ -12,6 +12,7 @@ import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.company.CompanyResourceHandler;
 import uk.gov.companieshouse.api.handler.company.request.CompanyGet;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.api.http.HttpClient;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
@@ -28,6 +29,9 @@ class CompanyServiceImplTest {
 
     @Mock
     private ApiClient apiClient;
+
+    @Mock
+    private HttpClient httpClient;
 
     @Mock
     private ApiClientService apiClientService;
@@ -104,6 +108,10 @@ class CompanyServiceImplTest {
 
         when(responseWithData.getData()).thenReturn(companyProfile);
 
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+
+        when(httpClient.getRequestId()).thenReturn("");
+
         CompanyProfileApi returnedCompanyProfile = companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS);
 
         assertEquals(companyProfile, returnedCompanyProfile);
@@ -117,6 +125,10 @@ class CompanyServiceImplTest {
 
         when(companyGet.execute()).thenThrow(ApiErrorResponseException.class);
 
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+
+        when(httpClient.getRequestId()).thenReturn("");
+
         assertThrows(ServiceException.class, () ->
                 companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));
     }
@@ -128,6 +140,10 @@ class CompanyServiceImplTest {
         initGetCompany();
 
         when(companyGet.execute()).thenThrow(URIValidationException.class);
+
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+
+        when(httpClient.getRequestId()).thenReturn("");
 
         assertThrows(ServiceException.class, () ->
                 companyService.getCompanyProfile(COMPANY_NUMBER_WITH_EIGHT_DIGITS));

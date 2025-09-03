@@ -12,6 +12,7 @@ import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.handler.payment.PaymentResourceHandler;
 import uk.gov.companieshouse.api.handler.payment.request.PaymentCreate;
+import uk.gov.companieshouse.api.http.HttpClient;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.payment.PaymentApi;
@@ -46,6 +47,9 @@ class PaymentServiceImplTest {
 
     @Mock
     private ApiClient apiClient;
+
+    @Mock
+    private HttpClient httpClient;
 
     @Mock
     private ApiClientService apiClientService;
@@ -89,6 +93,8 @@ class PaymentServiceImplTest {
         mockPaymentService = new PaymentServiceImpl(apiClientService, sessionService, environmentReader);
 
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+        when(httpClient.getRequestId()).thenReturn("");
 
         when(apiClient.payment()).thenReturn(paymentResourceHandler);
 

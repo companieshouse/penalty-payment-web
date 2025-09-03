@@ -17,6 +17,7 @@ import uk.gov.companieshouse.api.handler.financialpenalty.e5financialpenalty.Fin
 import uk.gov.companieshouse.api.handler.financialpenalty.e5financialpenalty.FinancialPenaltyResourceHandler;
 import uk.gov.companieshouse.api.handler.financialpenalty.e5financialpenalty.request.FinanceHealthcheckGet;
 import uk.gov.companieshouse.api.handler.financialpenalty.e5financialpenalty.request.FinancialPenaltiesGet;
+import uk.gov.companieshouse.api.http.HttpClient;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheckStatus;
@@ -53,6 +54,9 @@ class PenaltyPaymentServiceImplTest {
 
     @Mock
     private ApiClient apiClient;
+
+    @Mock
+    private HttpClient httpClient;
 
     @Mock
     private ApiClientService apiClientService;
@@ -98,6 +102,8 @@ class PenaltyPaymentServiceImplTest {
         penaltyPaymentService = new PenaltyPaymentServiceImpl(apiClientService);
 
         when(apiClientService.getPublicApiClient()).thenReturn(apiClient);
+        when(apiClient.getHttpClient()).thenReturn(httpClient);
+        when(httpClient.getRequestId()).thenReturn("");
     }
 
     /**

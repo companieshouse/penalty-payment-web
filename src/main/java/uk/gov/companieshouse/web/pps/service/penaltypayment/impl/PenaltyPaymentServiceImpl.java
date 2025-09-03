@@ -49,33 +49,35 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Override
     public List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         FinancialPenalties financialPenalties;
 
         try {
             String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
             String uri = GET_FINANCIAL_PENALTIES_URI.expand(companyNumber, penaltyReferenceType).toString();
-            LOGGER.debug(String.format("Sending request to API [%s] to fetch financial penalties (%s) for company number %s and penalty ref %s",
-                    uri, penaltyReferenceType, companyNumber, penaltyRef));
+            LOGGER.debug(String.format("[%s]: Sending request to API [%s] to fetch financial penalties (%s) for company number %s and penalty ref %s",
+                requestId, uri, penaltyReferenceType, companyNumber, penaltyRef));
             financialPenalties = apiClient.financialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            throw new ServiceException("Error retrieving financial penalties from API", ex);
+            throw new ServiceException(String.format("[%s]: Error retrieving financial penalties from API", requestId), ex);
         } catch (IllegalArgumentException | URIValidationException ex) {
-            throw new ServiceException("Invalid URI for financial penalties", ex);
+            throw new ServiceException(String.format("[%s]: Invalid URI for financial penalties", requestId), ex);
         }
 
         if (financialPenalties.getTotalResults() == 0) {
-            LOGGER.debug(String.format("No financial penalties results for company number %s and penalty ref %s",
-                    companyNumber, penaltyRef));
+            LOGGER.debug(String.format("[%s]: No financial penalties results for company number %s and penalty ref %s",
+                    requestId, companyNumber, penaltyRef));
             return Collections.emptyList();
         }
-        LOGGER.debug(String.format("Request to fetch financial penalties successful for company number %s and penalty ref %s", companyNumber, penaltyRef));
+        LOGGER.debug(String.format("[%s]: Request to fetch financial penalties successful for company number %s and penalty ref %s",
+                requestId, companyNumber, penaltyRef));
 
         var penaltyOrUnpaidItems = financialPenalties.getItems().stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
                         || FALSE.equals(financialPenalty.getPaid()))
                 .toList();
-        LOGGER.debug(String.format("%d Penalty or unpaid items for company number %s and penalty ref %s",
-                penaltyOrUnpaidItems.size(), companyNumber, penaltyRef));
+        LOGGER.debug(String.format("[%s]: %d Penalty or unpaid items for company number %s and penalty ref %s",
+                requestId, penaltyOrUnpaidItems.size(), companyNumber, penaltyRef));
 
         Optional<FinancialPenalty> penaltyOptional = penaltyOrUnpaidItems.stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
@@ -94,8 +96,8 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             penaltyAndCosts.add(penalty);
             penaltyAndCosts.addAll(unpaidLegalCosts);
 
-            LOGGER.debug(String.format("%d Penalty and costs for company number %s and penalty ref %s",
-                    penaltyAndCosts.size(), companyNumber, penaltyRef));
+            LOGGER.debug(String.format("[%s]: %d Penalty and costs for company number %s and penalty ref %s",
+                    requestId, penaltyAndCosts.size(), companyNumber, penaltyRef));
             return penaltyAndCosts;
         }
         return Collections.emptyList();
@@ -104,13 +106,14 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     @Override
     public FinanceHealthcheck checkFinanceSystemAvailableTime() throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
         FinanceHealthcheck financeHealthcheck;
 
         try {
             String uri = FINANCE_HEALTHCHECK_URI.toString();
             financeHealthcheck = apiClient.financeHealthcheckResourceHandler().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
-            LOGGER.debug(String.format("Error status code: %d, Error message: %s", ex.getStatusCode(), ex.getMessage()));
+            LOGGER.debug(String.format("[%s]: Error status code: %d, Error message: %s", requestId, ex.getStatusCode(), ex.getMessage()));
             if (ex.getStatusCode() == 503) {
                 // Generate a financeHealthcheck object to return from the exception
 
@@ -130,7 +133,7 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
             throw new ServiceException("Error retrieving Finance Healthcheck", ex);
 
         } catch (URIValidationException ex) {
-            throw new ServiceException("Invalid URI for Finance Healthcheck", ex);
+            throw new ServiceException(String.format("[%s]: Invalid URI for Finance Healthcheck", requestId), ex);
         }
 
         return financeHealthcheck;
