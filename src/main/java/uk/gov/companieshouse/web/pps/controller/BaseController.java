@@ -27,7 +27,7 @@ public abstract class BaseController {
     public static final String BACK_LINK_URL_ATTR = "backLinkUrl";
     public static final String USER_BAR_ATTR = "userBar";
     public static final String USER_EMAIL_ATTR = "userEmail";
-    public static final String USER_SIGN_OUT_URL_ATTR = "userSignOutUrl";
+    public static final String USER_SIGN_OUT_URL_ATTR = "userSignoutUrl";
     public static final String HIDE_YOUR_DETAILS_ATTR = "hideYourDetails";
     public static final String HIDE_RECENT_FILINGS_ATTR = "hideRecentFilings";
     public static final String PHASE_BANNER_ATTR = "phaseBanner";
