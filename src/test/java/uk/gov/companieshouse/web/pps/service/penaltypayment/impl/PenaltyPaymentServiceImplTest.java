@@ -301,9 +301,34 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<FinancialPenalty> payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF_TWO);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF);
 
-        assertEquals(0, payableFinancialPenalties.size());
+        assertEquals(1, payableFinancialPenalties.size());
+    }
+
+    @Test
+    @DisplayName("Get payable financial penalties - Paid Penalty with associated costs")
+    void getPayableFinancialPenaltiesPaidWithAssociatedCostPenalty()
+            throws ServiceException, ApiErrorResponseException, URIValidationException {
+        when(apiClient.financialPenalty()).thenReturn(financialPenaltyResourceHandler);
+
+        String uri = "/company/" + COMPANY_NUMBER + "/penalties/" + LATE_FILING;
+        String madeUpDate = now().minusYears(1).toString();
+        FinancialPenalty paidFinancialPenalty = PPSTestUtility.paidFinancialPenalty(
+                PENALTY_REF, madeUpDate);
+        FinancialPenalty associatedCosts = PPSTestUtility.notPenaltyTypeFinancialPenalty(PENALTY_REF, madeUpDate);
+
+        when(financialPenaltyResourceHandler.get(uri)).thenReturn(financialPenaltiesGet);
+        when(financialPenaltiesGet.execute()).thenReturn(responseWithData);
+
+        when(responseWithData.getData()).thenReturn(
+                PPSTestUtility.twoFinancialPenalties(paidFinancialPenalty, associatedCosts)
+        );
+
+        List<FinancialPenalty> payableFinancialPenalties =
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF);
+
+        assertEquals(1, payableFinancialPenalties.size());
     }
 
     @Test

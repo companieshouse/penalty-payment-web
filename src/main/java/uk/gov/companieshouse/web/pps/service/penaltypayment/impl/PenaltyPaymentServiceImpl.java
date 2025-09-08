@@ -72,29 +72,34 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
         LOGGER.debug(String.format("[%s]: Request to fetch financial penalties successful for company number %s and penalty ref %s",
                 requestId, companyNumber, penaltyRef));
 
-        var penaltyOrUnpaidItems = financialPenalties.getItems().stream()
+        var penaltyAndAssociatedCosts = financialPenalties.getItems().stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
                         || FALSE.equals(financialPenalty.getPaid()))
                 .toList();
-        LOGGER.debug(String.format("[%s]: %d Penalty or unpaid items for company number %s and penalty ref %s",
-                requestId, penaltyOrUnpaidItems.size(), companyNumber, penaltyRef));
+        LOGGER.debug(String.format("[%s]: %d Penalty and associated costs for company number %s and penalty ref %s",
+                requestId, penaltyAndAssociatedCosts.size(), companyNumber, penaltyRef));
 
-        Optional<FinancialPenalty> penaltyOptional = penaltyOrUnpaidItems.stream()
+        Optional<FinancialPenalty> penaltyOptional = penaltyAndAssociatedCosts.stream()
                 .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId()))
                 .filter(financialPenalty -> PENALTY_TYPE.equals(financialPenalty.getType()))
                 .findFirst();
 
         if (penaltyOptional.isPresent()) {
             FinancialPenalty penalty = penaltyOptional.get();
-            var unpaidLegalCosts = penaltyOrUnpaidItems.stream()
-                    .filter(financialPenalty -> OTHER_TYPE.equals(financialPenalty.getType()))
-                    .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
-                            || penalty.getMadeUpDate().equals(financialPenalty.getMadeUpDate()))
-                    .toList();
-
             var penaltyAndCosts = new ArrayList<FinancialPenalty>();
             penaltyAndCosts.add(penalty);
-            penaltyAndCosts.addAll(unpaidLegalCosts);
+            if (FALSE.equals(penalty.getPaid())) {
+                // Include associated costs only if penalty is unpaid. This is to ensure that decision is not made
+                // based on the associated costs for paid penalties.
+                // If penalty is already paid, we only need to tell the user that the penalty is already paid.
+                var associatedCosts = penaltyAndAssociatedCosts.stream()
+                        .filter(financialPenalty -> OTHER_TYPE.equals(financialPenalty.getType()))
+                        .filter(financialPenalty -> penaltyRef.equals(financialPenalty.getId())
+                                || penalty.getMadeUpDate().equals(financialPenalty.getMadeUpDate()))
+                        .toList();
+
+                penaltyAndCosts.addAll(associatedCosts);
+            }
 
             LOGGER.debug(String.format("[%s]: %d Penalty and costs for company number %s and penalty ref %s",
                     requestId, penaltyAndCosts.size(), companyNumber, penaltyRef));
