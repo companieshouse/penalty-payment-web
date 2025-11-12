@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED;
-import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_INSTALMENT_PLAN;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.CLOSED_PENDING_ALLOCATION;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.DISABLED;
 import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPEN;
