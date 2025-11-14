@@ -10,6 +10,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.financialpenalty.FinanceHealthcheck;
 import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalties;
 import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
@@ -33,6 +34,9 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
     private static final UriTemplate FINANCE_HEALTHCHECK_URI =
             new UriTemplate("/penalty-payment-api/healthcheck/finance-system");
+
+    private static final UriTemplate PENALTY_REFERENCE_TYPES_URI =
+            new UriTemplate("/penalty-payment-api/penalty-reference-types");
 
     public static final String PENALTY_TYPE = "penalty";
     public static final String OTHER_TYPE = "other";
@@ -138,4 +142,18 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
 
         return financeHealthcheck;
     }
+
+    @Override
+    public PenaltyReferenceType[] getPenaltyReferenceTypes() throws ServiceException {
+        ApiClient apiClient = apiClientService.getPublicApiClient();
+        String requestId = apiClient.getHttpClient().getRequestId();
+        try {
+            return apiClient.penaltyReferenceTypesResourceHandler().get(PENALTY_REFERENCE_TYPES_URI.toString()).execute().getData();
+        } catch (URIValidationException e) {
+            throw new ServiceException(String.format("[%s]: Invalid URI for Get penalty reference types", requestId), e);
+        } catch (ApiErrorResponseException e) {
+            throw new ServiceException(String.format("[%s]: Error retrieving penalty reference types from API", requestId), e);
+        }
+    }
+
 }
