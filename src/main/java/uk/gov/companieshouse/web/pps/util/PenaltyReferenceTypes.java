@@ -8,7 +8,6 @@ import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentServic
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -20,8 +19,7 @@ public class PenaltyReferenceTypes {
         this.penaltyPaymentService = penaltyPaymentService;
     }
 
-    public List<PenaltyReferenceType> getEnabled() {
-        try {
+    public List<PenaltyReferenceType> getEnabled() throws ServiceException {
             var now = ZonedDateTime.now(ZoneOffset.UTC);
             return Arrays.stream(penaltyPaymentService.getPenaltyReferenceTypes())
                     .filter(penaltyReferenceType -> {
@@ -29,12 +27,9 @@ public class PenaltyReferenceTypes {
                         return enabledTo == null || now.isBefore(enabledTo);
                     })
                     .toList();
-        } catch (ServiceException e) {
-            return Collections.emptyList();
-        }
     }
 
-    public List<PenaltyReferenceType> fromReferenceStartsWith(String referenceStartsWith) {
+    public List<PenaltyReferenceType> fromReferenceStartsWith(String referenceStartsWith) throws ServiceException {
         return getEnabled().stream()
                 .filter(penaltyReferenceType -> penaltyReferenceType.getReferenceStartsWith()
                         .equalsIgnoreCase(referenceStartsWith))

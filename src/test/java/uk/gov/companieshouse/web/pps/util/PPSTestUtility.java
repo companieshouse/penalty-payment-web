@@ -9,8 +9,11 @@ import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltie
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableStatus;
 import uk.gov.companieshouse.api.model.financialpenalty.Payment;
+import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
 import uk.gov.companieshouse.api.model.financialpenalty.TransactionPayableFinancialPenalty;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -274,6 +277,14 @@ public class PPSTestUtility {
         financeHealthcheck.setMessage(FinanceHealthcheckStatus.HEALTHY.getStatus());
 
         return financeHealthcheck;
+    }
+
+    public static PenaltyReferenceType getPenaltyReferenceType(PenaltyReference penaltyReference) {
+        PenaltyReferenceType penaltyReferenceType = new PenaltyReferenceType();
+        penaltyReferenceType.setEnabledFrom(ZonedDateTime.now(ZoneOffset.UTC));
+        penaltyReferenceType.setReferenceType(penaltyReference.name());
+        penaltyReferenceType.setReferenceStartsWith(penaltyReference.getStartsWith());
+        return penaltyReferenceType;
     }
 
 }

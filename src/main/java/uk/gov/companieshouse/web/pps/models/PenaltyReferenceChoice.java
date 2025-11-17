@@ -1,18 +1,17 @@
 package uk.gov.companieshouse.web.pps.models;
 
 import jakarta.validation.constraints.NotNull;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 public class PenaltyReferenceChoice {
 
     @NotNull(message = "{penaltyReferenceChoice.selectedPenaltyReference.notNull}")
-    private PenaltyReference selectedPenaltyReference;
+    private String selectedPenaltyReference;
 
-    public PenaltyReference getSelectedPenaltyReference() {
+    public String getSelectedPenaltyReference() {
         return selectedPenaltyReference;
     }
 
-    public void setSelectedPenaltyReference(PenaltyReference selectedPenaltyReference) {
+    public void setSelectedPenaltyReference(String selectedPenaltyReference) {
         this.selectedPenaltyReference = selectedPenaltyReference;
     }
 

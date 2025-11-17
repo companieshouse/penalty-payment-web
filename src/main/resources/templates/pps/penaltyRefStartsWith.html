@@ -11,11 +11,11 @@
                 var selectedPenaltyReference = document.querySelector('input[name=selectedPenaltyReference]:checked');
                 if (selectedPenaltyReference != null) {
                     var selectedPenaltyReferenceValue = selectedPenaltyReference.value;
-                    if (selectedPenaltyReferenceValue === 'LATE_FILING') {
+                    if (selectedPenaltyReferenceValue === 'A') {
                         _paq.push(['trackGoal', document.querySelector("#lfp-goal-id").value]);
-                    } else if (selectedPenaltyReferenceValue === 'SANCTIONS') {
+                    } else if (selectedPenaltyReferenceValue === 'P') {
                         _paq.push(['trackGoal', document.querySelector("#sanctions-goal-id").value]);
-                    } else if (selectedPenaltyReferenceValue === 'SANCTIONS_ROE') {
+                    } else if (selectedPenaltyReferenceValue === 'U') {
                         _paq.push(['trackGoal', document.querySelector("#sanctions-roe-goal-id").value]);
                     }
                 }
@@ -52,19 +52,19 @@
                         </span>
 
                         <div class="govuk-radios" data-module="govuk-radios"
-                             th:each="penaltyReference : ${availablePenaltyReference}"
+                             th:each="penaltyReferenceType : ${availablePenaltyReference}"
                              style="margin-bottom:1em;">
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input"
-                                       th:id="${penaltyReference.name}"
+                                       th:id="${penaltyReferenceType.referenceType}"
                                        name="selectedPenaltyReference"
                                        type="radio"
-                                       th:value="${penaltyReference.name}"
+                                       th:value="${penaltyReferenceType.referenceStartsWith}"
                                        th:field="*{selectedPenaltyReference}"
                                        th:errorclass="govuk-error-message"/>
 
-                                <label class="govuk-label govuk-radios__label" th:for="${penaltyReference}"
-                                       th:text="${penaltyReference.startsWith}"></label>
+                                <label class="govuk-label govuk-radios__label" th:for="${penaltyReferenceType}"
+                                       th:text="${penaltyReferenceType.referenceStartsWith}"></label>
                             </div>
                         </div>
                         <input type="hidden" th:value="${@environment.getProperty('matomo.penalty-ref-starts-with-lfp-goal-id')}" id="lfp-goal-id">

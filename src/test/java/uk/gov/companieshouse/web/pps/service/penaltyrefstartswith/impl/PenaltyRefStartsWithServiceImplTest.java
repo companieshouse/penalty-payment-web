@@ -9,17 +9,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyReferenceTypes;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.Boolean.TRUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,9 +32,9 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.getPenaltyReferenceType;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,10 +43,10 @@ class PenaltyRefStartsWithServiceImplTest {
     private PenaltyRefStartsWithServiceImpl penaltyRefStartsWithServiceImpl;
 
     @Mock
-    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
+    private PenaltyReferenceTypes mockPenaltyReferenceTypes;
 
     @Mock
-    private FeatureFlagChecker mockFeatureFlagChecker;
+    private PenaltyConfigurationProperties mockPenaltyConfigurationProperties;
 
     @Mock
     private FinanceServiceHealthCheck mockFinanceServiceHealthCheck;
@@ -56,37 +55,33 @@ class PenaltyRefStartsWithServiceImplTest {
     private static final String ENTER_DETAILS_PATH = "/pay-penalty/enter-details";
 
     @Test
-    @DisplayName("Get viewPenaltyRefStartWith - redirect late filing details")
-    void getPenaltyRefStartsWithFeatureFlagDisabled() {
+    @DisplayName("Get Penalty ref starts with sanctions disabled - redirect late filing details")
+    void getPenaltyRefStartsWithSanctionsDisabled() throws ServiceException {
+        var lateFilingPenaltyReferenceType = getPenaltyReferenceType(LATE_FILING);
+        when(mockPenaltyReferenceTypes.getEnabled())
+                .thenReturn(List.of(lateFilingPenaltyReferenceType));
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
 
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(lateFilingPenaltyReferenceType.getReferenceStartsWith()));
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
         assertEquals(mockServiceResponse.getUrl(), serviceResponse.getUrl());
     }
 
     @Test
-    @DisplayName("Get viewPenaltyRefStartWith - successful")
-    void getPenaltyRefStartsSuccessful() {
+    @DisplayName("Get Penalty ref starts with - successful")
+    void getPenaltyRefStartsWithSuccessful() throws ServiceException {
+        when(mockPenaltyReferenceTypes.getEnabled()).thenReturn(
+                List.of(getPenaltyReferenceType(LATE_FILING),
+                        getPenaltyReferenceType(SANCTIONS)));
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
 
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
-
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
 
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -101,16 +96,13 @@ class PenaltyRefStartsWithServiceImplTest {
     }
 
     @Test
-    @DisplayName("Post postPenaltyRefStartWithError - successful")
-    void getPostPenaltyRefStartsErrorSuccessful() {
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
-
+    @DisplayName("Post Penalty ref starts with error - successful")
+    void postPenaltyRefStartsWithErrorSuccessful() throws ServiceException {
+        when(mockPenaltyReferenceTypes.getEnabled()).thenReturn(
+                List.of(getPenaltyReferenceType(LATE_FILING),
+                        getPenaltyReferenceType(SANCTIONS)));
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartsWithError();
         assertEquals(Optional.empty(), serviceResponse.getUrl());
@@ -124,22 +116,15 @@ class PenaltyRefStartsWithServiceImplTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"A", "P", "U"})
-    @DisplayName("Post postPenaltyRefStartWithNext - lfp successful")
-    void getPostPenaltyRefStartsNextSuccessful(String startsWith) {
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(SANCTIONS_ROE)).thenReturn(TRUE);
-
+    @DisplayName("Post Penalty ref starts with next - successful")
+    void postPenaltyRefStartsWithNextSuccessful(String startsWith) {
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
-        PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(startsWith);
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(penaltyReference));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(startsWith));
         PenaltyReferenceChoice penaltyReferenceChoice = new PenaltyReferenceChoice();
-        penaltyReferenceChoice.setSelectedPenaltyReference(penaltyReference);
+        penaltyReferenceChoice.setSelectedPenaltyReference(startsWith);
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.postPenaltyRefStartsWithNext(
                 penaltyReferenceChoice);
@@ -147,20 +132,16 @@ class PenaltyRefStartsWithServiceImplTest {
     }
 
     @Test
-    @DisplayName("Get viewPenaltyRefStartWith - health check returning service unavailable")
-    void getPenaltyRefStartsWithHealthCheckReturningServiceUnavailable() {
+    @DisplayName("Get Penalty ref starts with - health check returning service unavailable")
+    void getPenaltyRefStartsWithHealthCheckReturningServiceUnavailable() throws ServiceException {
         PPSServiceResponse healthCheck = new PPSServiceResponse();
         healthCheck.setUrl(SERVICE_UNAVAILABLE_VIEW_NAME);
         healthCheck.setBaseModelAttributes(Map.of(SIGN_OUT_URL_ATTR, SIGN_OUT_PATH));
 
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
 
@@ -173,19 +154,15 @@ class PenaltyRefStartsWithServiceImplTest {
     }
 
     @Test
-    @DisplayName("Get viewPenaltyRefStartWith -  health check returning redirect")
-    void getPenaltyRefStartsWithHealthCheckReturningRedirect() {
+    @DisplayName("Get Penalty ref starts with -  health check returning redirect")
+    void getPenaltyRefStartsWithHealthCheckReturningRedirect() throws ServiceException {
         PPSServiceResponse healthCheck = new PPSServiceResponse();
         healthCheck.setUrl(REDIRECT_URL_PREFIX);
 
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
-        when(mockPenaltyConfigurationProperties.getAllowedRefStartsWith()).thenReturn(
-                List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(LATE_FILING)).thenReturn(TRUE);
-
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
-                mockPenaltyConfigurationProperties, mockFeatureFlagChecker, mockFinanceServiceHealthCheck);
+                mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
         PPSServiceResponse serviceResponse = penaltyRefStartsWithServiceImpl.viewPenaltyRefStartsWith();
 
@@ -195,11 +172,11 @@ class PenaltyRefStartsWithServiceImplTest {
         assertFalse(serviceResponse.getModelAttributes().isPresent());
     }
 
-    private String setUpEnterDetailsUrl(PenaltyReference penaltyReference) {
+    private String setUpEnterDetailsUrl(String referenceStartsWith) {
         when(mockPenaltyConfigurationProperties.getEnterDetailsPath()).thenReturn(
                 ENTER_DETAILS_PATH);
         return REDIRECT_URL_PREFIX + mockPenaltyConfigurationProperties.getEnterDetailsPath()
-                + String.format(REF_STARTS_WITH_PATH, penaltyReference.getStartsWith());
+                + String.format(REF_STARTS_WITH_PATH, referenceStartsWith);
     }
 
 }
