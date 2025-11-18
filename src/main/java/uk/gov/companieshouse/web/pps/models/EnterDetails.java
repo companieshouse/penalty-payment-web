@@ -5,7 +5,13 @@ import jakarta.validation.constraints.NotNull;
 public class EnterDetails {
 
     @NotNull
-    private String penaltyReferenceName;
+    private String penaltyReferenceRegex;
+
+    @NotNull
+    private String penaltyReferenceStartsWith;
+
+    @NotNull
+    private String penaltyReferenceType;
 
     @NotNull
     private String companyNumber;
@@ -13,12 +19,28 @@ public class EnterDetails {
     @NotNull
     private String penaltyRef;
 
-    public String getPenaltyReferenceName() {
-        return penaltyReferenceName;
+    public String getPenaltyReferenceRegex() {
+        return penaltyReferenceRegex;
     }
 
-    public void setPenaltyReferenceName(String penaltyReferenceName) {
-        this.penaltyReferenceName = penaltyReferenceName;
+    public void setPenaltyReferenceRegex(String penaltyReferenceRegex) {
+        this.penaltyReferenceRegex = penaltyReferenceRegex;
+    }
+
+    public String getPenaltyReferenceStartsWith() {
+        return penaltyReferenceStartsWith;
+    }
+
+    public void setPenaltyReferenceStartsWith(String penaltyReferenceStartsWith) {
+        this.penaltyReferenceStartsWith = penaltyReferenceStartsWith;
+    }
+
+    public String getPenaltyReferenceType() {
+        return penaltyReferenceType;
+    }
+
+    public void setPenaltyReferenceType(String penaltyReferenceType) {
+        this.penaltyReferenceType = penaltyReferenceType;
     }
 
     public String getCompanyNumber() {

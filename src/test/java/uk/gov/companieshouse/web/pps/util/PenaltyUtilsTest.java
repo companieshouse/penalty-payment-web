@@ -29,7 +29,7 @@ class PenaltyUtilsTest {
 
     @Test
     void testGetPenaltyReferenceType() {
-        PenaltyReference result = PenaltyUtils.getPenaltyReferenceType("AA100030");
+        PenaltyReference result = PenaltyUtils.getPenaltyReferenceEnum("AA100030");
         assertEquals(LATE_FILING, result);
     }
 
@@ -37,14 +37,14 @@ class PenaltyUtilsTest {
     void testGetPenaltyReferenceTypeWithNullRef() {
 
         IllegalArgumentException expectedException = assertThrowsExactly(
-                IllegalArgumentException.class, () -> PenaltyUtils.getPenaltyReferenceType(null));
+                IllegalArgumentException.class, () -> PenaltyUtils.getPenaltyReferenceEnum(null));
         assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
     }
 
     @Test
     void testGetPenaltyReferenceTypeWithEmptyRef() {
         IllegalArgumentException expectedException = assertThrowsExactly(
-                IllegalArgumentException.class, () -> PenaltyUtils.getPenaltyReferenceType(""));
+                IllegalArgumentException.class, () -> PenaltyUtils.getPenaltyReferenceEnum(""));
         assertEquals("Penalty Reference is null or empty", expectedException.getMessage());
     }
 

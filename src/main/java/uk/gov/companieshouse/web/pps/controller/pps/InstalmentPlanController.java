@@ -38,7 +38,7 @@ public class InstalmentPlanController extends BaseController {
                                     @PathVariable String penaltyRef,
                                     Model model) {
 
-        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceEnum(penaltyRef);
         model.addAttribute(PENALTY_REFERENCE_MODEL_ATTR, penaltyReference.name());
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()

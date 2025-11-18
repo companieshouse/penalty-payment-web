@@ -36,7 +36,7 @@ public class PenaltyPaymentInProgressController extends BaseController {
             @PathVariable String penaltyRef,
             Model model) {
 
-        var penaltyReference = PenaltyUtils.getPenaltyReferenceType(penaltyRef);
+        var penaltyReference = PenaltyUtils.getPenaltyReferenceEnum(penaltyRef);
         addBaseAttributesToModel(model,
                 penaltyConfigurationProperties.getEnterDetailsPath()
                         + "?ref-starts-with=" + penaltyReference.getStartsWith(),

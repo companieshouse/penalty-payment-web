@@ -61,7 +61,7 @@ public class EnterDetailsController extends BaseController {
             configureBaseAttributes(serviceResponse, model);
 
             return serviceResponse.getUrl().orElseGet(this::getTemplateName);
-        } catch (IllegalArgumentException e) {
+        } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getUnscheduledServiceDownPath();
         }

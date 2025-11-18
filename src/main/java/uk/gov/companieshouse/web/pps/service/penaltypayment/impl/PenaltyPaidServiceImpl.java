@@ -55,7 +55,7 @@ public class PenaltyPaidServiceImpl implements PenaltyPaidService {
 
     private String getBackUrl(String penaltyRef) {
         return penaltyConfigurationProperties.getEnterDetailsPath()
-                + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceType(penaltyRef)
+                + "?ref-starts-with=" + PenaltyUtils.getPenaltyReferenceEnum(penaltyRef)
                 .getStartsWith();
     }
 

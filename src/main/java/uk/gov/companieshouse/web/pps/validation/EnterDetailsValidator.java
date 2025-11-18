@@ -4,12 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import uk.gov.companieshouse.web.pps.models.EnterDetails;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import java.util.ResourceBundle;
 
 import static java.util.Locale.UK;
 import static java.util.ResourceBundle.getBundle;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @Component
@@ -17,9 +18,6 @@ public class EnterDetailsValidator {
 
     private static final String COMPANY_NUMBER_REGEX = "^([a-zA-Z0-9]{8}|\\d{1,8})$";
     private static final String OVERSEAS_ENTITY_ID_REGEX = "^[Oo][Ee]\\d{6}$";
-    private static final String LATE_FILING_PENALTY_REF_REGEX = "^[Aa]\\d{7}$";
-    private static final String SANCTIONS_PENALTY_REF_REGEX = "^[Pp]\\d{7}$";
-    private static final String SANCTIONS_ROE_PENALTY_REF_REGEX = "^[Uu]\\d{7}$";
 
     private final ResourceBundle bundle;
 
@@ -32,95 +30,87 @@ public class EnterDetailsValidator {
         isValidPenaltyRef(enterDetails, bindingResult);
     }
 
-    public void isValidCompanyNumber(final EnterDetails enterDetails,
-            final BindingResult bindingResult) {
-        String companyNumberField = "companyNumber";
-        String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
+    public void isValidCompanyNumber(final EnterDetails enterDetails, final BindingResult bindingResult) {
+        String penaltyReferenceType = enterDetails.getPenaltyReferenceType();
+        boolean isOverseasEntity = SANCTIONS_ROE.getStartsWith().equals(enterDetails.getPenaltyReferenceStartsWith());
+        String companyNumber = enterDetails.getCompanyNumber();
+        String field = "companyNumber";
 
-        // company number is empty
-        if (StringUtils.isEmpty(enterDetails.getCompanyNumber())) {
-            String key =
-                    "enterDetails.companyNumber.notValid." + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberField, companyNumberField,
-                    bundle.getString(key));
+        if (isEmpty(companyNumber)) {
+            reject(bindingResult, field, buildCompanyNumberErrorKey("enterDetails.companyNumber.notValid", isOverseasEntity, penaltyReferenceType));
+            return;
         }
-        // company number contains space
-        else if (StringUtils.containsAny(enterDetails.getCompanyNumber(), " ")) {
-            String key =
-                    "enterDetails.companyNumber.noSpaces." + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberField, companyNumberField,
-                    bundle.getString(key));
+        if (containsSpaces(companyNumber)) {
+            reject(bindingResult, field, buildCompanyNumberErrorKey("enterDetails.companyNumber.noSpaces", isOverseasEntity, penaltyReferenceType));
+            return;
         }
-        // company number less than 8 characters
-        else if (enterDetails.getCompanyNumber().length() < 8) {
-            String key =
-                    "enterDetails.companyNumber.lessCharacters."
-                            + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberField, companyNumberField,
-                    bundle.getString(key));
+        if (isTooShort(companyNumber)) {
+            reject(bindingResult, field, buildCompanyNumberErrorKey("enterDetails.companyNumber.lessCharacters", isOverseasEntity, penaltyReferenceType));
+            return;
         }
-        // company number contains non alphanumeric characters
-        else if (!StringUtils.isAlphanumeric(enterDetails.getCompanyNumber())) {
-            String key =
-                    "enterDetails.companyNumber.nonAlphanumeric."
-                            + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(companyNumberField, companyNumberField,
-                    bundle.getString(key));
+        if (isNotAlphanumeric(companyNumber)) {
+            reject(bindingResult, field, buildCompanyNumberErrorKey("enterDetails.companyNumber.nonAlphanumeric", isOverseasEntity, penaltyReferenceType));
+            return;
         }
-        // company number in incorrect format
-        else {
-            String regex = SANCTIONS_ROE.name().equals(penaltyReferenceName)
-                    ? OVERSEAS_ENTITY_ID_REGEX
-                    : COMPANY_NUMBER_REGEX;
-            if (!enterDetails.getCompanyNumber().matches(regex)) {
-                String key = "enterDetails.companyNumber.incorrectFormat."
-                        + enterDetails.getPenaltyReferenceName();
-                bindingResult.rejectValue(companyNumberField, companyNumberField,
-                        bundle.getString(key));
-            }
+        if (isCompanyNumberIncorrectFormat(companyNumber, isOverseasEntity)) {
+            reject(bindingResult, field, buildCompanyNumberErrorKey("enterDetails.companyNumber.incorrectFormat", isOverseasEntity, penaltyReferenceType));
         }
     }
 
-    public void isValidPenaltyRef(final EnterDetails enterDetails,
-            final BindingResult bindingResult) {
+    public void isValidPenaltyRef(final EnterDetails enterDetails, final BindingResult bindingResult) {
+        String penaltyReferenceType = enterDetails.getPenaltyReferenceType();
         String penaltyRef = enterDetails.getPenaltyRef();
-        String penaltyRefField = "penaltyRef";
-        String penaltyReferenceName = enterDetails.getPenaltyReferenceName();
+        String field = "penaltyRef";
 
-        // penalty reference is empty
-        if (StringUtils.isBlank(penaltyRef)) {
-            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString("enterDetails.penaltyRef.notValid"));
+        if (isBlank(penaltyRef)) {
+            reject(bindingResult, field, "enterDetails.penaltyRef.notValid");
+            return;
         }
-        // penalty reference contains space
-        else if (StringUtils.containsAny(penaltyRef, " ")) {
-            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString("enterDetails.penaltyRef.noSpaces"));
+        if (containsSpaces(penaltyRef)) {
+            reject(bindingResult, field, "enterDetails.penaltyRef.noSpaces");
+            return;
         }
-        // penalty reference less than 8 characters
-        else if (penaltyRef.length() < 8) {
-            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString("enterDetails.penaltyRef.lessCharacters"));
+        if (isTooShort(penaltyRef)) {
+            reject(bindingResult, field, "enterDetails.penaltyRef.lessCharacters");
+            return;
         }
-        // penalty reference contains non alphanumeric characters
-        else if (!StringUtils.isAlphanumeric(enterDetails.getPenaltyRef())) {
-            String key =
-                    "enterDetails.penaltyRef.nonAlphanumeric."
-                            + enterDetails.getPenaltyReferenceName();
-            bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                    bundle.getString(key));
+        if (isNotAlphanumeric(penaltyRef)) {
+            String key = "enterDetails.penaltyRef.nonAlphanumeric." + penaltyReferenceType;
+            reject(bindingResult, field, key);
+            return;
         }
-        // penalty reference in incorrect format
-        else {
-            String regex = switch (PenaltyReference.valueOf(penaltyReferenceName)) {
-                case LATE_FILING -> LATE_FILING_PENALTY_REF_REGEX;
-                case SANCTIONS -> SANCTIONS_PENALTY_REF_REGEX;
-                case SANCTIONS_ROE -> SANCTIONS_ROE_PENALTY_REF_REGEX;
-            };
-            if (!penaltyRef.matches(regex)) {
-                bindingResult.rejectValue(penaltyRefField, penaltyRefField,
-                        bundle.getString("enterDetails.penaltyRef.incorrectFormat"));
-            }
+        if (isIncorrectFormat(penaltyRef, enterDetails.getPenaltyReferenceRegex())) {
+            reject(bindingResult, field, "enterDetails.penaltyRef.incorrectFormat");
         }
     }
+
+    private boolean containsSpaces(String value) {
+        return StringUtils.containsAny(value, " ");
+    }
+
+    private boolean isTooShort(String value) {
+        return value.length() < 8;
+    }
+
+    private boolean isNotAlphanumeric(String value) {
+        return !StringUtils.isAlphanumeric(value);
+    }
+
+    private boolean isCompanyNumberIncorrectFormat(String companyNumber, boolean isOverseasEntity) {
+        String regex = isOverseasEntity ? OVERSEAS_ENTITY_ID_REGEX : COMPANY_NUMBER_REGEX;
+        return !companyNumber.matches(regex);
+    }
+
+    private String buildCompanyNumberErrorKey(String baseKey, boolean isOverseasEntity, String penaltyType) {
+        return isOverseasEntity ? baseKey + "." + penaltyType : baseKey;
+    }
+
+    private void reject(BindingResult bindingResult, String field, String key) {
+        bindingResult.rejectValue(field, field, bundle.getString(key));
+    }
+
+    private boolean isIncorrectFormat(String value, String regex) {
+        return !value.matches(regex);
+    }
+
 }

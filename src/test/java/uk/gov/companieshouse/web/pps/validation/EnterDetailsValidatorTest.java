@@ -12,9 +12,6 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 class EnterDetailsValidatorTest {
 
@@ -33,14 +30,17 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "SC123456,A1234567,LATE_FILING",
-            "SC123456,P1234567,SANCTIONS",
-            "OE123456,U1234567,SANCTIONS_ROE"
+            "^[Aa]\\d{7}$,A,LATE_FILING,SC123456,A1234567",
+            "^[Pp]\\d{7}$,P,SANCTIONS,SC123456,P1234567",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,OE123456,U1234567"
     })
-    void isValidWhenRefStart(String companyNumber, String penaltyRef, String referenceName) {
-        enterDetails.setPenaltyReferenceName(referenceName);
-        enterDetails.setPenaltyRef(penaltyRef);
+    void isValidWhenRefStart(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String companyNumber, String penaltyRef) {
+        enterDetails.setPenaltyReferenceRegex(penaltyReferenceRegex);
+        enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+        enterDetails.setPenaltyReferenceType(penaltyReferenceType);
         enterDetails.setCompanyNumber(companyNumber);
+        enterDetails.setPenaltyRef(penaltyRef);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
 
         testValidator.isValid(enterDetails, bindingResult);
@@ -57,7 +57,9 @@ class EnterDetailsValidatorTest {
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
     void isNotValidForLateFilingCompanyNumberCheck(String companyNumber, String errorMessage) {
-        enterDetails.setPenaltyReferenceName(LATE_FILING.name());
+        enterDetails.setPenaltyReferenceRegex("^[Aa]\\\\d{7}$");
+        enterDetails.setPenaltyReferenceStartsWith("A");
+        enterDetails.setPenaltyReferenceType("LATE_FILING");
         enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("A1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -78,7 +80,9 @@ class EnterDetailsValidatorTest {
             "X12345678, Enter the company number exactly as shown on your penalty notice"
     })
     void isNotValidForSanctionsCompanyNumberCheck(String companyNumber, String errorMessage) {
-        enterDetails.setPenaltyReferenceName(SANCTIONS.name());
+        enterDetails.setPenaltyReferenceRegex("^[Pp]\\d{7}$");
+        enterDetails.setPenaltyReferenceStartsWith("P");
+        enterDetails.setPenaltyReferenceType("SANCTIONS");
         enterDetails.setCompanyNumber(companyNumber);
         enterDetails.setPenaltyRef("P1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -99,7 +103,9 @@ class EnterDetailsValidatorTest {
             "X12345678, Enter the overseas entity ID exactly as shown on your penalty notice"
     })
     void isNotValidForOverseasEntityIdCheck(String oeId, String errorMessage) {
-        enterDetails.setPenaltyReferenceName(SANCTIONS_ROE.name());
+        enterDetails.setPenaltyReferenceRegex("^[Uu]\\d{7}$");
+        enterDetails.setPenaltyReferenceStartsWith("U");
+        enterDetails.setPenaltyReferenceType("SANCTIONS_ROE");
         enterDetails.setCompanyNumber(oeId);
         enterDetails.setPenaltyRef("U1234567");
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);
@@ -113,15 +119,18 @@ class EnterDetailsValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "A123456,Penalty reference must be 8 characters,LATE_FILING",
-            " ,Enter the penalty reference,LATE_FILING",
-            "X1234567, Enter your penalty reference exactly as shown on your penalty letter,LATE_FILING",
-            "1234567!, Penalty reference must only contain the letter A followed by 7 numbers,LATE_FILING",
-            "1234567!, Penalty reference must only contain the letter P followed by 7 numbers,SANCTIONS",
-            "1234567!, Penalty reference must only contain the letter U followed by 7 numbers,SANCTIONS_ROE"
+            "^[Aa]\\d{7}$,A,LATE_FILING,A123456,Penalty reference must be 8 characters",
+            "^[Aa]\\d{7}$,A,LATE_FILING, ,Enter the penalty reference",
+            "^[Aa]\\d{7}$,A,LATE_FILING,X1234567, Enter your penalty reference exactly as shown on your penalty letter",
+            "^[Aa]\\d{7}$,A,LATE_FILING,1234567!, Penalty reference must only contain the letter A followed by 7 numbers",
+            "^[Pp]\\d{7}$,P,SANCTIONS,1234567!, Penalty reference must only contain the letter P followed by 7 numbers",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,1234567!, Penalty reference must only contain the letter U followed by 7 numbers"
     })
-    void isNotValidForPenaltyReferenceCheck(String penaltyRef, String errorMessage, String penaltyReferenceName) {
-        enterDetails.setPenaltyReferenceName(penaltyReferenceName);
+    void isNotValidForPenaltyReferenceCheck(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String penaltyRef, String errorMessage) {
+        enterDetails.setPenaltyReferenceRegex(penaltyReferenceRegex);
+        enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+        enterDetails.setPenaltyReferenceType(penaltyReferenceType);
         enterDetails.setCompanyNumber("12345678");
         enterDetails.setPenaltyRef(penaltyRef);
         BindingResult bindingResult = new BeanPropertyBindingResult(enterDetails, ENTER_DETAILS_MODEL);

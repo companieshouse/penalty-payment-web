@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface PenaltyPaymentService {
 
-    List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef) throws ServiceException;
+    List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef, String penaltyReferenceType) throws ServiceException;
 
     FinanceHealthcheck checkFinanceSystemAvailableTime() throws ServiceException;
 

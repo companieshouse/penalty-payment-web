@@ -50,7 +50,7 @@ public class ViewPenaltiesController extends BaseController {
 
         try {
             serviceResponse = viewPenaltiesService.viewPenalties(companyNumber, penaltyRef);
-        } catch (IllegalArgumentException | ServiceException e) {
+        } catch (ServiceException e) {
             LOGGER.errorRequest(request, e.getMessage(), e);
             return REDIRECT_URL_PREFIX
                     + penaltyConfigurationProperties.getUnscheduledServiceDownPath();

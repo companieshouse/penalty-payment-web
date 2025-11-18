@@ -38,24 +38,24 @@ import static uk.gov.companieshouse.web.pps.controller.pps.ViewPenaltiesControll
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AMOUNT_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_TYPE_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.REASON_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.CS_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LFP_PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.OVERSEAS_ENTITY_ID;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.ROE_PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_TYPE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_ROE_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_CS_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_ROE_REASON;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -113,8 +113,7 @@ class ViewPenaltiesControllerTest {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(COMPANY_NAME_ATTR, penaltyTestData.customerCode());
         modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
-        modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
-                PenaltyUtils.getPenaltyReferenceType(penaltyTestData.penaltyRef()).name());
+        modelAttributes.put(PENALTY_REFERENCE_TYPE_ATTR, penaltyTestData.name());
         modelAttributes.put(REASON_ATTR, penaltyTestData.reasonForPenalty());
         modelAttributes.put(AMOUNT_ATTR, PenaltyUtils.getFormattedAmount(100));
 
@@ -133,7 +132,7 @@ class ViewPenaltiesControllerTest {
                 .andExpect(model().attributeExists(REASON_ATTR))
                 .andExpect(model().attributeExists(AMOUNT_ATTR))
                 .andExpect(model().attribute(BACK_LINK_URL_ATTR, ENTER_DETAILS_PATH))
-                .andExpect(model().attribute(PENALTY_REFERENCE_NAME_ATTR, penaltyTestData.name()));
+                .andExpect(model().attribute(PENALTY_REFERENCE_TYPE_ATTR, penaltyTestData.name()));
 
         verify(mockViewPenaltiesService).viewPenalties(penaltyTestData.customerCode(),
                 penaltyTestData.penaltyRef());
@@ -159,25 +158,7 @@ class ViewPenaltiesControllerTest {
     }
 
     @Test
-    @DisplayName("Get View Penalties - IllegalArgumentException when view penalties")
-    void getRequestLateFilingPenaltyIllegalArgumentException() throws Exception {
-
-        doThrow(IllegalArgumentException.class).
-                when(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
-
-        when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
-                UNSCHEDULED_SERVICE_DOWN_PATH);
-
-        this.mockMvc.perform(get(LFP_VIEW_PENALTIES_PATH))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH));
-
-        verify(mockViewPenaltiesService).viewPenalties(COMPANY_NUMBER, LFP_PENALTY_REF);
-
-    }
-
-    @Test
-    @DisplayName("Get View Penalties - ServiceException when getCompanyProfile")
+    @DisplayName("Get View Penalties - ServiceException when view penalties")
     void getRequestLateFilingPenaltyServiceException() throws Exception {
 
         doThrow(ServiceException.class).
@@ -279,19 +260,19 @@ class ViewPenaltiesControllerTest {
                 LFP_VIEW_PENALTIES_PATH,
                 LFP_PENALTY_REF,
                 VALID_LATE_FILING_REASON,
-                LATE_FILING.name());
+                LATE_FILING_PENALTY_REFERENCE_TYPE);
         PenaltyTestData cs = new PenaltyTestData(
                 COMPANY_NUMBER,
                 SANCTIONS_CS_VIEW_PENALTIES_PATH,
                 CS_PENALTY_REF,
                 VALID_CS_REASON,
-                SANCTIONS.name());
+                SANCTIONS_PENALTY_REFERENCE_TYPE);
         PenaltyTestData roe = new PenaltyTestData(
                 OVERSEAS_ENTITY_ID,
                 SANCTIONS_ROE_VIEW_PENALTIES_PATH,
                 ROE_PENALTY_REF,
                 VALID_ROE_REASON,
-                SANCTIONS_ROE.name());
+                SANCTIONS_ROE_PENALTY_REFERENCE_TYPE);
         return Stream.of(lfp, cs, roe);
     }
 }

@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import uk.gov.companieshouse.api.model.financialpenalty.FinancialPenalty;
+import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
 import uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
@@ -21,15 +21,15 @@ import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
 import uk.gov.companieshouse.web.pps.util.PPSTestUtility;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyReferenceTypes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.time.LocalDate.now;
 import static java.util.Locale.UK;
@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
@@ -48,17 +49,19 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.ENTER_DETAI
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.OTHER_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.VALID_LATE_FILING_REASON;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 class PenaltyDetailsServiceImplTest {
+
+    private static final String LATE_FILING_PENALTY_REFERENCE_REGEX = "^[Aa]\\d{7}$";
+    private static final String LATE_FILING_PENALTY_REFERENCE_STARTS_WITH = "A";
 
     @InjectMocks
     private PenaltyDetailsServiceImpl penaltyDetailsService;
@@ -67,7 +70,7 @@ class PenaltyDetailsServiceImplTest {
     private MessageSource mockMessageSource;
 
     @Mock
-    private FeatureFlagChecker mockFeatureFlagChecker;
+    private PenaltyReferenceTypes mockPenaltyReferenceTypes;
 
     @Mock
     private CompanyService mockCompanyService;
@@ -113,15 +116,22 @@ class PenaltyDetailsServiceImplTest {
             + PENALTY_REF + "/instalment-plan";
 
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "A,LATE_FILING",
+            "P,SANCTIONS",
+            "U,SANCTIONS_ROE"
+    })
     @DisplayName("Get Details - Successful")
-    void getEnterDetailsSuccessful(PenaltyReference penaltyReference) {
+    void getEnterDetailsSuccessful(String penaltyRefStartsWith, String penaltyRefType) throws ServiceException {
+        PenaltyReferenceType penaltyReferenceType = new PenaltyReferenceType();
+        penaltyReferenceType.setReferenceStartsWith(penaltyRefStartsWith);
+        penaltyReferenceType.setReferenceType(penaltyRefType);
 
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(penaltyReference)).thenReturn(true);
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+        when(mockPenaltyReferenceTypes.fromReferenceStartsWith(penaltyRefStartsWith))
+                .thenReturn(Optional.of(penaltyReferenceType));
 
-        PPSServiceResponse actualServiceResponse = penaltyDetailsService
-                .getEnterDetails(penaltyReference.getStartsWith());
+        PPSServiceResponse actualServiceResponse = penaltyDetailsService.getEnterDetails(penaltyRefStartsWith);
 
         assertNotNull(actualServiceResponse);
         assertTrue(actualServiceResponse.getUrl().isEmpty());
@@ -136,7 +146,7 @@ class PenaltyDetailsServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {SERVICE_UNAVAILABLE_VIEW_NAME, UNSCHEDULED_SERVICE_DOWN_PATH})
     @DisplayName("Get Details - Unsuccessful health check")
-    void getEnterDetailsFailedHealthCheck(String healthCheckRedirect) {
+    void getEnterDetailsFailedHealthCheck(String healthCheckRedirect) throws ServiceException {
 
         PPSServiceResponse healthCheck = new PPSServiceResponse();
         healthCheck.setUrl(healthCheckRedirect);
@@ -145,7 +155,7 @@ class PenaltyDetailsServiceImplTest {
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(healthCheck);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
-                .getEnterDetails(LATE_FILING.getStartsWith());
+                .getEnterDetails(LATE_FILING_PENALTY_REFERENCE_STARTS_WITH);
 
         assertNotNull(serviceResponse);
         assertTrue(serviceResponse.getUrl().isPresent());
@@ -155,18 +165,19 @@ class PenaltyDetailsServiceImplTest {
     }
 
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "A",
+            "P",
+            "U"
+    })
     @DisplayName("Get Details - Penalty reference type not enabled")
-    void getEnterDetailsFailedHealthCheck(PenaltyReference penaltyReference) {
-
+    void getEnterDetailsWhenPenaltyReferenceTypeIsNotEnabled(String penaltyRefStartsWith) throws ServiceException {
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
-
-        when(mockFeatureFlagChecker.isPenaltyRefEnabled(penaltyReference)).thenReturn(false);
+        when(mockPenaltyReferenceTypes.fromReferenceStartsWith(penaltyRefStartsWith)).thenReturn(Optional.empty());
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(
                 UNSCHEDULED_SERVICE_DOWN_PATH);
 
-        PPSServiceResponse serviceResponse = penaltyDetailsService
-                .getEnterDetails(penaltyReference.getStartsWith());
+        PPSServiceResponse serviceResponse = penaltyDetailsService.getEnterDetails(penaltyRefStartsWith);
 
         assertNotNull(serviceResponse);
         assertTrue(serviceResponse.getUrl().isPresent());
@@ -176,12 +187,12 @@ class PenaltyDetailsServiceImplTest {
     }
 
     @Test
-    @DisplayName("Get Details - throws exception")
-    void getEnterDetailsThrowsException() {
-
+    @DisplayName("Get Details - throws service exception")
+    void getEnterDetailsThrowsServiceException() throws ServiceException {
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
+        when(mockPenaltyReferenceTypes.fromReferenceStartsWith(anyString())).thenThrow(ServiceException.class);
 
-        assertThrows(IllegalArgumentException.class, () -> penaltyDetailsService
+        assertThrows(ServiceException.class, () -> penaltyDetailsService
                 .getEnterDetails("Z"));
     }
 
@@ -191,7 +202,8 @@ class PenaltyDetailsServiceImplTest {
     void postDetailsWithInputValidationErrors() throws Exception {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
-                .postEnterDetails(buildEnterDetails(null, null, null), true,
+                .postEnterDetails(buildEnterDetails(null, null,
+                                null, null, null), true,
                         enterDetailsControllerClass);
 
         assertNotNull(serviceResponse);
@@ -203,68 +215,73 @@ class PenaltyDetailsServiceImplTest {
     @Test
     @DisplayName("Post Details throws exception")
     void postDetailsThrowsException() throws Exception {
-
         configureAppendCompanyNumber(COMPANY_NUMBER);
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenThrow(new ServiceException("Failed to fetch penalties", new Exception()));
 
         assertThrows(ServiceException.class, () -> penaltyDetailsService
-                .postEnterDetails(buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, SANCTIONS.name()),
+                .postEnterDetails(buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
                         false, enterDetailsControllerClass));
     }
-
 
     @Test
     @DisplayName("Post Details successfully - lower case LLP, correct penalty ref")
     void postDetailsCompanyNumberLowerCase() throws Exception {
         configureAppendCompanyNumber(UPPER_CASE_LLP);
-        configureValidPenalty(UPPER_CASE_LLP, PENALTY_REF);
+        configureValidPenalty(UPPER_CASE_LLP, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE);
         when(mockNavigatorService.getNextControllerRedirect(any(), any(), any())).thenReturn(
                 NEXT_CONTROLLER_PATH);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(LOWER_CASE_LLP, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(LOWER_CASE_LLP, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertPostEnterDetailsSuccess(serviceResponse, UPPER_CASE_LLP);
     }
-
 
     @Test
     @DisplayName("Post Details successfully - upper case LLP, correct penalty ref")
     void postDetailsCompanyNumberUpperCase() throws Exception {
         configureAppendCompanyNumber(UPPER_CASE_LLP);
-        configureValidPenalty(UPPER_CASE_LLP, PENALTY_REF);
+        configureValidPenalty(UPPER_CASE_LLP, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE);
         when(mockNavigatorService.getNextControllerRedirect(any(), any(), any())).thenReturn(
                 NEXT_CONTROLLER_PATH);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(UPPER_CASE_LLP, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(UPPER_CASE_LLP, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertPostEnterDetailsSuccess(serviceResponse, UPPER_CASE_LLP);
     }
 
-
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "^[Aa]\\d{7}$,A,LATE_FILING,12345678,A1234567",
+            "^[Pp]\\d{7}$,P,SANCTIONS,12345678,P1234567",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,OE123456,U1234567"
+    })
     @DisplayName("Post Details failure - no payable financial penalties found")
-    void postDetailsNoPayableFinancialPenaltyFound(PenaltyReference penaltyReference)
-            throws Exception {
-
-        configureAppendCompanyNumber(COMPANY_NUMBER);
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+    void postDetailsNoPayableFinancialPenaltyFound(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String companyNumber, String penaltyRef) throws ServiceException {
+        configureAppendCompanyNumber(companyNumber);
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef, penaltyReferenceType))
                 .thenReturn(Collections.emptyList());
 
-        String messageCode = "details.penalty-details-not-found-error." + penaltyReference.name();
+        String messageCode = "details.penalty-details-not-found-error." + penaltyReferenceType;
         String message = "No payable financial penalties found";
         when(mockMessageSource.getMessage(messageCode, null, UK)).thenReturn(message);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, penaltyReference.name()),
+                        buildEnterDetails(companyNumber, penaltyRef,
+                                penaltyReferenceRegex, penaltyReferenceStartsWith, penaltyReferenceType),
                         false, enterDetailsControllerClass);
 
         assertNotNull(serviceResponse);
@@ -272,20 +289,20 @@ class PenaltyDetailsServiceImplTest {
         assertTrue(serviceResponse.getErrorRequestMsg().isPresent());
         assertEquals(message, serviceResponse.getErrorRequestMsg().get());
 
-        verify(mockCompanyService).appendToCompanyNumber(COMPANY_NUMBER);
+        verify(mockCompanyService).appendToCompanyNumber(companyNumber);
         verify(mockMessageSource).getMessage(
-                "details.penalty-details-not-found-error." + penaltyReference.name(), null, UK);
+                "details.penalty-details-not-found-error." + penaltyReferenceType, null, UK);
     }
 
     @ParameterizedTest
     @CsvSource({
-            "LATE_FILING, 12345678, A1234567",
-            "SANCTIONS, 12345678, P1234567",
-            "SANCTIONS_ROE, OE123456, U1234567"
+            "^[Aa]\\d{7}$,A,LATE_FILING,12345678,A1234567",
+            "^[Pp]\\d{7}$,P,SANCTIONS,12345678,P1234567",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,OE123456,U1234567"
     })
     @DisplayName("Post Details when multiple penalty and costs")
-    void postDetailsWhenMultiplePenaltyAndCosts(String penaltyReferenceName, String companyNumber,
-            String penaltyRef) throws Exception {
+    void postDetailsWhenMultiplePenaltyAndCosts(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String companyNumber, String penaltyRef) throws ServiceException {
 
         configureAppendCompanyNumber(companyNumber);
 
@@ -301,12 +318,14 @@ class PenaltyDetailsServiceImplTest {
                 madeUpDate.minusYears(1).toString()));
         financialPenalties.add(PPSTestUtility.notPenaltyTypeFinancialPenalty(penaltyRef,
                 madeUpDate.minusMonths(6).toString()));
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef, penaltyReferenceType))
                 .thenReturn(financialPenalties);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(companyNumber, penaltyRef, penaltyReferenceName), false,
+                        buildEnterDetails(companyNumber, penaltyRef,
+                                penaltyReferenceRegex, penaltyReferenceStartsWith, penaltyReferenceType),
+                        false,
                         enterDetailsControllerClass);
         String expectedRedirectUrl =
                 REDIRECT_URL_PREFIX + "/pay-penalty/company/" + companyNumber + "/penalty/"
@@ -314,7 +333,6 @@ class PenaltyDetailsServiceImplTest {
 
         assertRedirect(serviceResponse, expectedRedirectUrl, companyNumber);
     }
-
 
     @Test
     @DisplayName("Post Details failure - penalty has legal fees (DCA)")
@@ -325,12 +343,13 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, PENALTY_IN_DCA_PATH, COMPANY_NUMBER);
     }
-
 
     @Test
     @DisplayName("Post Details failure - penalty has payment pending")
@@ -341,12 +360,13 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, PENALTY_PAYMENT_IN_PROGRESS_PATH, COMPANY_NUMBER);
     }
-
 
     @Test
     @DisplayName("Post Details failure - penalty is already paid")
@@ -357,12 +377,13 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, ALREADY_PAID_PATH, COMPANY_NUMBER);
     }
-
 
     @Test
     @DisplayName("Post Details failure - penalty has negative outstanding amount")
@@ -373,12 +394,13 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, ONLINE_PAYMENT_UNAVAILABLE_PATH, COMPANY_NUMBER);
     }
-
 
     @Test
     @DisplayName("Post Details failure - penalty has been partially paid")
@@ -389,7 +411,9 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, ONLINE_PAYMENT_UNAVAILABLE_PATH, COMPANY_NUMBER);
@@ -404,7 +428,9 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, ONLINE_PAYMENT_UNAVAILABLE_PATH, COMPANY_NUMBER);
@@ -418,7 +444,9 @@ class PenaltyDetailsServiceImplTest {
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF, LATE_FILING.name()), false,
+                        buildEnterDetails(COMPANY_NUMBER, PENALTY_REF,
+                                LATE_FILING_PENALTY_REFERENCE_REGEX, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH, LATE_FILING_PENALTY_REFERENCE_TYPE),
+                        false,
                         enterDetailsControllerClass);
 
         assertRedirect(serviceResponse, INSTALMENT_PLAN_PATH, COMPANY_NUMBER);
@@ -426,21 +454,23 @@ class PenaltyDetailsServiceImplTest {
 
     @ParameterizedTest
     @CsvSource({
-            "LATE_FILING, 12345678, A1234567",
-            "SANCTIONS, 12345678, P1234567",
-            "SANCTIONS_ROE, OE123456, U1234567"
+            "^[Aa]\\d{7}$,A,LATE_FILING,12345678,A1234567",
+            "^[Pp]\\d{7}$,P,SANCTIONS,12345678,P1234567",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,OE123456,U1234567"
     })
     @DisplayName("Post Details successfully")
-    void postDetailsSuccessfully(String penaltyReferenceName, String companyNumber,
-            String penaltyRef) throws Exception {
+    void postDetailsSuccessfully(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String companyNumber, String penaltyRef) throws ServiceException {
         configureAppendCompanyNumber(companyNumber);
-        configureValidPenalty(companyNumber, penaltyRef);
+        configureValidPenalty(companyNumber, penaltyRef, penaltyReferenceType);
         when(mockNavigatorService.getNextControllerRedirect(any(), any(), any())).thenReturn(
                 NEXT_CONTROLLER_PATH);
 
         PPSServiceResponse serviceResponse = penaltyDetailsService
                 .postEnterDetails(
-                        buildEnterDetails(companyNumber, penaltyRef, penaltyReferenceName), false,
+                        buildEnterDetails(companyNumber, penaltyRef,
+                                penaltyReferenceRegex, penaltyReferenceStartsWith, penaltyReferenceType),
+                        false,
                         enterDetailsControllerClass);
 
         assertPostEnterDetailsSuccess(serviceResponse, companyNumber);
@@ -452,22 +482,24 @@ class PenaltyDetailsServiceImplTest {
     }
 
     private EnterDetails buildEnterDetails(String companyNumber, String penaltyRef,
-            String penaltyRefName) {
+            String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType) {
         EnterDetails enterDetails = new EnterDetails();
-        enterDetails.setPenaltyRef(penaltyRef);
+        enterDetails.setPenaltyReferenceRegex(penaltyReferenceRegex);
+        enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+        enterDetails.setPenaltyReferenceType(penaltyReferenceType);
         enterDetails.setCompanyNumber(companyNumber);
-        enterDetails.setPenaltyReferenceName(penaltyRefName);
+        enterDetails.setPenaltyRef(penaltyRef);
 
         return enterDetails;
     }
 
-    private void configureValidPenalty(String companyNumber, String penaltyRef)
+    private void configureValidPenalty(String companyNumber, String penaltyRef, String penaltyReferenceType)
             throws ServiceException {
         List<FinancialPenalty> validFinancialPenalties = new ArrayList<>();
         validFinancialPenalties.add(
                 PPSTestUtility.validFinancialPenalty(penaltyRef, now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef))
+        when(mockPenaltyPaymentService.getFinancialPenalties(companyNumber, penaltyRef, penaltyReferenceType))
                 .thenReturn(validFinancialPenalties);
     }
 
@@ -477,7 +509,7 @@ class PenaltyDetailsServiceImplTest {
         dcaFinancialPenalty.add(
                 PPSTestUtility.dcaFinancialPenalty(PENALTY_REF, now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(dcaFinancialPenalty);
     }
 
@@ -487,7 +519,7 @@ class PenaltyDetailsServiceImplTest {
         paymentPendingFinancialPenalty.add(
                 PPSTestUtility.paymentPendingFinancialPenalty(PENALTY_REF));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(paymentPendingFinancialPenalty);
     }
 
@@ -497,7 +529,7 @@ class PenaltyDetailsServiceImplTest {
         paidFinancialPenalty.add(PPSTestUtility.paidFinancialPenalty(PENALTY_REF,
                 now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(paidFinancialPenalty);
     }
 
@@ -507,7 +539,7 @@ class PenaltyDetailsServiceImplTest {
         negativeOutstandingFinancialPenalty.add(PPSTestUtility.negativeOustandingFinancialPenalty(
                 PENALTY_REF, now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(negativeOutstandingFinancialPenalty);
     }
 
@@ -517,7 +549,7 @@ class PenaltyDetailsServiceImplTest {
         partialPaidFinancialPenalty.add(PPSTestUtility.partialPaidFinancialPenalty(PENALTY_REF,
                 now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(partialPaidFinancialPenalty);
     }
 
@@ -527,7 +559,7 @@ class PenaltyDetailsServiceImplTest {
         disabledFinancialPenalty.add(PPSTestUtility.disabledFinancialPenalty(PENALTY_REF,
                 now().minusYears(1).toString()));
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(disabledFinancialPenalty);
     }
 
@@ -552,7 +584,7 @@ class PenaltyDetailsServiceImplTest {
         );
         instalmentPlanPenalty.add(instalmentPlanTransaction);
 
-        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF))
+        when(mockPenaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .thenReturn(instalmentPlanPenalty);
     }
 

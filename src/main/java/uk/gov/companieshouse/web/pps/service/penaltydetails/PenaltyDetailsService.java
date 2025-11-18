@@ -5,7 +5,8 @@ import uk.gov.companieshouse.web.pps.models.EnterDetails;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 public interface PenaltyDetailsService {
-    PPSServiceResponse getEnterDetails(String penaltyReferenceStartsWith) throws IllegalArgumentException;
+
+    PPSServiceResponse getEnterDetails(String penaltyReferenceStartsWith) throws ServiceException;
 
     PPSServiceResponse postEnterDetails(EnterDetails enterDetails, boolean hasBindingErrors, Class<?> clazz) throws ServiceException;
 }

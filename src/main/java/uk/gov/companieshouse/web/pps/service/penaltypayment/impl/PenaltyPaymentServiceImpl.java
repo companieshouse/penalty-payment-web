@@ -17,7 +17,6 @@ import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.api.ApiClientService;
 import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
-import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,20 +50,19 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     }
 
     @Override
-    public List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef) throws ServiceException {
+    public List<FinancialPenalty> getFinancialPenalties(String companyNumber, String penaltyRef, String penaltyReferenceType) throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         String requestId = apiClient.getHttpClient().getRequestId();
         FinancialPenalties financialPenalties;
 
         try {
-            String penaltyReferenceType = PenaltyUtils.getPenaltyReferenceType(penaltyRef).name();
             String uri = GET_FINANCIAL_PENALTIES_URI.expand(companyNumber, penaltyReferenceType).toString();
             LOGGER.debug(String.format("[%s]: Sending request to API [%s] to fetch financial penalties (%s) for company number %s and penalty ref %s",
                 requestId, uri, penaltyReferenceType, companyNumber, penaltyRef));
             financialPenalties = apiClient.financialPenalty().get(uri).execute().getData();
         } catch (ApiErrorResponseException ex) {
             throw new ServiceException(String.format("[%s]: Error retrieving financial penalties from API", requestId), ex);
-        } catch (IllegalArgumentException | URIValidationException ex) {
+        } catch (URIValidationException ex) {
             throw new ServiceException(String.format("[%s]: Invalid URI for financial penalties", requestId), ex);
         }
 

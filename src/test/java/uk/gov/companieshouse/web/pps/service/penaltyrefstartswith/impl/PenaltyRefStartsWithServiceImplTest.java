@@ -31,10 +31,12 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_U
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SIGN_OUT_PATH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.getPenaltyReferenceType;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -57,7 +59,7 @@ class PenaltyRefStartsWithServiceImplTest {
     @Test
     @DisplayName("Get Penalty ref starts with sanctions disabled - redirect late filing details")
     void getPenaltyRefStartsWithSanctionsDisabled() throws ServiceException {
-        var lateFilingPenaltyReferenceType = getPenaltyReferenceType(LATE_FILING);
+        var lateFilingPenaltyReferenceType = getPenaltyReferenceType(LATE_FILING_PENALTY_REFERENCE_TYPE, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH);
         when(mockPenaltyReferenceTypes.getEnabled())
                 .thenReturn(List.of(lateFilingPenaltyReferenceType));
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
@@ -76,8 +78,8 @@ class PenaltyRefStartsWithServiceImplTest {
     @DisplayName("Get Penalty ref starts with - successful")
     void getPenaltyRefStartsWithSuccessful() throws ServiceException {
         when(mockPenaltyReferenceTypes.getEnabled()).thenReturn(
-                List.of(getPenaltyReferenceType(LATE_FILING),
-                        getPenaltyReferenceType(SANCTIONS)));
+                List.of(getPenaltyReferenceType(LATE_FILING_PENALTY_REFERENCE_TYPE, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH),
+                        getPenaltyReferenceType(SANCTIONS_PENALTY_REFERENCE_TYPE, SANCTIONS_PENALTY_REFERENCE_STARTS_WITH)));
         when(mockFinanceServiceHealthCheck.checkIfAvailable()).thenReturn(new PPSServiceResponse());
 
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
@@ -99,8 +101,8 @@ class PenaltyRefStartsWithServiceImplTest {
     @DisplayName("Post Penalty ref starts with error - successful")
     void postPenaltyRefStartsWithErrorSuccessful() throws ServiceException {
         when(mockPenaltyReferenceTypes.getEnabled()).thenReturn(
-                List.of(getPenaltyReferenceType(LATE_FILING),
-                        getPenaltyReferenceType(SANCTIONS)));
+                List.of(getPenaltyReferenceType(LATE_FILING_PENALTY_REFERENCE_TYPE, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH),
+                        getPenaltyReferenceType(SANCTIONS_PENALTY_REFERENCE_TYPE, SANCTIONS_PENALTY_REFERENCE_STARTS_WITH)));
         penaltyRefStartsWithServiceImpl = new PenaltyRefStartsWithServiceImpl(
                 mockPenaltyReferenceTypes, mockPenaltyConfigurationProperties, mockFinanceServiceHealthCheck);
 
