@@ -2,16 +2,11 @@ package uk.gov.companieshouse.web.pps.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @ConfigurationProperties("penalty")
 public class PenaltyConfigurationProperties {
 
-    private List<PenaltyReference> allowedRefStartsWith = new ArrayList<>();
     private String refStartsWithPath;
     private String enterDetailsPath;
     private String unscheduledServiceDownPath;
@@ -23,15 +18,6 @@ public class PenaltyConfigurationProperties {
     private String signedOutUrl;
     private String govUkPayPenaltyUrl;
     private String pageNotFoundPath;
-
-    public List<PenaltyReference> getAllowedRefStartsWith() {
-        return allowedRefStartsWith;
-    }
-
-    public void setAllowedRefStartsWith(
-            List<PenaltyReference> allowedRefStartsWith) {
-        this.allowedRefStartsWith = allowedRefStartsWith;
-    }
 
     public String getRefStartsWithPath() {
         return refStartsWithPath;

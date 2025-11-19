@@ -7,7 +7,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,7 +20,6 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 import java.util.HashMap;
@@ -103,22 +101,26 @@ class EnterDetailsControllerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "^[Aa]\\d{7}$,A,LATE_FILING",
+            "^[Pp]\\d{7}$,P,SANCTIONS",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE"
+    })
     @DisplayName("Get Details success path")
-    void getEnterDetailsSuccessPath(PenaltyReference penaltyReference) throws Exception {
+    void getEnterDetailsSuccessPath(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType) throws Exception {
 
         var enterDetails = new EnterDetails();
-        enterDetails.setPenaltyReferenceType(penaltyReference.name());
+        enterDetails.setPenaltyReferenceRegex(penaltyReferenceRegex);
+        enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+        enterDetails.setPenaltyReferenceType(penaltyReferenceType);
 
         var serviceResponse = buildServiceResponse(true, true);
         serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
 
-        var startsWith = penaltyReference.getStartsWith();
-
-        when(mockPenaltyDetailsService.getEnterDetails(startsWith)).thenReturn(serviceResponse);
+        when(mockPenaltyDetailsService.getEnterDetails(penaltyReferenceStartsWith)).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", startsWith))
+                        .queryParam("ref-starts-with", penaltyReferenceStartsWith))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
