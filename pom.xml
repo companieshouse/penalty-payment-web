@@ -11,14 +11,13 @@
         <artifactId>companies-house-parent</artifactId>
         <version>2.1.12</version>
         <relativePath/>
-
     </parent>
     <properties>
         <java.version>21</java.version>
-        <structured-logging.version>3.0.36</structured-logging.version>
+        <structured-logging.version>3.0.42</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>4.1.0</common-web-java.version>
-        <java-session-handler.version>4.1.8</java-session-handler.version>
+        <java-session-handler.version>4.1.12</java-session-handler.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <!-- CVE-2025-48924 -->
         <commons-lang3.version>3.18.0</commons-lang3.version>
@@ -29,8 +28,8 @@
         <api-sdk-java.version>6.5.0</api-sdk-java.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.5.6</spring-boot-dependencies.version>
-        <spring-boot-maven-plugin.version>3.5.6</spring-boot-maven-plugin.version>
+        <spring-boot-dependencies.version>3.5.8</spring-boot-dependencies.version>
+        <spring-boot-maven-plugin.version>3.5.8</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
@@ -77,6 +76,12 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -131,6 +136,12 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>java-session-handler</artifactId>
             <version>${java-session-handler.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -169,6 +180,12 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-java</artifactId>
             <version>${api-sdk-java.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Security dependencies -->
         <dependency>
