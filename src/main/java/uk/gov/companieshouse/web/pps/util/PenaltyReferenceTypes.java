@@ -1,14 +1,15 @@
 package uk.gov.companieshouse.web.pps.util;
 
+import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
+import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
-import uk.gov.companieshouse.web.pps.exception.ServiceException;
-import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 
 @Component
 public class PenaltyReferenceTypes {
@@ -47,12 +48,6 @@ public class PenaltyReferenceTypes {
             throws ServiceException {
         String referenceStartsWith = penaltyReference.strip().substring(0, 1).toUpperCase();
         return fromReferenceStartsWith(referenceStartsWith);
-    }
-
-    public boolean isPenaltyReferenceEnabled(String penaltyReference)
-            throws ServiceException {
-        String referenceStartsWith = penaltyReference.strip().substring(0, 1).toUpperCase();
-        return fromReferenceStartsWith(referenceStartsWith).isPresent();
     }
 
 }

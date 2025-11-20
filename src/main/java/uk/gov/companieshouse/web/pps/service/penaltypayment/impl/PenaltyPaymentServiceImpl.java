@@ -2,6 +2,7 @@ package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriTemplate;
 import uk.gov.companieshouse.api.ApiClient;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
+import static uk.gov.companieshouse.web.pps.config.CacheConfig.PENALTY_REFERENCE_TYPES_CACHE;
 
 @Service
 public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
@@ -142,11 +144,15 @@ public class PenaltyPaymentServiceImpl implements PenaltyPaymentService {
     }
 
     @Override
+    @Cacheable(value = PENALTY_REFERENCE_TYPES_CACHE)
     public PenaltyReferenceType[] getPenaltyReferenceTypes() throws ServiceException {
         ApiClient apiClient = apiClientService.getPublicApiClient();
         String requestId = apiClient.getHttpClient().getRequestId();
+        String uri = PENALTY_REFERENCE_TYPES_URI.toString();
+        LOGGER.debug(String.format("[%s]: Sending request to API [%s] to get penalty reference types",
+                requestId, uri));
         try {
-            return apiClient.penaltyReferenceTypesResourceHandler().get(PENALTY_REFERENCE_TYPES_URI.toString()).execute().getData();
+            return apiClient.penaltyReferenceTypesResourceHandler().get(uri).execute().getData();
         } catch (URIValidationException e) {
             throw new ServiceException(String.format("[%s]: Invalid URI for Get penalty reference types", requestId), e);
         } catch (ApiErrorResponseException e) {
