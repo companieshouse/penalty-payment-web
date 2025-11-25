@@ -41,7 +41,7 @@ public final class PenaltyUtils {
                 .format(DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK));
     }
 
-    public static PenaltyReference getPenaltyReferenceType(final String penaltyRef) {
+    public static PenaltyReference getPenaltyReferenceEnum(final String penaltyRef) {
         if (StringUtils.isBlank(penaltyRef)) {
             throw new IllegalArgumentException("Penalty Reference is null or empty");
         }

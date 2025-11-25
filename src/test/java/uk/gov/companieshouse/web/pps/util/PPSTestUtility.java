@@ -9,8 +9,11 @@ import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltie
 import uk.gov.companieshouse.api.model.financialpenalty.PayableFinancialPenaltySession;
 import uk.gov.companieshouse.api.model.financialpenalty.PayableStatus;
 import uk.gov.companieshouse.api.model.financialpenalty.Payment;
+import uk.gov.companieshouse.api.model.financialpenalty.PenaltyReferenceType;
 import uk.gov.companieshouse.api.model.financialpenalty.TransactionPayableFinancialPenalty;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +39,13 @@ public class PPSTestUtility {
     public static final String CS_PENALTY_REF = "P1234567";
     public static final String ROE_PENALTY_REF = "U1234567";
     public static final String PAYABLE_REF = "PR_123456";
+    public static final String LATE_FILING_PENALTY_REFERENCE_REGEX = "^[Aa]\\d{7}$";
+    public static final String LATE_FILING_PENALTY_REFERENCE_STARTS_WITH = "A";
+    public static final String SANCTIONS_PENALTY_REFERENCE_STARTS_WITH = "P";
+    public static final String SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH = "U";
+    public static final String LATE_FILING_PENALTY_REFERENCE_TYPE = "LATE_FILING";
+    public static final String SANCTIONS_PENALTY_REFERENCE_TYPE = "SANCTIONS";
+    public static final String SANCTIONS_ROE_PENALTY_REFERENCE_TYPE = "SANCTIONS_ROE";
 
     public static final String PENALTY_TYPE = "penalty";
     public static final String OTHER_TYPE = "other";
@@ -274,6 +284,14 @@ public class PPSTestUtility {
         financeHealthcheck.setMessage(FinanceHealthcheckStatus.HEALTHY.getStatus());
 
         return financeHealthcheck;
+    }
+
+    public static PenaltyReferenceType getPenaltyReferenceType(String penaltyRefType, String penaltyRefStartsWith) {
+        PenaltyReferenceType penaltyReferenceType = new PenaltyReferenceType();
+        penaltyReferenceType.setEnabledFrom(ZonedDateTime.now(ZoneOffset.UTC));
+        penaltyReferenceType.setReferenceType(penaltyRefType);
+        penaltyReferenceType.setReferenceStartsWith(penaltyRefStartsWith);
+        return penaltyReferenceType;
     }
 
 }

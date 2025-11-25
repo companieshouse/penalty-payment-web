@@ -17,7 +17,6 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +35,13 @@ import static uk.gov.companieshouse.web.pps.service.ServiceConstants.AVAILABLE_P
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_CHOICE_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_ROE_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS_ROE;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.getPenaltyReferenceType;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -83,13 +85,13 @@ class PenaltyRefStartsWithControllerTest {
     @DisplayName("Get 'penaltyRefStartsWith' screen - redirect late filing details")
     void getPenaltyRefStartsWithSanctionsDisabled() throws Exception {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING_PENALTY_REFERENCE_STARTS_WITH));
 
         when(mockPenaltyRefStartsWithService.viewPenaltyRefStartsWith()).thenReturn(mockServiceResponse);
 
         this.mockMvc.perform(get(mockPenaltyConfigurationProperties.getRefStartsWithPath()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(setUpEnterDetailsUrl(LATE_FILING)));
+                .andExpect(view().name(setUpEnterDetailsUrl(LATE_FILING_PENALTY_REFERENCE_STARTS_WITH)));
     }
 
     @Test
@@ -161,15 +163,15 @@ class PenaltyRefStartsWithControllerTest {
 
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(LATE_FILING_PENALTY_REFERENCE_STARTS_WITH));
 
         when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         this.mockMvc.perform(post(mockPenaltyConfigurationProperties.getRefStartsWithPath())
-                        .param(SELECTED_PENALTY_REFERENCE, LATE_FILING.name()))
+                        .param(SELECTED_PENALTY_REFERENCE, LATE_FILING_PENALTY_REFERENCE_TYPE))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(setUpEnterDetailsUrl(LATE_FILING)));
+                .andExpect(view().name(setUpEnterDetailsUrl(LATE_FILING_PENALTY_REFERENCE_STARTS_WITH)));
     }
 
     @Test
@@ -177,15 +179,15 @@ class PenaltyRefStartsWithControllerTest {
     void postPenaltyRefStartsWithWhenSanctionSelected() throws Exception {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS_PENALTY_REFERENCE_STARTS_WITH));
 
         when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         this.mockMvc.perform(post(mockPenaltyConfigurationProperties.getRefStartsWithPath())
-                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS.name()))
+                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS_PENALTY_REFERENCE_STARTS_WITH))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(setUpEnterDetailsUrl(SANCTIONS)));
+                .andExpect(view().name(setUpEnterDetailsUrl(SANCTIONS_PENALTY_REFERENCE_STARTS_WITH)));
     }
 
     @Test
@@ -193,19 +195,19 @@ class PenaltyRefStartsWithControllerTest {
     void postPenaltyRefStartsWithWhenRoeSelected() throws Exception {
         PPSServiceResponse mockServiceResponse = new PPSServiceResponse();
         mockServiceResponse.setBaseModelAttributes(setBackUrl());
-        mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS_ROE));
+        mockServiceResponse.setUrl(setUpEnterDetailsUrl(SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH));
 
         when(mockPenaltyRefStartsWithService.postPenaltyRefStartsWithNext(any(PenaltyReferenceChoice.class))).thenReturn(mockServiceResponse);
 
         this.mockMvc.perform(post(mockPenaltyConfigurationProperties.getRefStartsWithPath())
-                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS_ROE.name()))
+                        .param(SELECTED_PENALTY_REFERENCE, SANCTIONS_ROE_PENALTY_REFERENCE_TYPE))
                 .andExpect(model().errorCount(0))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name(setUpEnterDetailsUrl(SANCTIONS_ROE)));
+                .andExpect(view().name(setUpEnterDetailsUrl(SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH)));
     }
 
-    private String setUpEnterDetailsUrl(PenaltyReference penaltyReference) {
-        return REDIRECT_URL_PREFIX + mockPenaltyConfigurationProperties.getEnterDetailsPath() + String.format(REF_STARTS_WITH_PATH, penaltyReference.getStartsWith());
+    private String setUpEnterDetailsUrl(String referenceStartsWith) {
+        return REDIRECT_URL_PREFIX + mockPenaltyConfigurationProperties.getEnterDetailsPath() + String.format(REF_STARTS_WITH_PATH, referenceStartsWith);
     }
 
     private Map<String, String> setBackUrl() {
@@ -215,18 +217,18 @@ class PenaltyRefStartsWithControllerTest {
     }
 
     private Map<String, Object> setModelForViewPenaltyRefStartWith() {
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(
-                AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        modelAttributes.put(
+        return Map.of(AVAILABLE_PENALTY_REF_ATTR, List.of(
+                        getPenaltyReferenceType(LATE_FILING_PENALTY_REFERENCE_TYPE, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH),
+                        getPenaltyReferenceType(SANCTIONS_ROE_PENALTY_REFERENCE_TYPE, SANCTIONS_PENALTY_REFERENCE_STARTS_WITH),
+                        getPenaltyReferenceType(SANCTIONS_ROE_PENALTY_REFERENCE_TYPE, SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH)),
                 PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
-        return modelAttributes;
     }
 
     private Map<String, Object> setModelForPostPenaltyRefStartWithError() {
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(
-                AVAILABLE_PENALTY_REF_ATTR, List.of(LATE_FILING, SANCTIONS, SANCTIONS_ROE));
-        return modelAttributes;
+        return Map.of(AVAILABLE_PENALTY_REF_ATTR, List.of(
+                getPenaltyReferenceType(LATE_FILING_PENALTY_REFERENCE_TYPE, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH),
+                getPenaltyReferenceType(SANCTIONS_ROE_PENALTY_REFERENCE_TYPE, SANCTIONS_PENALTY_REFERENCE_STARTS_WITH),
+                getPenaltyReferenceType(SANCTIONS_ROE_PENALTY_REFERENCE_TYPE, SANCTIONS_ROE_PENALTY_REFERENCE_STARTS_WITH)));
     }
+
 }

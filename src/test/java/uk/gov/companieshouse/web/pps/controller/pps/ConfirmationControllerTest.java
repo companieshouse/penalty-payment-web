@@ -36,8 +36,8 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.pps.ConfirmationController.CONFIRMATION_PAGE_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NAME;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
@@ -143,7 +143,7 @@ class ConfirmationControllerTest {
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put(PENALTY_REF_ATTR, penaltyTestData.penaltyRef());
         modelAttributes.put(PENALTY_REFERENCE_NAME_ATTR,
-                PenaltyUtils.getPenaltyReferenceType(penaltyTestData.penaltyRef()).name());
+                PenaltyUtils.getPenaltyReferenceEnum(penaltyTestData.penaltyRef()).name());
         modelAttributes.put(COMPANY_NAME_ATTR, COMPANY_NAME);
         modelAttributes.put(COMPANY_NUMBER_ATTR, penaltyTestData.customerCode());
         modelAttributes.put(REASON_FOR_PENALTY_ATTR, penaltyTestData.reasonForPenalty());

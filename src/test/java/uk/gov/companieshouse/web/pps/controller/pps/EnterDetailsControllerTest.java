@@ -7,7 +7,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,7 +20,6 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
 import uk.gov.companieshouse.web.pps.validation.EnterDetailsValidator;
 
 import java.util.HashMap;
@@ -39,16 +37,20 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 import static uk.gov.companieshouse.web.pps.controller.BaseController.BACK_LINK_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.controller.pps.EnterDetailsController.ENTER_DETAILS_TEMPLATE_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.COMPANY_NUMBER_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_REGEX_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_STARTS_WITH_ATTR;
+import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_TYPE_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REF_ATTR;
-import static uk.gov.companieshouse.web.pps.service.ServiceConstants.PENALTY_REFERENCE_NAME_ATTR;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SERVICE_UNAVAILABLE_VIEW_NAME;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.BACK_LINK_MODEL_ATTR;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_REGEX;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_STARTS_WITH;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_STARTS_WITH;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.UNSCHEDULED_SERVICE_DOWN_PATH;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -99,22 +101,26 @@ class EnterDetailsControllerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(PenaltyReference.class)
+    @CsvSource({
+            "^[Aa]\\d{7}$,A,LATE_FILING",
+            "^[Pp]\\d{7}$,P,SANCTIONS",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE"
+    })
     @DisplayName("Get Details success path")
-    void getEnterDetailsSuccessPath(PenaltyReference penaltyReference) throws Exception {
+    void getEnterDetailsSuccessPath(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType) throws Exception {
 
         var enterDetails = new EnterDetails();
-        enterDetails.setPenaltyReferenceName(penaltyReference.name());
+        enterDetails.setPenaltyReferenceRegex(penaltyReferenceRegex);
+        enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+        enterDetails.setPenaltyReferenceType(penaltyReferenceType);
 
         var serviceResponse = buildServiceResponse(true, true);
         serviceResponse.setModelAttributes(Map.of(ENTER_DETAILS_MODEL_ATTR, enterDetails));
 
-        var startsWith = penaltyReference.getStartsWith();
-
-        when(mockPenaltyDetailsService.getEnterDetails(startsWith)).thenReturn(serviceResponse);
+        when(mockPenaltyDetailsService.getEnterDetails(penaltyReferenceStartsWith)).thenReturn(serviceResponse);
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
-                        .queryParam("ref-starts-with", startsWith))
+                        .queryParam("ref-starts-with", penaltyReferenceStartsWith))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
                 .andExpect(model().attributeExists(ENTER_DETAILS_MODEL_ATTR))
@@ -127,7 +133,7 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenHealthCheckFails(String viewName) throws Exception {
 
         var serviceResponse = buildServiceResponse(false, false);
-        var startsWith = LATE_FILING.getStartsWith();
+        var startsWith = LATE_FILING_PENALTY_REFERENCE_STARTS_WITH;
         serviceResponse.setUrl(viewName);
 
         when(mockPenaltyDetailsService.getEnterDetails(startsWith)).thenReturn(serviceResponse);
@@ -146,7 +152,7 @@ class EnterDetailsControllerTest {
 
         when(mockPenaltyConfigurationProperties.getUnscheduledServiceDownPath()).thenReturn(UNSCHEDULED_SERVICE_DOWN_PATH);
         when(mockPenaltyDetailsService.getEnterDetails("Z"))
-                .thenThrow(new IllegalArgumentException("Starts with is invalid", new Exception()));
+                .thenThrow(new ServiceException("Starts with is invalid", new Exception()));
 
         this.mockMvc.perform(get(ENTER_DETAILS_PATH)
                         .queryParam("ref-starts-with", "Z"))
@@ -161,7 +167,7 @@ class EnterDetailsControllerTest {
     void getEnterDetailsWhenStartsWithIsInvalid() throws Exception {
 
         var serviceResponse = buildServiceResponse(false, false);
-        var startsWith = SANCTIONS.getStartsWith();
+        var startsWith = SANCTIONS_PENALTY_REFERENCE_STARTS_WITH;
         var url = REDIRECT_URL_PREFIX + UNSCHEDULED_SERVICE_DOWN_PATH;
         serviceResponse.setUrl(url);
 
@@ -178,12 +184,13 @@ class EnterDetailsControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "LATE_FILING, 12345678, A1234567",
-            "SANCTIONS, 12345678, P1234567",
-            "SANCTIONS_ROE, OE123456, U1234567"
+            "^[Aa]\\d{7}$,A,LATE_FILING,12345678,A1234567",
+            "^[Pp]\\d{7}$,P,SANCTIONS,12345678,P1234567",
+            "^[Uu]\\d{7}$,U,SANCTIONS_ROE,OE123456,U1234567"
     })
     @DisplayName("Post Details success path")
-    void postRequestSuccessPath(String penaltyReferenceName, String penaltyRef, String companyNumber) throws Exception {
+    void postRequestSuccessPath(String penaltyReferenceRegex, String penaltyReferenceStartsWith, String penaltyReferenceType,
+            String companyNumber, String penaltyRef) throws Exception {
         var serviceResponse = buildServiceResponse(true, true);
         serviceResponse.setUrl(NEXT_CONTROLLER_PATH);
 
@@ -191,7 +198,9 @@ class EnterDetailsControllerTest {
                 .thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTR, penaltyReferenceName)
+                        .param(PENALTY_REFERENCE_REGEX_ATTR, penaltyReferenceRegex)
+                        .param(PENALTY_REFERENCE_STARTS_WITH_ATTR, penaltyReferenceStartsWith)
+                        .param(PENALTY_REFERENCE_TYPE_ATTR, penaltyReferenceType)
                         .param(COMPANY_NUMBER_ATTR, companyNumber)
                         .param(PENALTY_REF_ATTR, penaltyRef))
                 .andExpect(status().is3xxRedirection())
@@ -207,7 +216,9 @@ class EnterDetailsControllerTest {
         when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_REGEX_ATTR, "^[Aa]\\d{7}$")
+                        .param(PENALTY_REFERENCE_STARTS_WITH_ATTR, "A")
+                        .param(PENALTY_REFERENCE_TYPE_ATTR, "LATE_FILING")
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().isOk())
                 .andExpect(view().name(ENTER_DETAILS_TEMPLATE_NAME))
@@ -226,7 +237,9 @@ class EnterDetailsControllerTest {
         when(mockPenaltyDetailsService.postEnterDetails(any(), anyBoolean(), any())).thenReturn(serviceResponse);
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_REGEX_ATTR, LATE_FILING_PENALTY_REFERENCE_REGEX)
+                        .param(PENALTY_REFERENCE_STARTS_WITH_ATTR, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH)
+                        .param(PENALTY_REFERENCE_TYPE_ATTR, LATE_FILING_PENALTY_REFERENCE_TYPE)
                         .param(COMPANY_NUMBER_ATTR, COMPANY_NUMBER)
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().isOk())
@@ -244,7 +257,9 @@ class EnterDetailsControllerTest {
                 .thenThrow(new ServiceException("Failed to get penalties", new Exception()));
 
         this.mockMvc.perform(post(ENTER_DETAILS_PATH)
-                        .param(PENALTY_REFERENCE_NAME_ATTR, LATE_FILING.name())
+                        .param(PENALTY_REFERENCE_REGEX_ATTR, LATE_FILING_PENALTY_REFERENCE_REGEX)
+                        .param(PENALTY_REFERENCE_STARTS_WITH_ATTR, LATE_FILING_PENALTY_REFERENCE_STARTS_WITH)
+                        .param(PENALTY_REFERENCE_TYPE_ATTR, LATE_FILING_PENALTY_REFERENCE_TYPE)
                         .param(COMPANY_NUMBER_ATTR, COMPANY_NUMBER)
                         .param(PENALTY_REF_ATTR, PENALTY_REF))
                 .andExpect(status().is3xxRedirection())

@@ -5,15 +5,14 @@ import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.web.pps.PPSWebApplication;
 import uk.gov.companieshouse.web.pps.config.PenaltyConfigurationProperties;
+import uk.gov.companieshouse.web.pps.exception.ServiceException;
 import uk.gov.companieshouse.web.pps.models.PenaltyReferenceChoice;
 import uk.gov.companieshouse.web.pps.service.finance.FinanceServiceHealthCheck;
 import uk.gov.companieshouse.web.pps.service.penaltyrefstartswith.PenaltyRefStartsWithService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyReferenceTypes;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
@@ -27,25 +26,21 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     protected static final Logger LOGGER = LoggerFactory
             .getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
 
-    private final List<PenaltyReference> availablePenaltyReference;
+    private final PenaltyReferenceTypes penaltyReferenceTypes;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
 
     public PenaltyRefStartsWithServiceImpl(
+            PenaltyReferenceTypes penaltyReferenceTypes,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
-            FeatureFlagChecker featureFlagChecker,
-            FinanceServiceHealthCheck financeServiceHealthCheck
-    ) {
+            FinanceServiceHealthCheck financeServiceHealthCheck) {
+        this.penaltyReferenceTypes = penaltyReferenceTypes;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.financeServiceHealthCheck = financeServiceHealthCheck;
-        availablePenaltyReference = penaltyConfigurationProperties.getAllowedRefStartsWith()
-                .stream()
-                .filter(featureFlagChecker::isPenaltyRefEnabled)
-                .toList();
     }
 
     @Override
-    public PPSServiceResponse viewPenaltyRefStartsWith() {
+    public PPSServiceResponse viewPenaltyRefStartsWith() throws ServiceException {
         var healthCheck = financeServiceHealthCheck.checkIfAvailable();
         var url = healthCheck.getUrl();
 
@@ -55,13 +50,15 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
             healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
             serviceResponse.setUrl(url.get());
         } else {
-            LOGGER.debug(
-                    String.format("Available penalty reference types: %s",availablePenaltyReference));
-            if (availablePenaltyReference.size() == 1) {
-                return setUpEnterDetails();
+            var availablePenaltyReferenceTypes = penaltyReferenceTypes.getEnabled();
+            LOGGER.debug(String.format("Available penalty reference types: %s", availablePenaltyReferenceTypes));
+            if (availablePenaltyReferenceTypes.size() == 1) {
+                return setUpEnterDetails(availablePenaltyReferenceTypes.getFirst().getReferenceStartsWith());
             }
 
-            serviceResponse.setModelAttributes(setModelForViewPenaltyRefStartWith());
+            serviceResponse.setModelAttributes(Map.of(
+                    AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReferenceTypes,
+                    PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice()));
             serviceResponse.setBaseModelAttributes(setBackUrl());
         }
 
@@ -69,10 +66,9 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     }
 
     @Override
-    public PPSServiceResponse postPenaltyRefStartsWithError() {
+    public PPSServiceResponse postPenaltyRefStartsWithError() throws ServiceException {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
-
-        serviceResponse.setModelAttributes(setModelForPostPenaltyRefStartWith());
+        serviceResponse.setModelAttributes(Map.of(AVAILABLE_PENALTY_REF_ATTR, penaltyReferenceTypes.getEnabled()));
         serviceResponse.setBaseModelAttributes(setBackUrl());
         return serviceResponse;
     }
@@ -80,40 +76,23 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
     @Override
     public PPSServiceResponse postPenaltyRefStartsWithNext(
             PenaltyReferenceChoice penaltyReferenceChoice) {
+        String referenceStartsWith = penaltyReferenceChoice.getSelectedPenaltyReference();
+        LOGGER.debug(String.format("Selected penalty reference starts with: %s",
+                referenceStartsWith));
 
-        PPSServiceResponse serviceResponse = new PPSServiceResponse();
-
-        PenaltyReference selectedPenaltyReference = penaltyReferenceChoice.getSelectedPenaltyReference();
-        LOGGER.debug(String.format("Selected penalty type: %s, starts with: %s",
-                selectedPenaltyReference.name(), selectedPenaltyReference.getStartsWith()));
-
-        serviceResponse.setUrl(
-                REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + selectedPenaltyReference.getStartsWith());
-        return serviceResponse;
-
-    }
-
-    private PPSServiceResponse setUpEnterDetails() {
         PPSServiceResponse serviceResponse = new PPSServiceResponse();
         serviceResponse.setUrl(
                 REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
-                        + "?ref-starts-with=" + availablePenaltyReference.getFirst()
-                        .getStartsWith());
+                        + "?ref-starts-with=" + referenceStartsWith);
         return serviceResponse;
     }
 
-    private Map<String, Object> setModelForViewPenaltyRefStartWith() {
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-        modelAttributes.put(PENALTY_REFERENCE_CHOICE_ATTR, new PenaltyReferenceChoice());
-        return modelAttributes;
-    }
-
-    private Map<String, Object> setModelForPostPenaltyRefStartWith() {
-        Map<String, Object> modelAttributes = new HashMap<>();
-        modelAttributes.put(AVAILABLE_PENALTY_REF_ATTR, availablePenaltyReference);
-        return modelAttributes;
+    private PPSServiceResponse setUpEnterDetails(String referenceStartsWith) {
+        PPSServiceResponse serviceResponse = new PPSServiceResponse();
+        serviceResponse.setUrl(
+                REDIRECT_URL_PREFIX + penaltyConfigurationProperties.getEnterDetailsPath()
+                        + "?ref-starts-with=" + referenceStartsWith);
+        return serviceResponse;
     }
 
     private Map<String, String> setBackUrl() {
@@ -121,4 +100,5 @@ public class PenaltyRefStartsWithServiceImpl implements PenaltyRefStartsWithServ
         baseModelAttributes.put(BACK_LINK_URL_ATTR, penaltyConfigurationProperties.getStartPath());
         return baseModelAttributes;
     }
+
 }

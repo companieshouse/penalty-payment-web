@@ -17,8 +17,7 @@ import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.penaltydetails.PenaltyDetailsService;
 import uk.gov.companieshouse.web.pps.service.penaltypayment.PenaltyPaymentService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
-import uk.gov.companieshouse.web.pps.util.FeatureFlagChecker;
-import uk.gov.companieshouse.web.pps.util.PenaltyReference;
+import uk.gov.companieshouse.web.pps.util.PenaltyReferenceTypes;
 import uk.gov.companieshouse.web.pps.util.PenaltyUtils;
 
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.UK;
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
@@ -42,42 +40,42 @@ import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
 @Service
 public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(
-            PPSWebApplication.APPLICATION_NAME_SPACE);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(PPSWebApplication.APPLICATION_NAME_SPACE);
     private static final String ONLINE_PAYMENT_UNAVAILABLE = "/online-payment-unavailable";
     private static final String PAYABLE_PENALTY = "Payable penalty ";
     private static final String PENALTY_IN_DCA = "/penalty-in-dca";
     private static final String PENALTY_PAID = "/penalty-paid";
     private static final String PENALTY_PAYMENT_IN_PROGRESS = "/penalty-payment-in-progress";
     private static final String INSTALMENT_PLAN = "/instalment-plan";
+
     private final CompanyService companyService;
-    private final FeatureFlagChecker featureFlagChecker;
     private final MessageSource messageSource;
     private final NavigatorService navigatorService;
     private final PenaltyConfigurationProperties penaltyConfigurationProperties;
     private final PenaltyPaymentService penaltyPaymentService;
     private final FinanceServiceHealthCheck financeServiceHealthCheck;
+    private final PenaltyReferenceTypes penaltyReferenceTypes;
 
     public PenaltyDetailsServiceImpl(
             CompanyService companyService,
-            FeatureFlagChecker featureFlagChecker,
             MessageSource messageSource,
             NavigatorService navigatorService,
             PenaltyConfigurationProperties penaltyConfigurationProperties,
             PenaltyPaymentService penaltyPaymentService,
-            FinanceServiceHealthCheck financeServiceHealthCheck) {
+            FinanceServiceHealthCheck financeServiceHealthCheck,
+            PenaltyReferenceTypes penaltyReferenceTypes) {
         this.companyService = companyService;
-        this.featureFlagChecker = featureFlagChecker;
         this.messageSource = messageSource;
         this.navigatorService = navigatorService;
         this.penaltyConfigurationProperties = penaltyConfigurationProperties;
         this.penaltyPaymentService = penaltyPaymentService;
         this.financeServiceHealthCheck = financeServiceHealthCheck;
+        this.penaltyReferenceTypes = penaltyReferenceTypes;
     }
 
     @Override
     public PPSServiceResponse getEnterDetails(String penaltyReferenceStartsWith)
-            throws IllegalArgumentException {
+            throws ServiceException {
         var healthCheck = financeServiceHealthCheck.checkIfAvailable();
         var url = healthCheck.getUrl();
 
@@ -87,18 +85,20 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
             healthCheck.getModelAttributes().ifPresent(serviceResponse::setModelAttributes);
             serviceResponse.setUrl(url.get());
         } else {
-            PenaltyReference penaltyReference = PenaltyReference.fromStartsWith(
-                    penaltyReferenceStartsWith);
-            if (FALSE.equals(featureFlagChecker.isPenaltyRefEnabled(penaltyReference))) {
-                serviceResponse.setUrl(REDIRECT_URL_PREFIX
-                        + penaltyConfigurationProperties.getUnscheduledServiceDownPath());
-            } else {
+            final var penaltyReferenceTypeOptional = penaltyReferenceTypes.fromReferenceStartsWith(penaltyReferenceStartsWith);
+            if (penaltyReferenceTypeOptional.isPresent()) {
+                final var penaltyReferenceType = penaltyReferenceTypeOptional.get();
                 var enterDetails = new EnterDetails();
-                enterDetails.setPenaltyReferenceName(penaltyReference.name());
+                enterDetails.setPenaltyReferenceStartsWith(penaltyReferenceStartsWith);
+                enterDetails.setPenaltyReferenceRegex(penaltyReferenceType.getReferenceRegex());
+                enterDetails.setPenaltyReferenceType(penaltyReferenceType.getReferenceType());
                 serviceResponse.setModelAttributes(Map.of(
                         ENTER_DETAILS_MODEL_ATTR, enterDetails,
                         PENALTY_REFERENCE_STARTS_WITH_ATTR, penaltyReferenceStartsWith));
                 serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
+            } else {
+                serviceResponse.setUrl(REDIRECT_URL_PREFIX
+                        + penaltyConfigurationProperties.getUnscheduledServiceDownPath());
             }
         }
 
@@ -118,14 +118,19 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
             String companyNumber = companyService.appendToCompanyNumber(
                     enterDetails.getCompanyNumber().toUpperCase());
             List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(
-                    companyNumber, penaltyRef);
+                    companyNumber, penaltyRef, enterDetails.getPenaltyReferenceType());
             getPostDetailsRedirectPath(penaltyAndCosts, companyNumber, penaltyRef, clazz)
                     .ifPresentOrElse(serviceResponse::setUrl, () -> {
                         String code = "details.penalty-details-not-found-error."
-                                + enterDetails.getPenaltyReferenceName();
+                                + enterDetails.getPenaltyReferenceType();
                         serviceResponse.setErrorRequestMsg(
                                 messageSource.getMessage(code, null, UK));
-                        serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
+                        try {
+                            serviceResponse.setBaseModelAttributes(createBaseAttributesUpdate());
+                        } catch (ServiceException e) {
+                            serviceResponse.setUrl(REDIRECT_URL_PREFIX
+                                    + penaltyConfigurationProperties.getUnscheduledServiceDownPath());
+                        }
                     });
         }
 
@@ -200,14 +205,14 @@ public class PenaltyDetailsServiceImpl implements PenaltyDetailsService {
         return "/pay-penalty/company/" + companyNumber + "/penalty/" + penaltyRef;
     }
 
-    private String getBackLink() {
-        if (TRUE.equals(featureFlagChecker.isPenaltyRefEnabled(SANCTIONS))) {
+    private String getBackLink() throws ServiceException {
+        if (penaltyReferenceTypes.isPenaltyReferenceStartsWithEnabled(SANCTIONS.getStartsWith())) {
             return penaltyConfigurationProperties.getRefStartsWithPath();
         }
         return penaltyConfigurationProperties.getStartPath();
     }
 
-    private Map<String, String> createBaseAttributesUpdate() {
+    private Map<String, String> createBaseAttributesUpdate() throws ServiceException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put(SIGN_OUT_URL_ATTR, penaltyConfigurationProperties.getSignOutPath());
         attributes.put(BACK_LINK_URL_ATTR, getBackLink());

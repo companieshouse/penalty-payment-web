@@ -5,7 +5,7 @@ import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 
 public interface ViewPenaltiesService {
 
-    PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef) throws IllegalArgumentException, ServiceException;
+    PPSServiceResponse viewPenalties(String companyNumber, String penaltyRef) throws ServiceException;
 
     String postViewPenalties(String companyNumber, String penaltyRef) throws ServiceException;
 }

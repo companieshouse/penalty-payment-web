@@ -44,9 +44,9 @@ import static uk.gov.companieshouse.api.model.financialpenalty.PayableStatus.OPE
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.OTHER_TYPE;
 import static uk.gov.companieshouse.web.pps.service.penaltypayment.impl.PenaltyPaymentServiceImpl.PENALTY_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.COMPANY_NUMBER;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.LATE_FILING_PENALTY_REFERENCE_TYPE;
 import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.PENALTY_REF;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.LATE_FILING;
-import static uk.gov.companieshouse.web.pps.util.PenaltyReference.SANCTIONS;
+import static uk.gov.companieshouse.web.pps.util.PPSTestUtility.SANCTIONS_PENALTY_REFERENCE_TYPE;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -84,10 +84,10 @@ class PenaltyPaymentServiceImplTest {
     private static final String PENALTY_REF_TWO = "A0000001";
 
     private static final String GET_FINANCIAL_PENALTIES_LATE_FILING_URI =
-            "/company/" + COMPANY_NUMBER + "/penalties/" + LATE_FILING;
+            "/company/" + COMPANY_NUMBER + "/penalties/" + LATE_FILING_PENALTY_REFERENCE_TYPE;
 
     private static final String GET_FINANCIAL_PENALTIES_SANCTIONS_URI =
-            "/company/" + COMPANY_NUMBER + "/penalties/" + SANCTIONS;
+            "/company/" + COMPANY_NUMBER + "/penalties/" + SANCTIONS_PENALTY_REFERENCE_TYPE;
 
     private static final String GET_FINANCE_HEALTHCHECK_URI = "/penalty-payment-api/healthcheck/finance-system";
 
@@ -124,7 +124,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<FinancialPenalty> payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE);
 
         assertEquals(1, payableFinancialPenalties.size());
         assertEquals(validFinancialPenalty, payableFinancialPenalties.getFirst());
@@ -151,12 +151,12 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<FinancialPenalty> payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF_TWO);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF_TWO, LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertEquals(1, payableFinancialPenalties.size());
         assertEquals(validLateFilingPenalty2, payableFinancialPenalties.getFirst());
 
         payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertEquals(1, payableFinancialPenalties.size());
         assertEquals(validLateFilingPenalty1, payableFinancialPenalties.getFirst());
     }
@@ -177,19 +177,19 @@ class PenaltyPaymentServiceImplTest {
 
         when(responseWithData.getData()).thenReturn(financialPenaltiesResponse);
 
-        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A1234567");
+        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A1234567", LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 150, LATE_FILING_OF_ACCOUNTS_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000003");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000003", LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 1210, LATE_FILING_OF_ACCOUNTS_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000004");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000004", LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 750, LATE_FILING_OF_ACCOUNTS_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000002");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000002", LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 0, LATE_FILING_OF_ACCOUNTS_REASON, CLOSED);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000001");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "A0000001", LATE_FILING_PENALTY_REFERENCE_TYPE);
         assertEquals(3, penaltyAndCosts.size());
         final var penalty = penaltyAndCosts.getFirst();
         assertEquals(3000, penalty.getOutstanding());
@@ -226,19 +226,19 @@ class PenaltyPaymentServiceImplTest {
 
         when(responseWithData.getData()).thenReturn(financialPenaltiesResponse);
 
-        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P1234567");
+        List<FinancialPenalty> penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P1234567", SANCTIONS_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 250, FAILURE_TO_FILE_A_CONFIRMATION_STATEMENT_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000600");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000600", SANCTIONS_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 600, FAILURE_TO_FILE_A_CONFIRMATION_STATEMENT_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000601");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000601", SANCTIONS_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 601, FAILURE_TO_FILE_A_CONFIRMATION_STATEMENT_REASON, OPEN);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000602");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000602", SANCTIONS_PENALTY_REFERENCE_TYPE);
         assertSinglePenalty(penaltyAndCosts, 0, FAILURE_TO_FILE_A_CONFIRMATION_STATEMENT_REASON, CLOSED);
 
-        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000603");
+        penaltyAndCosts = penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, "P0000603", SANCTIONS_PENALTY_REFERENCE_TYPE);
         assertEquals(2, penaltyAndCosts.size());
         final var penalty = penaltyAndCosts.getFirst();
         assertEquals(603, penalty.getOutstanding());
@@ -277,7 +277,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<FinancialPenalty> payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE);
 
         assertEquals(0, payableFinancialPenalties.size());
     }
@@ -288,7 +288,7 @@ class PenaltyPaymentServiceImplTest {
             throws ServiceException, ApiErrorResponseException, URIValidationException {
         when(apiClient.financialPenalty()).thenReturn(financialPenaltyResourceHandler);
 
-        String uri = "/company/" + COMPANY_NUMBER + "/penalties/" + LATE_FILING;
+        String uri = "/company/" + COMPANY_NUMBER + "/penalties/" + LATE_FILING_PENALTY_REFERENCE_TYPE;
         FinancialPenalty paidFinancialPenalty = PPSTestUtility.paidFinancialPenalty(
                 PENALTY_REF, now().minusYears(1).toString());
 
@@ -300,7 +300,7 @@ class PenaltyPaymentServiceImplTest {
         );
 
         List<FinancialPenalty> payableFinancialPenalties =
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF_TWO);
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF_TWO, LATE_FILING_PENALTY_REFERENCE_TYPE);
 
         assertEquals(0, payableFinancialPenalties.size());
     }
@@ -315,7 +315,7 @@ class PenaltyPaymentServiceImplTest {
         when(financialPenaltiesGet.execute()).thenThrow(ApiErrorResponseException.class);
 
         assertThrows(ServiceException.class, () ->
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF));
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE));
     }
 
     @Test
@@ -328,14 +328,7 @@ class PenaltyPaymentServiceImplTest {
         when(financialPenaltiesGet.execute()).thenThrow(URIValidationException.class);
 
         assertThrows(ServiceException.class, () ->
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF));
-    }
-
-    @Test
-    @DisplayName("Get payable financial penalties - Throws IllegalArgumentException when penalty reference is invalid")
-    void getPayableFinancialPenaltiesThrowsIllegalArgumentExceptionWhenPenaltyReferenceIsInvalid() {
-        assertThrows(ServiceException.class, () ->
-                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, ""));
+                penaltyPaymentService.getFinancialPenalties(COMPANY_NUMBER, PENALTY_REF, LATE_FILING_PENALTY_REFERENCE_TYPE));
     }
 
     @Test
