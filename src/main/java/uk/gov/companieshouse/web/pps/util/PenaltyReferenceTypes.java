@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Comparator.comparing;
+
 @Component
 public class PenaltyReferenceTypes {
 
@@ -28,6 +30,7 @@ public class PenaltyReferenceTypes {
                         var enabledTo = penaltyReferenceType.getEnabledTo();
                         return enabledTo == null || now.isBefore(enabledTo);
                     })
+                    .sorted(comparing(PenaltyReferenceType::getReferenceStartsWith))
                     .toList();
     }
 
