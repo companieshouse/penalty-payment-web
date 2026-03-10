@@ -26,6 +26,7 @@
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.11</sdk-manager-java.version>
         <api-sdk-java.version>6.5.0</api-sdk-java.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
         <spring-boot-dependencies.version>3.5.8</spring-boot-dependencies.version>
@@ -200,6 +201,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
