@@ -17,19 +17,19 @@
         <structured-logging.version>3.0.42</structured-logging.version>
         <log4j-bom.version>2.24.3</log4j-bom.version>
         <common-web-java.version>4.1.0</common-web-java.version>
-        <java-session-handler.version>4.1.12</java-session-handler.version>
+        <java-session-handler.version>4.1.15</java-session-handler.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <!-- CVE-2025-48924 -->
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <web-security-java.version>3.1.6</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
-        <sdk-manager-java.version>3.0.11</sdk-manager-java.version>
+        <sdk-manager-java.version>3.0.14</sdk-manager-java.version>
         <api-sdk-java.version>6.5.0</api-sdk-java.version>
         <assertj-core.version>3.27.7</assertj-core.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.5.8</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>3.5.11</spring-boot-dependencies.version>
         <spring-boot-maven-plugin.version>3.5.8</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
@@ -196,6 +196,12 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <!-- Addresses CVE-2025-68161 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.25.3</version>
         </dependency>
         <!-- Test scope -->
         <dependency>
