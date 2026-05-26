@@ -120,10 +120,10 @@
                 <p class="govuk-body">
                     You can use this service again to
                     <a id="penalty-ref-starts-with-link"
-                       th:href="${@environment.getProperty('penalty.ref-starts-with-url')}"
+                       th:href="${payAnotherPenaltyUrl}"
                        class="govuk-link"
                        data-event-id="Pay another penalty link"
-                       th:onclick="_paq.push(['trackGoal', [[${@environment.getProperty('matomo.pay-another-penalty-goal-id')}]]]);">
+                       th:onclick="|_paq.push(['trackGoal', ${payAnotherPenaltyGoalId}]);|">
                     pay another penalty</a>.
                 </p>
                 <br><br>
