@@ -15,6 +15,7 @@ import uk.gov.companieshouse.web.pps.service.confirmation.ConfirmationService;
 import uk.gov.companieshouse.web.pps.service.navigation.NavigatorService;
 import uk.gov.companieshouse.web.pps.service.response.PPSServiceResponse;
 import uk.gov.companieshouse.web.pps.session.SessionService;
+import org.springframework.beans.factory.annotation.Value;
 
 import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 import static uk.gov.companieshouse.web.pps.service.ServiceConstants.SIGN_OUT_URL_ATTR;
@@ -26,6 +27,12 @@ public class ConfirmationController extends BaseController {
     static final String CONFIRMATION_PAGE_TEMPLATE_NAME = "pps/confirmationPage";
 
     private final ConfirmationService confirmationService;
+
+    @Value("${penalty.ref-starts-with-url}")
+    private String payAnotherPenaltyUrl;
+
+    @Value("${matomo.pay-another-penalty-goal-id}")
+    private Integer payAnotherPenaltyGoalId;
 
     public ConfirmationController(
             NavigatorService navigatorService,
@@ -73,6 +80,9 @@ public class ConfirmationController extends BaseController {
                             model,
                             sessionService.getSessionDataFromContext(),
                             serviceResponse.getBaseModelAttributes().get().get(SIGN_OUT_URL_ATTR)));
+
+            model.addAttribute("payAnotherPenaltyUrl", payAnotherPenaltyUrl);
+            model.addAttribute("payAnotherPenaltyGoalId", payAnotherPenaltyGoalId);
 
             return serviceResponse.getUrl().orElse(getTemplateName());
 
