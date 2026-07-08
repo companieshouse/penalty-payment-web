@@ -21,6 +21,11 @@ In order to run this Web App locally you will need to install:
 1. Run `make`
 1. Run `./start.sh`
 
+### Run in Docker Chs Development
+
+1. chs-dev modules enable lfp-appeals
+2. [Optional] chs-dev development enable penalty-payment-web
+3. chs-dev up
 
 ### Configuration
 
@@ -82,6 +87,7 @@ This is done by calling a [module](https://github.com/companieshouse/terraform-m
 ### Testing
 - Ensure the terraform runner local plan executes without issues. For information on terraform runners please see the [Terraform Runner Quickstart guide](https://companieshouse.atlassian.net/wiki/spaces/DEVOPS/pages/1694236886/Terraform+Runner+Quickstart).
 - If you encounter any issues or have questions, reach out to the team on the **#platform** slack channel.
+- Test Data for penalties: https://companieshouse.atlassian.net/wiki/spaces/NS/pages/5351702653/PPS+Test+Data
 
 ### Vault Configuration Updates
 - Any secrets required for this service will be stored in Vault. For any updates to the Vault configuration, please consult with the **#platform** team and submit a workflow request.
