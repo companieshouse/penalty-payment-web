@@ -14,25 +14,23 @@
     </parent>
     <properties>
         <java.version>21</java.version>
-        <structured-logging.version>3.0.55</structured-logging.version>
+        <structured-logging.version>3.0.57</structured-logging.version>
         <log4j-bom.version>2.25.4</log4j-bom.version>
         <common-web-java.version>4.1.5</common-web-java.version>
-        <java-session-handler.version>4.1.15</java-session-handler.version>
-        <commons-beanutils.version>1.11.0</commons-beanutils.version>
-        <!-- CVE-2025-48924 -->
+        <java-session-handler.version>4.1.22</java-session-handler.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <web-security-java.version>3.1.6</web-security-java.version>
         <junit-jupiter-engine.version>5.11.4</junit-jupiter-engine.version>
         <mockito-junit-jupiter.version>5.15.2</mockito-junit-jupiter.version>
         <sdk-manager-java.version>3.0.14</sdk-manager-java.version>
-        <api-sdk-java.version>6.5.0</api-sdk-java.version>
+        <api-sdk-java.version>6.6.23</api-sdk-java.version>
         <assertj-core.version>3.27.7</assertj-core.version>
         <!-- Add Tomcat version property for consistent override -->
-        <tomcat.version>10.1.55</tomcat.version>
+        <tomcat.version>10.1.56</tomcat.version>
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
-        <spring-boot-dependencies.version>3.5.14</spring-boot-dependencies.version>
-        <spring-boot-maven-plugin.version>3.5.14</spring-boot-maven-plugin.version>
+        <spring-boot-dependencies.version>3.5.16</spring-boot-dependencies.version>
+        <spring-boot-maven-plugin.version>3.5.16</spring-boot-maven-plugin.version>
 
         <json.version>20241224</json.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
@@ -70,50 +68,32 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--Temporary managed transitive dependency remove once spring-boot.version >= 3.5.16-->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <!--Temporary managed transitive dependency remove once uk.gov.companieshouse:structured-logging >= 3.0.57-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.semconv</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>1.42.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <!--the following transitive dependencies are added specifically to avoid vulnerabilities-->
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>${commons-beanutils.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
-        </dependency>
-        <!--
-            TEMPORARY FIX: Override Tomcat dependencies to ${tomcat.version} to 
-            remediate CVEs (CVE-2026-43515,CVE-2026-43514, CVE-2026-43513, CVE-2026-43512,
-             CVE-2026-42498,CVE-2026-41293, CVE-2026-41284).
-            Remove these overrides when the Spring Boot BOM manages a secure version.
-        -->
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-websocket</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-el</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>
-        <!--end transitive dependencies-->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -160,12 +140,6 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>java-session-handler</artifactId>
             <version>${java-session-handler.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -204,12 +178,6 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-java</artifactId>
             <version>${api-sdk-java.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Security dependencies -->
         <dependency>
@@ -219,12 +187,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-        </dependency>
-        <!-- Addresses CVE-2025-68161 -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.25.4</version>
         </dependency>
         <!-- Test scope -->
         <dependency>
