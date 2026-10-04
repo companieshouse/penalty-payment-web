@@ -29,7 +29,7 @@
         <tomcat.version>10.1.57</tomcat.version>
         <opentelemetry-semconv.version>1.42.0</opentelemetry-semconv.version>
         <opentelemetry.version>2.31.0</opentelemetry.version>
-        <jackson-databind.version>2.21.5</jackson-databind.version>
+        <jackson-databind.version>2.21.7</jackson-databind.version>
 
 
         <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
