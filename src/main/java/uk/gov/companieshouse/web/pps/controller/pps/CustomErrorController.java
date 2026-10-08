@@ -1,7 +1,7 @@
 package uk.gov.companieshouse.web.pps.controller.pps;
 
 import jakarta.servlet.RequestDispatcher;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.boot.webmvc.error.ErrorController;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
