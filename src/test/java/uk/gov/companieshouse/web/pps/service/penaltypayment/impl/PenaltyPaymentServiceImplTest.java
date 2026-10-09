@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.web.pps.service.penaltypayment.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Objects;
+import tools.jackson.databind.ObjectMapper;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,8 +167,12 @@ class PenaltyPaymentServiceImplTest {
     void getPayableFinancialPenaltiesWithMultiplePayableLateFiling() throws IOException, URIValidationException, ServiceException {
 
         FinancialPenalties financialPenaltiesResponse = new ObjectMapper().readValue(
-                this.getClass().getClassLoader().getResource("company_12345678_penalties_LATE_FILING_response.json"),
-                FinancialPenalties.class);
+            Objects.requireNonNull(
+                this.getClass()
+                    .getClassLoader()
+                    .getResource("company_12345678_penalties_LATE_FILING_response.json"))
+                    .openStream(),
+                    FinancialPenalties.class);
         assertNotNull(financialPenaltiesResponse.getItems());
 
         when(apiClient.financialPenalty()).thenReturn(financialPenaltyResourceHandler);
@@ -215,8 +220,13 @@ class PenaltyPaymentServiceImplTest {
     void getPayableFinancialPenaltiesWithMultiplePayableSanctions() throws IOException, URIValidationException, ServiceException {
 
         FinancialPenalties financialPenaltiesResponse = new ObjectMapper().readValue(
-                this.getClass().getClassLoader().getResource("company_12345678_penalties_SANCTIONS_response.json"),
-                FinancialPenalties.class);
+            Objects.requireNonNull(
+                this.getClass()
+                .getClassLoader()
+                .getResource("company_12345678_penalties_SANCTIONS_response.json"))
+                .openStream(),
+                FinancialPenalties.class
+        );
         assertNotNull(financialPenaltiesResponse.getItems());
 
         when(apiClient.financialPenalty()).thenReturn(financialPenaltyResourceHandler);
